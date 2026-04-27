@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, styles } from '../styles/MusicScreen.styles';
 
 const SearchIcon = ({ color }: { color: string }) => (
@@ -100,6 +101,7 @@ const recent = [
 ];
 
 const MusicScreen = () => {
+  const navigation = useNavigation<any>();
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeMood, setActiveMood] = useState('Calm');
   const [isPlaying, setIsPlaying] = useState(true);
@@ -257,13 +259,19 @@ const MusicScreen = () => {
       <View style={styles.bottomDock}>
         <View style={styles.miniPlayer}>
           <View style={styles.miniPlayerInner}>
-            <View style={styles.miniThumb} />
-            <View style={styles.miniInfo}>
-              <Text style={styles.miniTitle} numberOfLines={1}>
-                Himalayan Dawn — Sitar...
-              </Text>
-              <Text style={styles.miniSub}>Sleep · 18:24</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.miniTapTarget}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('NowPlaying')}
+            >
+              <View style={styles.miniThumb} />
+              <View style={styles.miniInfo}>
+                <Text style={styles.miniTitle} numberOfLines={1}>
+                  Himalayan Dawn — Sitar...
+                </Text>
+                <Text style={styles.miniSub}>Sleep · 18:24</Text>
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.miniIconBtn} activeOpacity={0.7}>
               <PrevIcon color={COLORS.textPrimary} />
             </TouchableOpacity>

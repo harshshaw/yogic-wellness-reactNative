@@ -328,6 +328,13 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
 
+  miniTapTarget: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+
   miniThumb: {
     width: 40,
     height: 40,
