@@ -1,0 +1,15 @@
+export const COLORS = {
+  primaryGold: '#D4AF37',
+  deepBrown: '#1C140F',
+  cardBrown: '#2A1F17',
+  cardBrownLight: '#33261B',
+  warmBeige: '#F5E7C1',
+  sageGreen: '#7A8F6A',
+  sunsetOrange: '#FF8A3D',
+  mutedTeal: '#4E7C74',
+  softCream: '#FFF7E6',
+  textPrimary: '#F5E7C1',
+  textSecondary: '#A8977A',
+  lavender: '#B8A4D9',
+  rose: '#D9A4B8',
+};

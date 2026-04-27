@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../styles/colors';
 
-const ProfileScreen = () => {
+const ProgressScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.overline}>SEEKER</Text>
-      <Text style={styles.title}>Profile</Text>
-      <Text style={styles.body}>Account, achievements, and settings — coming soon.</Text>
+      <Text style={styles.overline}>YOUR JOURNEY</Text>
+      <Text style={styles.title}>Progress</Text>
+      <Text style={styles.body}>Streaks, sessions, and milestones — coming soon.</Text>
     </View>
   );
 };
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default ProgressScreen;

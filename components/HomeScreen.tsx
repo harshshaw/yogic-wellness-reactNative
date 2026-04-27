@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,25 +8,6 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
-
-type TabKey = 'Home' | 'Yoga' | 'Diet' | 'Progress' | 'Profile';
-
-const TabIcon = ({ tab, color }: { tab: TabKey; color: string }) => {
-  const paths: Record<TabKey, string> = {
-    Home: 'M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5z',
-    Yoga: 'M12 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-7 8c0-1 1-2 2-2h10c1 0 2 1 2 2s-1 2-2 2h-3l2 6h-2l-2-5-2 5H8l2-6H7c-1 0-2-1-2-2z',
-    Diet: 'M12 2c-1 3-3 4-3 7 0 2 1 4 3 4s3-2 3-4c0-3-2-4-3-7zm-6 9c0 5 3 11 6 11s6-6 6-11c-2 1-4 2-6 2s-4-1-6-2z',
-    Progress:
-      'M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z',
-    Profile:
-      'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 5v3h16v-3c0-3.3-4.7-5-8-5z',
-  };
-  return (
-    <Svg width={22} height={22} viewBox="0 0 24 24">
-      <Path d={paths[tab]} fill={color} />
-    </Svg>
-  );
-};
 
 const MenuIcon = ({ color }: { color: string }) => (
   <Svg width={26} height={26} viewBox="0 0 24 24">
@@ -143,14 +124,11 @@ const StatRing = ({ value, label, sub, color, progress, Icon }: StatRingProps) =
 };
 
 const HomeScreen = () => {
-  const [activeTab, setActiveTab] = useState<TabKey>('Home');
-  const tabs: TabKey[] = ['Home', 'Yoga', 'Diet', 'Progress', 'Profile'];
-
   return (
     <View style={styles.container}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 110 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HEADER WITH GURU IMAGE */}
@@ -247,25 +225,6 @@ const HomeScreen = () => {
           </View>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* BOTTOM NAVIGATION */}
-      <View style={styles.bottomNav}>
-        {tabs.map(tab => {
-          const isActive = activeTab === tab;
-          const color = isActive ? COLORS.primaryGold : COLORS.textSecondary;
-          return (
-            <TouchableOpacity
-              key={tab}
-              style={styles.navButton}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab(tab)}
-            >
-              <TabIcon tab={tab} color={color} />
-              <Text style={[styles.navLabel, { color }]}>{tab}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
     </View>
   );
 };

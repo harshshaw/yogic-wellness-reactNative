@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Splash: undefined;
-  Home: undefined;
+  Main: undefined;
 };
 
 const SplashScreen = () => {
@@ -13,7 +13,7 @@ const SplashScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate("Home");
+      navigation.replace("Main");
     }, 3000); // 3 seconds
 
     return () => clearTimeout(timer);

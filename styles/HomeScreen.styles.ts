@@ -1,17 +1,7 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from './colors';
 
-export const COLORS = {
-  primaryGold: '#D4AF37',
-  deepBrown: '#1C140F',
-  cardBrown: '#2A1F17',
-  warmBeige: '#F5E7C1',
-  sageGreen: '#7A8F6A',
-  sunsetOrange: '#FF8A3D',
-  mutedTeal: '#4E7C74',
-  softCream: '#FFF7E6',
-  textPrimary: '#F5E7C1',
-  textSecondary: '#A8977A',
-};
+export { COLORS };
 
 export const styles = StyleSheet.create({
   container: {

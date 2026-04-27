@@ -3,7 +3,25 @@
     "name": "YogicWellness",
     "slug": "yogicwellness",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"],
-    "platforms": ["ios", "android", "web"]
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1c36a2b4-712b-468b-b4b3-4cb35dc98a2e"
+      }
+    },
+    "owner": "harsshaw",
+    "runtimeVersion": "exposdk:54.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/1c36a2b4-712b-468b-b4b3-4cb35dc98a2e"
+    },
+    "android": {},
+    "ios": {}
   }
 }
