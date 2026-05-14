@@ -8,6 +8,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, styles } from '../styles/MusicScreen.styles';
+import { useAppMusic } from '../hooks/useAppMusic';
 
 const SearchIcon = ({ color }: { color: string }) => (
   <Svg width={18} height={18} viewBox="0 0 24 24">
@@ -102,9 +103,9 @@ const recent = [
 
 const MusicScreen = () => {
   const navigation = useNavigation<any>();
+  const { isTrackPlaying, toggleTrack, playTrack } = useAppMusic();
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeMood, setActiveMood] = useState('Calm');
-  const [isPlaying, setIsPlaying] = useState(true);
 
   return (
     <View style={styles.container}>
@@ -186,6 +187,7 @@ const MusicScreen = () => {
               key={card.id}
               style={styles.featuredCard}
               activeOpacity={0.85}
+              onPress={playTrack}
             >
               <View style={styles.featuredTop}>
                 <Text style={styles.featuredImageLabel}>{card.id}</Text>
@@ -277,10 +279,10 @@ const MusicScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.miniPlayBtn}
-              onPress={() => setIsPlaying(p => !p)}
+              onPress={toggleTrack}
               activeOpacity={0.85}
             >
-              {isPlaying ? (
+              {isTrackPlaying ? (
                 <PauseIcon color={COLORS.deepBrown} size={16} />
               ) : (
                 <PlayIcon color={COLORS.deepBrown} size={16} />

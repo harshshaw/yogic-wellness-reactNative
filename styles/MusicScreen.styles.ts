@@ -306,12 +306,12 @@ export const styles = StyleSheet.create({
     fontSize: 11,
   },
 
-  // MINI PLAYER (positioned above the tab bar)
+  // MINI PLAYER (sits flush against the top of the tab bar)
   bottomDock: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 80,
+    bottom: 0,
   },
 
   miniPlayer: {

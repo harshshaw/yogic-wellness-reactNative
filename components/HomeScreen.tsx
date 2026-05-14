@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
+import { useAppMusic } from '../hooks/useAppMusic';
 
 const MenuIcon = ({ color }: { color: string }) => (
   <Svg width={26} height={26} viewBox="0 0 24 24">
@@ -15,13 +16,27 @@ const MenuIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const BellIcon = ({ color }: { color: string }) => (
-  <Svg width={24} height={24} viewBox="0 0 24 24">
+const SoundOnIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
     <Path
-      d="M12 22a2.5 2.5 0 0 0 2.5-2.5h-5A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5.5-6.83V3.5a1.5 1.5 0 1 0-3 0v.67A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"
+      d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a4 4 0 0 1 0 7M19 5a9 9 0 0 1 0 14"
       stroke={color}
-      strokeWidth={1.6}
+      strokeWidth={1.8}
       fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const SoundOffIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
+    <Path
+      d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+      stroke={color}
+      strokeWidth={1.8}
+      fill="none"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
   </Svg>
@@ -124,6 +139,7 @@ const StatRing = ({ value, label, sub, color, progress, Icon }: StatRingProps) =
 };
 
 const HomeScreen = () => {
+  const { muted, toggleMuted } = useAppMusic();
   return (
     <View style={styles.container}>
       <ScrollView
@@ -143,8 +159,12 @@ const HomeScreen = () => {
             <TouchableOpacity activeOpacity={0.7}>
               <MenuIcon color={COLORS.deepBrown} />
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7}>
-              <BellIcon color={COLORS.deepBrown} />
+            <TouchableOpacity activeOpacity={0.7} onPress={toggleMuted}>
+              {muted ? (
+                <SoundOffIcon color={COLORS.deepBrown} />
+              ) : (
+                <SoundOnIcon color={COLORS.deepBrown} />
+              )}
             </TouchableOpacity>
           </View>
 

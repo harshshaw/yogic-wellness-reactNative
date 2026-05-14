@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, styles } from '../styles/NowPlayingScreen.styles';
+import { useAppMusic } from '../hooks/useAppMusic';
 
 const ChevronDownIcon = ({ color }: { color: string }) => (
   <Svg width={18} height={18} viewBox="0 0 24 24">
@@ -190,7 +191,7 @@ const upNext = [
 
 const NowPlayingScreen = () => {
   const navigation = useNavigation();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const { isTrackPlaying, toggleTrack } = useAppMusic();
   const [liked, setLiked] = useState(false);
 
   return (
@@ -257,9 +258,9 @@ const NowPlayingScreen = () => {
           <TouchableOpacity
             style={styles.playBtn}
             activeOpacity={0.85}
-            onPress={() => setIsPlaying(p => !p)}
+            onPress={toggleTrack}
           >
-            {isPlaying ? (
+            {isTrackPlaying ? (
               <PauseIcon color={COLORS.primaryGold} size={20} />
             ) : (
               <PlayIcon color={COLORS.primaryGold} size={20} />
