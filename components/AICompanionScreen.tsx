@@ -13,8 +13,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
 import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target } from './Icons';
+import { sendToCompanion, type CompanionMode } from '../lib/aiCompanion';
 
-type Mode = 'Pranayama Guru' | 'Gita Companion' | 'Sleep Guide' | 'Confidence Coach';
+type Mode = CompanionMode;
 type Msg = { from: 'ai' | 'user'; text: string; cite?: string; time: string };
 
 const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: string[] }> = {
@@ -44,39 +45,8 @@ const modeIcons: Record<Mode, any> = {
   'Confidence Coach': Target,
 };
 
-const replyFor = (mode: Mode, _userText: string): Msg => {
-  const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  switch (mode) {
-    case 'Pranayama Guru':
-      return {
-        from: 'ai',
-        text: 'Let’s do three rounds of 4-7-8. Inhale four, hold seven, exhale eight. I’ll wait with you.',
-        time: t,
-      };
-    case 'Gita Companion':
-      return {
-        from: 'ai',
-        text:
-          'The arrow you loose well is yours; where it lands is not. Do the work fully, then release the outcome.',
-        cite: 'Gita-inspired · 2.47',
-        time: t,
-      };
-    case 'Sleep Guide':
-      return {
-        from: 'ai',
-        text:
-          'Let the day be the day. Eyes soft. Jaw soft. One long out-breath, then another.',
-        time: t,
-      };
-    case 'Confidence Coach':
-      return {
-        from: 'ai',
-        text:
-          'Naming it is the hardest part — you already did that. Pick one small action you can finish today.',
-        time: t,
-      };
-  }
-};
+const timeStamp = () =>
+  new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 const AICompanionScreen = () => {
   const navigation = useNavigation();
@@ -87,24 +57,45 @@ const AICompanionScreen = () => {
   const Icon = modeIcons[mode];
 
   const [messages, setMessages] = useState<Msg[]>(() => [
-    {
-      from: 'ai',
-      text: intro.open,
-      cite: intro.cite,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
+    { from: 'ai', text: intro.open, cite: intro.cite, time: timeStamp() },
   ]);
   const [draft, setDraft] = useState('');
+  const [pending, setPending] = useState(false);
 
-  const send = (forced?: string) => {
+  const send = async (forced?: string) => {
     const text = (forced ?? draft).trim();
-    if (!text) return;
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setMessages(m => [...m, { from: 'user', text, time }]);
+    if (!text || pending) return;
+
+    const userMsg: Msg = { from: 'user', text, time: timeStamp() };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
     setDraft('');
-    setTimeout(() => {
-      setMessages(m => [...m, replyFor(mode, text)]);
-    }, 600);
+    setPending(true);
+
+    try {
+      const apiMessages = nextMessages.map(m => ({
+        role: (m.from === 'ai' ? 'assistant' : 'user') as 'assistant' | 'user',
+        content: m.text,
+      }));
+      const reply = await sendToCompanion(mode, apiMessages);
+      const cite =
+        reply.citations.length > 0
+          ? reply.citations.map(c => c.ref).join(' · ')
+          : undefined;
+      setMessages(m => [...m, { from: 'ai', text: reply.content, cite, time: timeStamp() }]);
+    } catch (err: any) {
+      setMessages(m => [
+        ...m,
+        {
+          from: 'ai',
+          text:
+            'I couldn’t reach the companion just now. Take a slow breath — try again in a moment.',
+          time: timeStamp(),
+        },
+      ]);
+    } finally {
+      setPending(false);
+    }
   };
 
   const hasUser = useMemo(() => messages.some(m => m.from === 'user'), [messages]);
@@ -155,6 +146,13 @@ const AICompanionScreen = () => {
             </View>
           )
         )}
+        {pending && (
+          <View style={styles.aiBubble}>
+            <Text style={[styles.aiText, { color: COLORS.textSecondary }]}>
+              breathing in…
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       {/* SUGGESTIONS (before user has typed) */}
@@ -190,7 +188,12 @@ const AICompanionScreen = () => {
           style={styles.input}
           onSubmitEditing={() => send()}
         />
-        <TouchableOpacity style={styles.sendBtn} onPress={() => send()} activeOpacity={0.85}>
+        <TouchableOpacity
+          style={[styles.sendBtn, pending && { opacity: 0.5 }]}
+          onPress={() => send()}
+          activeOpacity={0.85}
+          disabled={pending}
+        >
           <Send size={18} color={COLORS.deepBrown} />
         </TouchableOpacity>
       </View>

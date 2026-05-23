@@ -1,0 +1,182 @@
+[
+  {
+    "ref": "BG 2.14",
+    "topic": "impermanence",
+    "sanskrit": "मात्रास्पर्शास्तु कौन्तेय शीतोष्णसुखदुःखदाः। आगमापायिनोऽनित्यास्तांस्तितिक्षस्व भारत॥",
+    "transliteration": "mātrā-sparśās tu kaunteya śītoṣṇa-sukha-duḥkha-dāḥ āgamāpāyino 'nityās tāṁs titikṣasva bhārata",
+    "english": "Heat and cold, pleasure and pain are temporary. They come and go. Endure them.",
+    "context": "Krishna reminds Arjuna that sensations and emotions arise and pass. The wise person does not get swept away by either.",
+    "themes": ["impermanence", "emotion regulation", "discomfort", "patience", "endurance"]
+  },
+  {
+    "ref": "BG 2.20",
+    "topic": "self",
+    "sanskrit": "न जायते म्रियते वा कदाचिन्नायं भूत्वा भविता वा न भूयः। अजो नित्यः शाश्वतोऽयं पुराणो न हन्यते हन्यमाने शरीरे॥",
+    "transliteration": "na jāyate mriyate vā kadācin nāyaṁ bhūtvā bhavitā vā na bhūyaḥ",
+    "english": "The self is never born and never dies. Unborn, eternal, ancient — it is not slain when the body is slain.",
+    "context": "On the indestructibility of the true self. Used to soften fear of death, loss, and identity threats.",
+    "themes": ["death", "identity", "fear", "self", "eternity"]
+  },
+  {
+    "ref": "BG 2.47",
+    "topic": "karma-yoga",
+    "sanskrit": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
+    "transliteration": "karmaṇy evādhikāras te mā phaleṣu kadācana mā karma-phala-hetur bhūr mā te saṅgo 'stv akarmaṇi",
+    "english": "You have the right to perform your action, but never to its fruits. Do not be motivated by results, nor be attached to inaction.",
+    "context": "The most famous verse on detached action. Effort is yours, outcomes are not. Counsel for missed goals, perfectionism, anxiety about results.",
+    "themes": ["effort vs outcome", "detachment", "anxiety about results", "missed goals", "perfectionism", "action"]
+  },
+  {
+    "ref": "BG 2.48",
+    "topic": "equanimity",
+    "sanskrit": "योगस्थः कुरु कर्माणि सङ्गं त्यक्त्वा धनञ्जय। सिद्ध्यसिद्ध्योः समो भूत्वा समत्वं योग उच्यते॥",
+    "transliteration": "yoga-sthaḥ kuru karmāṇi saṅgaṁ tyaktvā dhanañjaya siddhy-asiddhyoḥ samo bhūtvā samatvaṁ yoga ucyate",
+    "english": "Steady in yoga, perform your duty. Let go of attachment. Be even in success and failure — this evenness is yoga.",
+    "context": "Equanimity as the foundation of right action. Useful for stress around stakes and outcomes.",
+    "themes": ["equanimity", "success and failure", "balance", "stress", "stakes"]
+  },
+  {
+    "ref": "BG 2.62-63",
+    "topic": "anger",
+    "sanskrit": "ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते। सङ्गात्संजायते कामः कामात्क्रोधोऽभिजायते॥",
+    "transliteration": "dhyāyato viṣayān puṁsaḥ saṅgas teṣūpajāyate saṅgāt saṁjāyate kāmaḥ kāmāt krodho 'bhijāyate",
+    "english": "Dwelling on objects of the senses breeds attachment. From attachment comes craving. From craving, anger. From anger, confusion. From confusion, loss of memory. From loss of memory, the ruin of reason.",
+    "context": "A psychological chain: rumination → craving → anger → confusion → collapse. Useful for understanding emotional escalation.",
+    "themes": ["anger", "rumination", "craving", "emotional escalation", "confusion"]
+  },
+  {
+    "ref": "BG 2.66",
+    "topic": "peace",
+    "sanskrit": "नास्ति बुद्धिरयुक्तस्य न चायुक्तस्य भावना। न चाभावयतः शान्तिरशान्तस्य कुतः सुखम्॥",
+    "transliteration": "nāsti buddhir ayuktasya na cāyuktasya bhāvanā na cābhāvayataḥ śāntir aśāntasya kutaḥ sukham",
+    "english": "Without a steady mind there is no clarity. Without clarity, no inner stillness. Without stillness, where is happiness?",
+    "context": "The cascade from steadiness to happiness. Used to motivate practice when the user feels unsettled.",
+    "themes": ["stillness", "happiness", "clarity", "steady mind", "practice motivation"]
+  },
+  {
+    "ref": "BG 3.5",
+    "topic": "action",
+    "sanskrit": "न हि कश्चित्क्षणमपि जातु तिष्ठत्यकर्मकृत्। कार्यते ह्यवशः कर्म सर्वः प्रकृतिगुणैः॥",
+    "transliteration": "na hi kaścit kṣaṇam api jātu tiṣṭhaty akarma-kṛt kāryate hy avaśaḥ karma sarvaḥ prakṛti-jair guṇaiḥ",
+    "english": "No one can remain truly inactive even for a moment. Everyone is compelled to act by the qualities of nature.",
+    "context": "On the inescapability of action — inaction itself is action. Useful for procrastination and avoidance.",
+    "themes": ["procrastination", "avoidance", "inaction", "action", "compulsion"]
+  },
+  {
+    "ref": "BG 4.7",
+    "topic": "dharma",
+    "sanskrit": "यदा यदा हि धर्मस्य ग्लानिर्भवति भारत। अभ्युत्थानमधर्मस्य तदात्मानं सृजाम्यहम्॥",
+    "transliteration": "yadā yadā hi dharmasya glānir bhavati bhārata abhyutthānam adharmasya tadātmānaṁ sṛjāmy aham",
+    "english": "Whenever dharma declines and adharma rises, I bring myself forth.",
+    "context": "Krishna's promise of renewal when balance is lost. Frame for self-renewal when life feels off-track.",
+    "themes": ["renewal", "rebalancing", "dharma", "off-track", "self-correction"]
+  },
+  {
+    "ref": "BG 5.22",
+    "topic": "pleasure",
+    "sanskrit": "ये हि संस्पर्शजा भोगा दुःखयोनय एव ते। आद्यन्तवन्तः कौन्तेय न तेषु रमते बुधः॥",
+    "transliteration": "ye hi saṁsparśa-jā bhogā duḥkha-yonaya eva te ādy-antavantaḥ kaunteya na teṣu ramate budhaḥ",
+    "english": "Pleasures born of sense contact are wombs of suffering. They have a beginning and an end. The wise do not delight in them.",
+    "context": "On the impermanent nature of sensory pleasure. Counsel for compulsive behavior and chasing highs.",
+    "themes": ["pleasure", "addiction", "chasing highs", "impermanence", "compulsion"]
+  },
+  {
+    "ref": "BG 6.5",
+    "topic": "self-reliance",
+    "sanskrit": "उद्धरेदात्मनात्मानं नात्मानमवसादयेत्। आत्मैव ह्यात्मनो बन्धुरात्मैव रिपुरात्मनः॥",
+    "transliteration": "uddhared ātmanātmānaṁ nātmānam avasādayet ātmaiva hy ātmano bandhur ātmaiva ripur ātmanaḥ",
+    "english": "Lift yourself by yourself. Do not let yourself sink. The self is its own friend, and the self is its own enemy.",
+    "context": "On personal responsibility for one's own state. Useful for moments of self-pity, self-sabotage, or victim mindset.",
+    "themes": ["self-reliance", "self-pity", "self-sabotage", "agency", "personal responsibility"]
+  },
+  {
+    "ref": "BG 6.16-17",
+    "topic": "moderation",
+    "sanskrit": "नात्यश्नतस्तु योगोऽस्ति न चैकान्तमनश्नतः। न चातिस्वप्नशीलस्य जाग्रतो नैव चार्जुन॥",
+    "transliteration": "nātyaśnatas tu yogo 'sti na caikāntam anaśnataḥ na cāti-svapna-śīlasya jāgrato naiva cārjuna",
+    "english": "Yoga is not for one who eats too much, nor too little. Not for one who sleeps too much, nor stays awake too long. Moderation in food, recreation, work and rest is the way.",
+    "context": "On moderation as the foundation of practice. Useful for sleep, diet, work-life balance.",
+    "themes": ["moderation", "balance", "sleep", "diet", "work-life balance", "overdoing"]
+  },
+  {
+    "ref": "BG 6.25",
+    "topic": "meditation",
+    "sanskrit": "शनैः शनैरुपरमेद्बुद्ध्या धृतिगृहीतया। आत्मसंस्थं मनः कृत्वा न किञ्चिदपि चिन्तयेत्॥",
+    "transliteration": "śanaiḥ śanair uparamed buddhyā dhṛti-gṛhītayā ātma-saṁsthaṁ manaḥ kṛtvā na kiñcid api cintayet",
+    "english": "Gradually, gradually still the mind, holding it with patient resolve. Settled in the self, think of nothing at all.",
+    "context": "On the slow patience of meditation practice. Useful for users frustrated they can't quiet their thoughts.",
+    "themes": ["meditation", "patience", "racing thoughts", "stillness", "slow progress"]
+  },
+  {
+    "ref": "BG 6.35",
+    "topic": "practice",
+    "sanskrit": "असंशयं महाबाहो मनो दुर्निग्रहं चलम्। अभ्यासेन तु कौन्तेय वैराग्येण च गृह्यते॥",
+    "transliteration": "asaṁśayaṁ mahā-bāho mano durnigrahaṁ calam abhyāsena tu kaunteya vairāgyeṇa ca gṛhyate",
+    "english": "Without doubt, the mind is restless and hard to subdue. But it can be brought to stillness through practice and dispassion.",
+    "context": "Krishna acknowledges Arjuna's complaint that the mind is hard to control, and offers practice (abhyasa) and dispassion (vairagya) as the answer.",
+    "themes": ["restless mind", "practice", "dispassion", "discipline", "consistency"]
+  },
+  {
+    "ref": "BG 9.22",
+    "topic": "trust",
+    "sanskrit": "अनन्याश्चिन्तयन्तो मां ये जनाः पर्युपासते। तेषां नित्याभियुक्तानां योगक्षेमं वहाम्यहम्॥",
+    "transliteration": "ananyāś cintayanto māṁ ye janāḥ paryupāsate teṣāṁ nityābhiyuktānāṁ yoga-kṣemaṁ vahām y aham",
+    "english": "To those who think of me with undivided focus, I bring what they lack and preserve what they have.",
+    "context": "On trust and surrender to a higher principle. For users who carry everything alone.",
+    "themes": ["trust", "surrender", "support", "letting go of control", "burden"]
+  },
+  {
+    "ref": "BG 12.13-14",
+    "topic": "compassion",
+    "sanskrit": "अद्वेष्टा सर्वभूतानां मैत्रः करुण एव च। निर्ममो निरहङ्कारः समदुःखसुखः क्षमी॥",
+    "transliteration": "adveṣṭā sarva-bhūtānāṁ maitraḥ karuṇa eva ca nirmamo nirahaṅkāraḥ sama-duḥkha-sukhaḥ kṣamī",
+    "english": "Friend to all beings, free from hostility. Not possessive, not ego-driven. Even in pleasure and pain. Forgiving.",
+    "context": "Krishna's portrait of the devotee. A model for how to relate to others when feeling reactive.",
+    "themes": ["compassion", "forgiveness", "ego", "reactivity", "friendship", "even-mindedness"]
+  },
+  {
+    "ref": "BG 16.21",
+    "topic": "self-destruction",
+    "sanskrit": "त्रिविधं नरकस्येदं द्वारं नाशनमात्मनः। कामः क्रोधस्तथा लोभस्तस्मादेतत्त्रयं त्यजेत्॥",
+    "transliteration": "tri-vidhaṁ narakasyedaṁ dvāraṁ nāśanam ātmanaḥ kāmaḥ krodhas tathā lobhas tasmād etat trayaṁ tyajet",
+    "english": "Three gates open into self-destruction: craving, anger, and greed. Let them go.",
+    "context": "A short list of the three most ruinous emotional patterns. Useful for emotional crisis check-ins.",
+    "themes": ["craving", "anger", "greed", "self-destruction", "emotional crisis"]
+  },
+  {
+    "ref": "BG 17.16",
+    "topic": "discipline",
+    "sanskrit": "मनःप्रसादः सौम्यत्वं मौनमात्मविनिग्रहः। भावसंशुद्धिरित्येतत्तपो मानसमुच्यते॥",
+    "transliteration": "manaḥ-prasādaḥ saumyatvaṁ maunam ātma-vinigrahaḥ bhāva-saṁśuddhir ity etat tapo mānasam ucyate",
+    "english": "Serenity of mind. Gentleness. Silence. Self-control. Purity of intent. This is the inner discipline.",
+    "context": "Five qualities that constitute mental discipline. A checklist for self-cultivation.",
+    "themes": ["self-discipline", "serenity", "gentleness", "silence", "intent", "self-control"]
+  },
+  {
+    "ref": "BG 18.58",
+    "topic": "ego",
+    "sanskrit": "मच्चित्तः सर्वदुर्गाणि मत्प्रसादात्तरिष्यसि। अथ चेत्त्वमहङ्कारान्न श्रोष्यसि विनङ्क्ष्यसि॥",
+    "transliteration": "mac-cittaḥ sarva-durgāṇi mat-prasādāt tariṣyasi atha cet tvam ahaṅkārān na śroṣyasi vinaṅkṣyasi",
+    "english": "Focused on me, you will cross every obstacle through my grace. But if from ego you refuse to listen, you will be lost.",
+    "context": "On the cost of ego — refusing wise counsel out of pride. Counsel for the stubborn moment.",
+    "themes": ["ego", "pride", "stubbornness", "listening", "obstacles"]
+  },
+  {
+    "ref": "BG 18.63",
+    "topic": "autonomy",
+    "sanskrit": "इति ते ज्ञानमाख्यातं गुह्याद्गुह्यतरं मया। विमृश्यैतदशेषेण यथेच्छसि तथा कुरु॥",
+    "transliteration": "iti te jñānam ākhyātaṁ guhyād guhyataraṁ mayā vimṛśyaitad aśeṣeṇa yathecchasi tathā kuru",
+    "english": "I have given you the secret of secrets. Reflect on it fully. Then act as you choose.",
+    "context": "Krishna's closing — no commandment, only an offering. The user retains full agency. A model for non-coercive guidance.",
+    "themes": ["autonomy", "free will", "reflection", "choice", "non-coercion", "consent"]
+  },
+  {
+    "ref": "BG 18.66",
+    "topic": "surrender",
+    "sanskrit": "सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज। अहं त्वा सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः॥",
+    "transliteration": "sarva-dharmān parityajya mām ekaṁ śaraṇaṁ vraja ahaṁ tvāṁ sarva-pāpebhyo mokṣayiṣyāmi mā śucaḥ",
+    "english": "Let go of all rules and surrender to me alone. I will free you from all wrongs. Do not grieve.",
+    "context": "The final verse of teaching — radical surrender. For users overwhelmed by their own moral arithmetic.",
+    "themes": ["surrender", "grief", "guilt", "overwhelm", "rules", "permission to release"]
+  }
+]
