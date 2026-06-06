@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { COLORS } from '../styles/colors';
 import { styles } from '../styles/BottomTabBar.styles';
+import { useTheme } from '../hooks/useTheme';
 
 const ICON_PATHS: Record<string, string> = {
   Home: 'M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5z',
@@ -24,14 +24,20 @@ export default function BottomTabBar({
   descriptors,
   navigation,
 }: BottomTabBarProps) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card, borderTopColor: colors.border },
+      ]}
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
           (options.tabBarLabel as string) ?? options.title ?? route.name;
         const isFocused = state.index === index;
-        const color = isFocused ? COLORS.primaryGold : COLORS.textSecondary;
+        const color = isFocused ? colors.accent : colors.textSecondary;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -53,7 +59,12 @@ export default function BottomTabBar({
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
           >
-            <View style={[styles.iconWrap, isFocused && styles.iconWrapActive]}>
+            <View
+              style={[
+                styles.iconWrap,
+                isFocused && { backgroundColor: colors.accentSoft },
+              ]}
+            >
               <TabIcon name={route.name} color={color} />
             </View>
             <Text style={[styles.label, { color }]}>{label}</Text>

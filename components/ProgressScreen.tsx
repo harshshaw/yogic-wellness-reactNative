@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import Svg, { Circle, Rect } from 'react-native-svg';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
+import { useTheme } from '../hooks/useTheme';
 import {
   Sparkles,
   Flame,
@@ -37,7 +38,7 @@ const Ring = ({
   const cx = size / 2;
   return (
     <Svg width={size} height={size}>
-      <Circle cx={cx} cy={cx} r={r} stroke="rgba(255,255,255,0.06)" strokeWidth={sw} fill="none" />
+      <Circle cx={cx} cy={cx} r={r} stroke="rgba(15,23,42,0.08)" strokeWidth={sw} fill="none" />
       <Circle
         cx={cx} cy={cx} r={r}
         stroke={color} strokeWidth={sw} fill="none"
@@ -50,20 +51,21 @@ const Ring = ({
 };
 
 const RingStat = ({
-  Icon, value, total, label, color,
+  Icon, value, total, label, color, ink, muted,
 }: {
   Icon: any; value: string; total: string; label: string; color: string;
+  ink?: string; muted?: string;
 }) => (
   <View style={styles.ringWrap}>
     <View style={{ width: 78, height: 78, alignItems: 'center', justifyContent: 'center' }}>
       <Ring value={parseFloat(value)} max={parseFloat(total)} color={color} />
       <View style={{ position: 'absolute', alignItems: 'center' }}>
         <Icon size={16} color={color} />
-        <Text style={styles.ringValue}>{value}</Text>
+        <Text style={[styles.ringValue, ink && { color: ink }]}>{value}</Text>
       </View>
     </View>
-    <Text style={styles.ringLabel}>{label}</Text>
-    <Text style={styles.ringTotal}>/ {total}</Text>
+    <Text style={[styles.ringLabel, ink && { color: ink }]}>{label}</Text>
+    <Text style={[styles.ringTotal, muted && { color: muted }]}>/ {total}</Text>
   </View>
 );
 
@@ -79,39 +81,40 @@ const weekBars = [
 
 const ProgressScreen = () => {
   const navigation = useNavigation<any>();
+  const { colors } = useTheme();
 
   return (
-    <View style={warm.screen}>
+    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={warm.topRow}>
           <View>
             <Text style={warm.overline}>Your journey</Text>
-            <Text style={[warm.h1, { marginTop: 4 }]}>Progress</Text>
-            <Text style={warm.body}>See your journey unfold.</Text>
+            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Progress</Text>
+            <Text style={[warm.body, { color: colors.textSecondary }]}>See your journey unfold.</Text>
           </View>
           <TouchableOpacity
-            style={warm.iconBtn}
+            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('AICompanion', { mode: 'Confidence Coach' })}
           >
-            <Sparkles size={18} color={COLORS.primaryGold} />
+            <Sparkles size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         {/* STREAK HERO */}
-        <View style={warm.goldCard}>
+        <View style={[warm.goldCard, { backgroundColor: colors.card, borderColor: colors.borderStrong }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-            <View style={styles.streakBadge}>
-              <Flame size={22} color={COLORS.deepBrown} />
+            <View style={[styles.streakBadge, { backgroundColor: colors.accent }]}>
+              <Flame size={22} color="#FFFFFF" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={warm.overline}>Current streak</Text>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 4 }}>
-                <Text style={styles.streakNum}>12</Text>
-                <Text style={styles.streakUnit}> days</Text>
+                <Text style={[styles.streakNum, { color: colors.textPrimary }]}>12</Text>
+                <Text style={[styles.streakUnit, { color: colors.textSecondary }]}> days</Text>
               </View>
-              <Text style={[warm.bodySm, { marginTop: 2 }]}>
+              <Text style={[warm.bodySm, { marginTop: 2, color: colors.textSecondary }]}>
                 Your longest yet — keep the rhythm.
               </Text>
             </View>
@@ -119,21 +122,21 @@ const ProgressScreen = () => {
         </View>
 
         {/* RINGS */}
-        <View style={[warm.card, { marginTop: 14 }]}>
+        <View style={[warm.card, { marginTop: 14, backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={warm.overline}>This week</Text>
           <View style={styles.ringsRow}>
-            <RingStat Icon={Wind} value="68" total="100" label="Breath min" color={COLORS.primaryGold} />
-            <RingStat Icon={Moon} value="6" total="7" label="Sleep eve" color={COLORS.mutedTeal} />
-            <RingStat Icon={HeartPulse} value="82" total="100" label="Calm score" color={COLORS.lavender} />
+            <RingStat Icon={Wind} value="68" total="100" label="Breath min" color={colors.statOrange} ink={colors.textPrimary} muted={colors.textSecondary} />
+            <RingStat Icon={Moon} value="6" total="7" label="Sleep eve" color={colors.statMint} ink={colors.textPrimary} muted={colors.textSecondary} />
+            <RingStat Icon={HeartPulse} value="82" total="100" label="Calm score" color={colors.statPurple} ink={colors.textPrimary} muted={colors.textSecondary} />
           </View>
         </View>
 
         {/* MOOD TREND */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Mood trend</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Mood trend</Text>
           <Text style={warm.seeAll}>This week</Text>
         </View>
-        <View style={[warm.card, styles.chartCard]}>
+        <View style={[warm.card, styles.chartCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Svg width="100%" height="120" viewBox="0 0 280 120">
             <Rect x="0" y="80" width="280" height="0.5" fill="rgba(212,175,55,0.1)" />
             <Rect x="0" y="40" width="280" height="0.5" fill="rgba(212,175,55,0.1)" />
@@ -148,30 +151,30 @@ const ProgressScreen = () => {
                   width={22}
                   height={h}
                   rx={6}
-                  fill={i === 3 ? COLORS.primaryGold : 'rgba(212,175,55,0.45)'}
+                  fill={i === 3 ? colors.accent : 'rgba(212,175,55,0.45)'}
                 />
               );
             })}
           </Svg>
           <View style={styles.dayLabels}>
             {weekBars.map((b, i) => (
-              <Text key={i} style={styles.dayLabel}>{b.day}</Text>
+              <Text key={i} style={[styles.dayLabel, { color: colors.textSecondary }]}>{b.day}</Text>
             ))}
           </View>
         </View>
 
         {/* WEEKLY INSIGHT */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Weekly insights</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Weekly insights</Text>
         </View>
-        <View style={warm.card}>
+        <View style={[warm.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
-            <View style={styles.insightBadge}>
-              <Sparkles size={16} color={COLORS.primaryGold} />
+            <View style={[styles.insightBadge, { backgroundColor: colors.accentSoft }]}>
+              <Sparkles size={16} color={colors.accent} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={warm.h3}>Evenings are your sanctuary</Text>
-              <Text style={[warm.bodySm, { marginTop: 6, lineHeight: 19 }]}>
+              <Text style={[warm.h3, { color: colors.textPrimary }]}>Evenings are your sanctuary</Text>
+              <Text style={[warm.bodySm, { marginTop: 6, lineHeight: 19, color: colors.textSecondary }]}>
                 Six of seven sessions this week happened after sunset.
                 Try a short morning breath to bookend your day.
               </Text>
@@ -181,36 +184,46 @@ const ProgressScreen = () => {
 
         {/* WINS */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Wins this week</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Wins this week</Text>
         </View>
-        <Win icon="🌅" title="3 morning sessions" sub="A new pattern is forming." />
-        <Win icon="🌙" title="Slept by 11pm 4 nights" sub="Body clock is settling." />
-        <Win icon="🪷" title="Tried Deep Healing" sub="You went deeper than usual." />
+        <Win icon="🌅" title="3 morning sessions" sub="A new pattern is forming." colors={colors} />
+        <Win icon="🌙" title="Slept by 11pm 4 nights" sub="Body clock is settling." colors={colors} />
+        <Win icon="🪷" title="Tried Deep Healing" sub="You went deeper than usual." colors={colors} />
 
         {/* CONTINUE */}
         <TouchableOpacity
-          style={[styles.continueCard, { marginTop: 16 }]}
+          style={[styles.continueCard, { marginTop: 16, backgroundColor: colors.card, borderColor: colors.borderStrong }]}
           activeOpacity={0.9}
           onPress={() => navigation.navigate('Breathe')}
         >
           <View style={{ flex: 1 }}>
             <Text style={warm.overline}>Continue</Text>
-            <Text style={styles.continueTitle}>Anxiety Reset · Day 4</Text>
-            <Text style={[warm.bodySm, { marginTop: 4 }]}>Pick up where you left off.</Text>
+            <Text style={[styles.continueTitle, { color: colors.textPrimary }]}>Anxiety Reset · Day 4</Text>
+            <Text style={[warm.bodySm, { marginTop: 4, color: colors.textSecondary }]}>Pick up where you left off.</Text>
           </View>
-          <ChevronRight size={20} color={COLORS.primaryGold} />
+          <ChevronRight size={20} color={colors.accent} />
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
 
-const Win = ({ icon, title, sub }: { icon: string; title: string; sub: string }) => (
-  <View style={styles.winRow}>
+const Win = ({
+  icon,
+  title,
+  sub,
+  colors,
+}: {
+  icon: string;
+  title: string;
+  sub: string;
+  colors: { card: string; border: string; textPrimary: string; textSecondary: string };
+}) => (
+  <View style={[styles.winRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
     <Text style={styles.winIcon}>{icon}</Text>
     <View style={{ flex: 1 }}>
-      <Text style={styles.winTitle}>{title}</Text>
-      <Text style={styles.winSub}>{sub}</Text>
+      <Text style={[styles.winTitle, { color: colors.textPrimary }]}>{title}</Text>
+      <Text style={[styles.winSub, { color: colors.textSecondary }]}>{sub}</Text>
     </View>
   </View>
 );

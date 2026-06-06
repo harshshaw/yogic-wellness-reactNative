@@ -5,10 +5,12 @@ import {
   ScrollView,
   ImageBackground,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
 import { useAppMusic } from '../hooks/useAppMusic';
+import { useTheme } from '../hooks/useTheme';
 
 const MenuIcon = ({ color }: { color: string }) => (
   <Svg width={26} height={26} viewBox="0 0 24 24">
@@ -38,6 +40,31 @@ const SoundOffIcon = ({ color }: { color: string }) => (
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const MoonIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
+    <Path
+      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+      stroke={color}
+      strokeWidth={1.8}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const SunIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="4" stroke={color} strokeWidth={1.8} fill="none" />
+    <Path
+      d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
     />
   </Svg>
 );
@@ -94,9 +121,11 @@ type StatRingProps = {
   color: string;
   progress: number;
   Icon: React.FC<{ color: string }>;
+  ink?: string;
+  muted?: string;
 };
 
-const StatRing = ({ value, label, sub, color, progress, Icon }: StatRingProps) => {
+const StatRing = ({ value, label, sub, color, progress, Icon, ink, muted }: StatRingProps) => {
   const radius = 38;
   const strokeWidth = 5;
   const circumference = 2 * Math.PI * radius;
@@ -110,7 +139,7 @@ const StatRing = ({ value, label, sub, color, progress, Icon }: StatRingProps) =
             cx="45"
             cy="45"
             r={radius}
-            stroke="rgba(255,255,255,0.08)"
+            stroke="rgba(0,0,0,0.06)"
             strokeWidth={strokeWidth}
             fill="none"
           />
@@ -129,19 +158,23 @@ const StatRing = ({ value, label, sub, color, progress, Icon }: StatRingProps) =
         </Svg>
         <View style={styles.ringInner}>
           <Icon color={color} />
-          <Text style={styles.ringValue}>{value}</Text>
+          <Text style={[styles.ringValue, ink && { color: ink }]}>{value}</Text>
         </View>
       </View>
-      <Text style={styles.ringLabel}>{label}</Text>
-      <Text style={styles.ringSub}>{sub}</Text>
+      <Text style={[styles.ringLabel, ink && { color: ink }]}>{label}</Text>
+      <Text style={[styles.ringSub, muted && { color: muted }]}>{sub}</Text>
     </View>
   );
 };
 
 const HomeScreen = () => {
   const { muted, toggleMuted } = useAppMusic();
+  const { mode, toggle, colors, images } = useTheme();
+  const isNight = mode === 'night';
+  const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -149,38 +182,71 @@ const HomeScreen = () => {
       >
         {/* HEADER WITH GURU IMAGE */}
         <ImageBackground
-          source={require('../assets/images/meditatingGuru.png')}
+          source={images.homeHero}
           style={styles.header}
           imageStyle={styles.headerImage}
         >
-          <View style={styles.headerOverlay} />
+          {isNight && (
+            <View
+              style={[
+                styles.headerOverlay,
+                { backgroundColor: 'rgba(11,16,36,0.15)' },
+              ]}
+            />
+          )}
 
           <View style={styles.topBar}>
-            <TouchableOpacity activeOpacity={0.7}>
-              <MenuIcon color={COLORS.deepBrown} />
+            <TouchableOpacity activeOpacity={0.7} style={localStyles.headerBtn}>
+              <MenuIcon color={headerIconColor} />
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} onPress={toggleMuted}>
-              {muted ? (
-                <SoundOffIcon color={COLORS.deepBrown} />
-              ) : (
-                <SoundOnIcon color={COLORS.deepBrown} />
-              )}
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={toggle}
+                style={localStyles.headerBtn}
+              >
+                {isNight ? (
+                  <SunIcon color={headerIconColor} />
+                ) : (
+                  <MoonIcon color={headerIconColor} />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={toggleMuted}
+                style={localStyles.headerBtn}
+              >
+                {muted ? (
+                  <SoundOffIcon color={headerIconColor} />
+                ) : (
+                  <SoundOnIcon color={headerIconColor} />
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.greetingBlock}>
-            <Text style={styles.greeting}>Namaste, Arjun 🙏</Text>
-            <Text style={styles.greetingSub}>
+            <Text style={[styles.greeting, { color: headerIconColor }]}>
+              Namaste, Arjun 🙏
+            </Text>
+            <Text style={[styles.greetingSub, { color: headerIconColor }]}>
               Embrace the ancient wisdom,{'\n'}Transform your life.
             </Text>
           </View>
         </ImageBackground>
 
         {/* YOUR PROGRESS CARD */}
-        <View style={styles.progressCard}>
+        <View
+          style={[
+            styles.progressCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <View style={styles.progressHeader}>
-            <OmIcon color={COLORS.primaryGold} />
-            <Text style={styles.progressTitle}>Your Progress</Text>
+            <OmIcon color={colors.accent} />
+            <Text style={[styles.progressTitle, { color: colors.textPrimary }]}>
+              Your Progress
+            </Text>
           </View>
 
           <View style={styles.ringsRow}>
@@ -188,32 +254,38 @@ const HomeScreen = () => {
               value="520"
               label="Calories"
               sub="/700 kcal"
-              color={COLORS.sunsetOrange}
+              color={colors.statOrange}
               progress={74}
               Icon={FlameIcon}
+              ink={colors.textPrimary}
+              muted={colors.textSecondary}
             />
             <StatRing
               value="8,243"
               label="Steps"
               sub="/10,000"
-              color={COLORS.sageGreen}
+              color={colors.statMint}
               progress={82}
               Icon={StepsIcon}
+              ink={colors.textPrimary}
+              muted={colors.textSecondary}
             />
             <StatRing
               value="52"
               label="Minutes"
               sub="/60 min"
-              color={COLORS.primaryGold}
+              color={colors.statYellow}
               progress={86}
               Icon={ClockIcon}
+              ink={colors.textPrimary}
+              muted={colors.textSecondary}
             />
           </View>
         </View>
 
         {/* TODAY'S GOAL */}
         <ImageBackground
-          source={require('../assets/images/meditatingGuru.png')}
+          source={images.goalHero}
           style={styles.goalCard}
           imageStyle={styles.goalImage}
         >
@@ -229,18 +301,32 @@ const HomeScreen = () => {
         </ImageBackground>
 
         {/* TODAY'S FOCUS */}
-        <Text style={styles.sectionTitle}>Today's Focus</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+          Today's Focus
+        </Text>
 
-        <TouchableOpacity activeOpacity={0.85} style={styles.focusCard}>
-          <View style={styles.focusIconWrap}>
-            <OmIcon color={COLORS.primaryGold} />
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={[
+            styles.focusCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <View style={[styles.focusIconWrap, { backgroundColor: colors.accentSoft }]}>
+            <OmIcon color={colors.accent} />
           </View>
           <View style={styles.focusContent}>
-            <Text style={styles.focusTitle}>Surya Namaskar</Text>
-            <Text style={styles.focusDesc}>Improve strength &amp;</Text>
-            <Text style={styles.focusMeta}>25 min • Intermediate</Text>
+            <Text style={[styles.focusTitle, { color: colors.textPrimary }]}>
+              Surya Namaskar
+            </Text>
+            <Text style={[styles.focusDesc, { color: colors.textSecondary }]}>
+              Improve strength &amp;
+            </Text>
+            <Text style={[styles.focusMeta, { color: colors.textSecondary }]}>
+              25 min • Intermediate
+            </Text>
           </View>
-          <View style={styles.focusPlay}>
+          <View style={[styles.focusPlay, { backgroundColor: colors.accent }]}>
             <ChevronRight color={COLORS.deepBrown} />
           </View>
         </TouchableOpacity>
@@ -248,5 +334,18 @@ const HomeScreen = () => {
     </View>
   );
 };
+
+const localStyles = StyleSheet.create({
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default HomeScreen;

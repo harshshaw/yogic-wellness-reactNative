@@ -5,10 +5,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
+import { useTheme } from '../hooks/useTheme';
 import {
   Sparkles,
   Wind,
@@ -29,41 +31,46 @@ type SessionCard = {
 };
 
 const sessions: SessionCard[] = [
-  { id: 'anxiety', title: 'Anxiety Reset', duration: '6 min', level: 'Gentle', Icon: HeartPulse, tint: COLORS.lavender },
-  { id: 'energy', title: 'Energy Boost', duration: '4 min', level: 'Active', Icon: Flame, tint: COLORS.sunsetOrange },
-  { id: 'focus', title: 'Focus Mode', duration: '7 min', level: 'Steady', Icon: Wind, tint: COLORS.sageGreen },
-  { id: 'sleep', title: 'Calm Before Sleep', duration: '10 min', level: 'Soft', Icon: Moon, tint: COLORS.mutedTeal },
-  { id: 'healing', title: 'Deep Healing', duration: '12 min', level: 'Restorative', Icon: HeartPulse, tint: COLORS.rose },
+  { id: 'anxiety', title: 'Anxiety Reset', duration: '6 min', level: 'Gentle', Icon: HeartPulse, tint: '#10B981' },
+  { id: 'energy', title: 'Energy Boost', duration: '4 min', level: 'Active', Icon: Flame, tint: '#FB923C' },
+  { id: 'focus', title: 'Focus Mode', duration: '7 min', level: 'Steady', Icon: Wind, tint: '#3B82F6' },
+  { id: 'sleep', title: 'Calm Before Sleep', duration: '10 min', level: 'Soft', Icon: Moon, tint: '#8B5CF6' },
+  { id: 'healing', title: 'Deep Healing', duration: '12 min', level: 'Restorative', Icon: HeartPulse, tint: '#F472B6' },
 ];
 
 const BreatheScreen = () => {
   const navigation = useNavigation<any>();
+  const { colors, images } = useTheme();
 
   const openSession = (id: string, title: string) =>
     navigation.navigate('BreathingSession', { id, title });
 
   return (
-    <View style={warm.screen}>
+    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={warm.topRow}>
           <View>
             <Text style={warm.overline}>Soundscapes · Practice</Text>
-            <Text style={[warm.h1, { marginTop: 4 }]}>Breathe</Text>
-            <Text style={warm.body}>Reset your body and mind.</Text>
+            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Breathe</Text>
+            <Text style={[warm.body, { color: colors.textSecondary }]}>Reset your body and mind.</Text>
           </View>
           <TouchableOpacity
-            style={warm.iconBtn}
+            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
           >
-            <Sparkles size={18} color={COLORS.primaryGold} />
+            <Sparkles size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
-        {/* AI GURU HERO CARD */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroGlow} />
+        {/* AI GURU HERO CARD — image-backed */}
+        <ImageBackground
+          source={images.breatheHero}
+          style={styles.heroCard}
+          imageStyle={{ borderRadius: 24 }}
+        >
+          <View style={styles.heroImageOverlay} />
           <View style={styles.heroIconRow}>
             <View style={styles.heroIcon}>
               <Sparkles size={20} color={COLORS.deepBrown} />
@@ -82,38 +89,38 @@ const BreatheScreen = () => {
             <Play size={13} color={COLORS.deepBrown} />
             <Text style={warm.pillPrimaryText}>Start Session</Text>
           </TouchableOpacity>
-        </View>
+        </ImageBackground>
 
         {/* RECOMMENDED */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Recommended for you</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Recommended for you</Text>
         </View>
         <TouchableOpacity
-          style={styles.recCard}
+          style={[styles.recCard, { backgroundColor: colors.card, borderColor: colors.border }]}
           activeOpacity={0.9}
           onPress={() => openSession('anxiety', 'Anxiety Reset')}
         >
-          <View style={[styles.recIcon, { backgroundColor: 'rgba(184,164,217,0.18)' }]}>
-            <HeartPulse size={20} color={COLORS.lavender} />
+          <View style={[styles.recIcon, { backgroundColor: colors.statMintSoft }]}>
+            <HeartPulse size={20} color={colors.statMint} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.recTitle}>Anxiety Reset</Text>
-            <Text style={styles.recMeta}>6 min · 4-7-8 protocol · Gentle</Text>
-            <Text style={styles.recHint}>Suggested based on your evening rhythm.</Text>
+            <Text style={[styles.recTitle, { color: colors.textPrimary }]}>Anxiety Reset</Text>
+            <Text style={[styles.recMeta, { color: colors.textSecondary }]}>6 min · 4-7-8 protocol · Gentle</Text>
+            <Text style={[styles.recHint, { color: colors.accent }]}>Suggested based on your evening rhythm.</Text>
           </View>
-          <View style={styles.recPlay}>
+          <View style={[styles.recPlay, { backgroundColor: colors.accent }]}>
             <Play size={14} color={COLORS.deepBrown} />
           </View>
         </TouchableOpacity>
 
         {/* CATEGORIES */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Sessions</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Sessions</Text>
         </View>
         {sessions.map(s => (
           <TouchableOpacity
             key={s.id}
-            style={styles.row}
+            style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}
             activeOpacity={0.85}
             onPress={() => openSession(s.id, s.title)}
           >
@@ -121,10 +128,10 @@ const BreatheScreen = () => {
               <s.Icon size={20} color={s.tint} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.rowTitle}>{s.title}</Text>
-              <Text style={styles.rowMeta}>{s.duration} · {s.level}</Text>
+              <Text style={[styles.rowTitle, { color: colors.textPrimary }]}>{s.title}</Text>
+              <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{s.duration} · {s.level}</Text>
             </View>
-            <ChevronRight size={18} color={COLORS.textSecondary} />
+            <ChevronRight size={18} color={colors.textSecondary} />
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -153,6 +160,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 20,
     elevation: 6,
+  },
+  heroImageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 24,
+    backgroundColor: 'rgba(20,12,8,0.55)',
   },
   heroGlow: {
     position: 'absolute',

@@ -1,0 +1,10 @@
+# Files / folders excluded from EAS uploads and fingerprinting.
+# The Expo app and the Vercel backend live in the same repo but are
+# unrelated builds — EAS should never scan or ship the server folder.
+
+server/
+docs/
+*.md
+.vercel/
+.env
+.env.*

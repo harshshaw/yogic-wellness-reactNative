@@ -9,6 +9,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
+import { useTheme } from '../hooks/useTheme';
 import {
   Sparkles,
   Target,
@@ -44,60 +45,73 @@ const settings = [
 const ProfileScreen = () => {
   const navigation = useNavigation<any>();
   const [activeMode, setActiveMode] = useState<Mode>('Pranayama Guru');
+  const { colors } = useTheme();
 
   return (
-    <View style={warm.screen}>
+    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={warm.topRow}>
           <View>
             <Text style={warm.overline}>Settings</Text>
-            <Text style={[warm.h1, { marginTop: 4 }]}>Profile</Text>
-            <Text style={warm.body}>Your journey, your way.</Text>
+            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Profile</Text>
+            <Text style={[warm.body, { color: colors.textSecondary }]}>Your journey, your way.</Text>
           </View>
           <TouchableOpacity
-            style={warm.iconBtn}
+            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('AICompanion', { mode: activeMode })}
           >
-            <Sparkles size={18} color={COLORS.primaryGold} />
+            <Sparkles size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         {/* HERO CARD */}
-        <View style={styles.heroCard}>
+        <View style={[styles.heroCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.avatar}>
             <User size={28} color={COLORS.deepBrown} />
           </View>
-          <Text style={styles.heroName}>Arjun</Text>
-          <Text style={styles.heroSub}>Seeker · Level 3 · 1,250 / 2,000 XP</Text>
+          <Text style={[styles.heroName, { color: colors.textPrimary }]}>Arjun</Text>
+          <Text style={[styles.heroSub, { color: colors.textSecondary }]}>
+            Seeker · Level 3 · 1,250 / 2,000 XP
+          </Text>
           <View style={styles.xpBar}>
             <View style={[styles.xpFill, { width: '62%' }]} />
           </View>
           <View style={styles.heroStats}>
-            <Stat n="48" l="Days" />
-            <View style={styles.statDivider} />
-            <Stat n="126" l="Sessions" />
-            <View style={styles.statDivider} />
-            <Stat n="89%" l="Consistency" />
+            <Stat n="48" l="Days" colors={colors} />
+            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <Stat n="126" l="Sessions" colors={colors} />
+            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            <Stat n="89%" l="Consistency" colors={colors} />
           </View>
         </View>
 
         {/* DAILY INTENTION */}
-        <View style={[warm.goldCard, { marginTop: 14 }]}>
+        <View
+          style={[
+            warm.goldCard,
+            { marginTop: 14, backgroundColor: colors.card, borderColor: colors.borderStrong },
+          ]}
+        >
           <Text style={warm.overline}>Today’s intention</Text>
-          <Text style={[warm.h3, { marginTop: 6, fontStyle: 'italic' }]}>
+          <Text
+            style={[
+              warm.h3,
+              { marginTop: 6, fontStyle: 'italic', color: colors.textPrimary },
+            ]}
+          >
             “Breath first. Decisions second.”
           </Text>
           <TouchableOpacity style={styles.editLink} activeOpacity={0.7}>
             <Text style={styles.editLinkTxt}>Edit intention</Text>
-            <ChevronRight size={14} color={COLORS.primaryGold} />
+            <ChevronRight size={14} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         {/* COMPANION MODE */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Change companion</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Change companion</Text>
         </View>
         <View style={styles.modesGrid}>
           {modes.map(m => {
@@ -105,16 +119,23 @@ const ProfileScreen = () => {
             return (
               <TouchableOpacity
                 key={m.id}
-                style={[styles.modeCard, active && styles.modeCardActive]}
+                style={[
+                  styles.modeCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                  active && {
+                    borderColor: colors.accent,
+                    backgroundColor: colors.accentSoft,
+                  },
+                ]}
                 activeOpacity={0.85}
                 onPress={() => setActiveMode(m.id)}
               >
                 <View style={[styles.modeIcon, { backgroundColor: hexA(m.tint, 0.16) }]}>
                   <m.Icon size={18} color={m.tint} />
                 </View>
-                <Text style={styles.modeName}>{m.id}</Text>
-                <Text style={styles.modeTag}>{m.tagline}</Text>
-                {active && <View style={styles.modeDot} />}
+                <Text style={[styles.modeName, { color: colors.textPrimary }]}>{m.id}</Text>
+                <Text style={[styles.modeTag, { color: colors.textSecondary }]}>{m.tagline}</Text>
+                {active && <View style={[styles.modeDot, { backgroundColor: colors.accent }]} />}
               </TouchableOpacity>
             );
           })}
@@ -122,20 +143,23 @@ const ProfileScreen = () => {
 
         {/* SETTINGS LIST */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Settings</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Settings</Text>
         </View>
-        <View style={styles.settingsCard}>
+        <View style={[styles.settingsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           {settings.map((s, i) => (
             <TouchableOpacity
               key={s.id}
-              style={[styles.settingRow, i < settings.length - 1 && styles.settingDivider]}
+              style={[
+                styles.settingRow,
+                i < settings.length - 1 && [styles.settingDivider, { borderBottomColor: colors.border }],
+              ]}
               activeOpacity={0.7}
             >
-              <View style={styles.settingIcon}>
-                <s.Icon size={16} color={COLORS.primaryGold} />
+              <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft }]}>
+                <s.Icon size={16} color={colors.accent} />
               </View>
-              <Text style={styles.settingLabel}>{s.label}</Text>
-              <ChevronRight size={16} color={COLORS.textSecondary} />
+              <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>{s.label}</Text>
+              <ChevronRight size={16} color={colors.textSecondary} />
             </TouchableOpacity>
           ))}
         </View>
@@ -156,10 +180,18 @@ const ProfileScreen = () => {
   );
 };
 
-const Stat = ({ n, l }: { n: string; l: string }) => (
+const Stat = ({
+  n,
+  l,
+  colors,
+}: {
+  n: string;
+  l: string;
+  colors: { textPrimary: string; textSecondary: string };
+}) => (
   <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={styles.statN}>{n}</Text>
-    <Text style={styles.statL}>{l}</Text>
+    <Text style={[styles.statN, { color: colors.textPrimary }]}>{n}</Text>
+    <Text style={[styles.statL, { color: colors.textSecondary }]}>{l}</Text>
   </View>
 );
 

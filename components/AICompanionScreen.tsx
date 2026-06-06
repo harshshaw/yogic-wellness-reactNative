@@ -14,6 +14,7 @@ import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
 import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target } from './Icons';
 import { sendToCompanion, type CompanionMode } from '../lib/aiCompanion';
+import { useTheme } from '../hooks/useTheme';
 
 type Mode = CompanionMode;
 type Msg = { from: 'ai' | 'user'; text: string; cite?: string; time: string };
@@ -99,29 +100,31 @@ const AICompanionScreen = () => {
   };
 
   const hasUser = useMemo(() => messages.some(m => m.from === 'user'), [messages]);
+  const { colors } = useTheme();
 
   return (
     <KeyboardAvoidingView
-      style={warm.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={[warm.screen, { backgroundColor: colors.bg }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
     >
       {/* HEADER */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity
-          style={warm.iconBtn}
+          style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
           activeOpacity={0.7}
           onPress={() => navigation.goBack()}
         >
-          <X size={18} color={COLORS.textPrimary} />
+          <X size={18} color={colors.textPrimary} />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: 'center' }}>
-          <View style={styles.avatar}>
-            <Icon size={16} color={COLORS.deepBrown} />
+          <View style={[styles.avatar, { backgroundColor: colors.statPurple }]}>
+            <Icon size={16} color="#FFFFFF" />
           </View>
-          <Text style={styles.modeTitle}>{mode}</Text>
+          <Text style={[styles.modeTitle, { color: colors.textPrimary }]}>{mode}</Text>
           <View style={styles.statusRow}>
-            <View style={styles.dot} />
-            <Text style={styles.status}>Listening</Text>
+            <View style={[styles.dot, { backgroundColor: colors.statMint }]} />
+            <Text style={[styles.status, { color: colors.textSecondary }]}>Listening</Text>
           </View>
         </View>
         <View style={warm.iconBtn} />
@@ -129,26 +132,38 @@ const AICompanionScreen = () => {
 
       {/* THREAD */}
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={styles.thread}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {messages.map((m, i) =>
           m.from === 'ai' ? (
-            <View key={i} style={styles.aiBubble}>
-              {m.cite && <Text style={styles.cite}>{m.cite}</Text>}
-              <Text style={styles.aiText}>{m.text}</Text>
-              <Text style={styles.time}>{m.time}</Text>
+            <View
+              key={i}
+              style={[
+                styles.aiBubble,
+                { backgroundColor: colors.cardLight, borderColor: colors.border },
+              ]}
+            >
+              <Text style={[styles.aiText, { color: colors.textPrimary }]}>{m.text}</Text>
+              <Text style={[styles.time, { color: colors.textSecondary }]}>{m.time}</Text>
             </View>
           ) : (
-            <View key={i} style={styles.userBubble}>
-              <Text style={styles.userText}>{m.text}</Text>
-              <Text style={styles.timeOnUser}>{m.time}</Text>
+            <View key={i} style={[styles.userBubble, { backgroundColor: colors.statPurple }]}>
+              <Text style={[styles.userText, { color: '#FFFFFF' }]}>{m.text}</Text>
+              <Text style={[styles.timeOnUser, { color: 'rgba(255,255,255,0.7)' }]}>{m.time}</Text>
             </View>
           )
         )}
         {pending && (
-          <View style={styles.aiBubble}>
-            <Text style={[styles.aiText, { color: COLORS.textSecondary }]}>
+          <View
+            style={[
+              styles.aiBubble,
+              { backgroundColor: colors.cardLight, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.aiText, { color: colors.textSecondary }]}>
               breathing in…
             </Text>
           </View>
@@ -165,36 +180,47 @@ const AICompanionScreen = () => {
           {intro.suggestions.map(s => (
             <TouchableOpacity
               key={s}
-              style={styles.chip}
+              style={[styles.chip, { backgroundColor: colors.card, borderColor: colors.borderStrong }]}
               activeOpacity={0.85}
               onPress={() => send(s)}
             >
-              <Text style={styles.chipText}>{s}</Text>
+              <Text style={[styles.chipText, { color: colors.statPurple }]}>{s}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       )}
 
       {/* COMPOSER */}
-      <View style={styles.composer}>
-        <TouchableOpacity style={styles.micBtn} activeOpacity={0.7}>
-          <Mic size={18} color={COLORS.primaryGold} />
+      <View
+        style={[
+          styles.composer,
+          { backgroundColor: colors.bg, borderTopColor: colors.border },
+        ]}
+      >
+        <TouchableOpacity
+          style={[styles.micBtn, { backgroundColor: colors.statPurpleSoft }]}
+          activeOpacity={0.7}
+        >
+          <Mic size={18} color={colors.statPurple} />
         </TouchableOpacity>
         <TextInput
           value={draft}
           onChangeText={setDraft}
           placeholder="Speak your truth…"
-          placeholderTextColor={COLORS.textSecondary}
-          style={styles.input}
+          placeholderTextColor={colors.textSecondary}
+          style={[
+            styles.input,
+            { backgroundColor: colors.cardLight, color: colors.textPrimary, borderColor: colors.border },
+          ]}
           onSubmitEditing={() => send()}
         />
         <TouchableOpacity
-          style={[styles.sendBtn, pending && { opacity: 0.5 }]}
+          style={[styles.sendBtn, { backgroundColor: colors.statPurple }, pending && { opacity: 0.5 }]}
           onPress={() => send()}
           activeOpacity={0.85}
           disabled={pending}
         >
-          <Send size={18} color={COLORS.deepBrown} />
+          <Send size={18} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -265,6 +291,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     gap: 8,
+    alignItems: 'center',
   },
   chip: {
     paddingHorizontal: 14,
@@ -273,6 +300,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(212,175,55,0.3)',
     borderRadius: RADII.pill,
+    alignSelf: 'flex-start',
   },
   chipText: { color: COLORS.primaryGold, fontSize: 12, fontWeight: '600' },
 

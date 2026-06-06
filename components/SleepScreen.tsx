@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
 import { Moon, Sparkles, Play, ChevronRight, Wind } from './Icons';
+import { useTheme } from '../hooks/useTheme';
 
 const sections = [
   {
@@ -41,29 +42,30 @@ const sections = [
 
 const SleepScreen = () => {
   const navigation = useNavigation<any>();
+  const { colors, images } = useTheme();
 
   return (
-    <View style={warm.screen}>
+    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={warm.topRow}>
           <View>
             <Text style={warm.overline}>Night ritual</Text>
-            <Text style={[warm.h1, { marginTop: 4 }]}>Sleep</Text>
-            <Text style={warm.body}>Slow down. Let go.</Text>
+            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Sleep</Text>
+            <Text style={[warm.body, { color: colors.textSecondary }]}>Slow down. Let go.</Text>
           </View>
           <TouchableOpacity
-            style={warm.iconBtn}
+            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('AICompanion', { mode: 'Sleep Guide' })}
           >
-            <Sparkles size={18} color={COLORS.primaryGold} />
+            <Sparkles size={18} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         {/* HERO */}
         <ImageBackground
-          source={require('../assets/images/meditatingGuru.png')}
+          source={images.sleepHero}
           style={styles.hero}
           imageStyle={styles.heroImg}
         >
@@ -87,31 +89,43 @@ const SleepScreen = () => {
 
         {/* TONIGHT'S ROUTINE */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Tonight’s routine</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Tonight’s routine</Text>
         </View>
-        <View style={styles.routineCard}>
-          <Step n={1} title="Unwind" sub="5 min · soft stretch" />
+        <View
+          style={[
+            styles.routineCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Step n={1} title="Unwind" sub="5 min · soft stretch" colors={colors} />
           <View style={styles.routineDivider} />
-          <Step n={2} title="Breathe" sub="8 min · 4-7-8" />
+          <Step n={2} title="Breathe" sub="8 min · 4-7-8" colors={colors} />
           <View style={styles.routineDivider} />
-          <Step n={3} title="Sleep" sub="Story or soundscape" />
+          <Step n={3} title="Sleep" sub="Story or soundscape" colors={colors} />
         </View>
 
         {/* SECTIONS */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Library</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Library</Text>
         </View>
         {sections.map((s, i) => (
-          <TouchableOpacity key={i} style={styles.row} activeOpacity={0.85}>
-            <View style={styles.rowIcon}>
-              <s.Icon size={20} color={COLORS.mutedTeal} />
+          <TouchableOpacity
+            key={i}
+            style={[
+              styles.row,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.rowIcon, { backgroundColor: colors.statPurpleSoft }]}>
+              <s.Icon size={20} color={colors.statPurple} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.rowTitle}>{s.title}</Text>
-              <Text style={styles.rowDesc}>{s.desc}</Text>
-              <Text style={styles.rowMeta}>{s.duration}</Text>
+              <Text style={[styles.rowTitle, { color: colors.textPrimary }]}>{s.title}</Text>
+              <Text style={[styles.rowDesc, { color: colors.textSecondary }]}>{s.desc}</Text>
+              <Text style={[styles.rowMeta, { color: colors.accent }]}>{s.duration}</Text>
             </View>
-            <View style={styles.rowPlay}>
+            <View style={[styles.rowPlay, { backgroundColor: colors.accent }]}>
               <Play size={13} color={COLORS.deepBrown} />
             </View>
           </TouchableOpacity>
@@ -119,25 +133,38 @@ const SleepScreen = () => {
 
         {/* TIMER + AMBIENT */}
         <View style={warm.sectionRow}>
-          <Text style={warm.h2}>Comfort controls</Text>
+          <Text style={[warm.h2, { color: colors.textPrimary }]}>Comfort controls</Text>
         </View>
-        <View style={styles.controlCard}>
+        <View
+          style={[
+            styles.controlCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <View style={styles.controlRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.controlTitle}>Sleep timer</Text>
-              <Text style={styles.controlSub}>Fade audio after 45 min</Text>
+              <Text style={[styles.controlTitle, { color: colors.textPrimary }]}>
+                Sleep timer
+              </Text>
+              <Text style={[styles.controlSub, { color: colors.textSecondary }]}>
+                Fade audio after 45 min
+              </Text>
             </View>
-            <Text style={styles.controlValue}>45m</Text>
-            <ChevronRight size={18} color={COLORS.textSecondary} />
+            <Text style={[styles.controlValue, { color: colors.accent }]}>45m</Text>
+            <ChevronRight size={18} color={colors.textSecondary} />
           </View>
           <View style={styles.controlDivider} />
           <View style={styles.controlRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.controlTitle}>Background ambient</Text>
-              <Text style={styles.controlSub}>Soft rain · 30% volume</Text>
+              <Text style={[styles.controlTitle, { color: colors.textPrimary }]}>
+                Background ambient
+              </Text>
+              <Text style={[styles.controlSub, { color: colors.textSecondary }]}>
+                Soft rain · 30% volume
+              </Text>
             </View>
-            <Text style={styles.controlValue}>30%</Text>
-            <ChevronRight size={18} color={COLORS.textSecondary} />
+            <Text style={[styles.controlValue, { color: colors.accent }]}>30%</Text>
+            <ChevronRight size={18} color={colors.textSecondary} />
           </View>
         </View>
       </ScrollView>
@@ -145,14 +172,24 @@ const SleepScreen = () => {
   );
 };
 
-const Step = ({ n, title, sub }: { n: number; title: string; sub: string }) => (
+const Step = ({
+  n,
+  title,
+  sub,
+  colors,
+}: {
+  n: number;
+  title: string;
+  sub: string;
+  colors: { accent: string; accentSoft: string; textPrimary: string; textSecondary: string };
+}) => (
   <View style={styles.stepRow}>
-    <View style={styles.stepBadge}>
-      <Text style={styles.stepN}>{n}</Text>
+    <View style={[styles.stepBadge, { backgroundColor: colors.accentSoft }]}>
+      <Text style={[styles.stepN, { color: colors.accent }]}>{n}</Text>
     </View>
     <View style={{ flex: 1 }}>
-      <Text style={styles.stepTitle}>{title}</Text>
-      <Text style={styles.stepSub}>{sub}</Text>
+      <Text style={[styles.stepTitle, { color: colors.textPrimary }]}>{title}</Text>
+      <Text style={[styles.stepSub, { color: colors.textSecondary }]}>{sub}</Text>
     </View>
   </View>
 );
