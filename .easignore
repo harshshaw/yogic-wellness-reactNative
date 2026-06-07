@@ -3,6 +3,7 @@
 # unrelated builds — EAS should never scan or ship the server folder.
 
 server/
+freellmapi/
 docs/
 *.md
 .vercel/

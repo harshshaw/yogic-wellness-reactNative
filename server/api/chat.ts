@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -14,7 +13,10 @@ const VALID_MODES: Mode[] = [
 ];
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
-const CHAT_MODEL = 'claude-sonnet-4-6';
+// freellmapi accepts 'auto' to pick the best available free model across the
+// configured providers (Gemini, Groq, Cerebras, Mistral, etc.) and failover
+// automatically when one hits a rate limit.
+const CHAT_MODEL = 'auto';
 const TOP_K = 3;
 const MAX_HISTORY = 10;
 
@@ -50,9 +52,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    // 1. Embed the latest user query.
+    // freellmapi proxy — OpenAI-compatible, but pointed at the Railway deploy
+    // and authed with the freellmapi-... key.
+    const llm = new OpenAI({
+      apiKey: process.env.FREELLM_KEY,
+      baseURL: process.env.FREELLM_BASE_URL,
+    });
+
+    // 1. Embed the latest user query (still via OpenAI — cheap, reliable).
     const emb = await openai.embeddings.create({
       model: EMBEDDING_MODEL,
       input: lastUser.content,
@@ -70,25 +78,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 3. Build the prompt.
     const system = buildSystemPrompt(mode, relevant);
 
-    // 4. Call Claude with rolling history.
+    // 4. Call freellmapi with rolling history.
     const trimmed = messages.slice(-MAX_HISTORY);
-    const completion = await anthropic.messages.create({
+    const completion = await llm.chat.completions.create({
       model: CHAT_MODEL,
       max_tokens: 400,
-      system,
-      messages: trimmed.map(m => ({ role: m.role, content: m.content })),
+      messages: [
+        { role: 'system', content: system },
+        ...trimmed.map(m => ({ role: m.role, content: m.content })),
+      ],
     });
 
-    const text = completion.content
-      .filter(block => block.type === 'text')
-      .map(block => (block as { type: 'text'; text: string }).text)
-      .join('\n')
-      .trim();
+    const text = (completion.choices[0]?.message?.content ?? '').trim();
+    const usedModel = completion.model ?? CHAT_MODEL;
 
     return res.status(200).json({
       content: text,
       citations: relevant.map(v => ({ ref: v.ref, english: v.english })),
       retrieval: retrieved.map(r => ({ ref: r.verse.ref, score: r.score })),
+      model: usedModel,
     });
   } catch (err: any) {
     console.error('chat handler error', err);

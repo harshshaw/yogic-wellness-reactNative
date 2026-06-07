@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# freellmapi service (separate deploy)
+freellmapi/
