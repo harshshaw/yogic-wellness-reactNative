@@ -27,7 +27,7 @@ const AudioContext = createContext<AudioContextValue>({
 });
 
 const BACKGROUND_SOURCE = require('../assets/karmana-app-music.mp3');
-const TRACK_SOURCE = require('../assets/music-playlist/sounovamusic-himalaya-journey-449825.mp3');
+const TRACK_SOURCE = require('../assets/music-playlist/screen-recording.mp3');
 
 export const AppMusicProvider = ({ children }: { children: React.ReactNode }) => {
   const [muted, setMuted] = useState(false);

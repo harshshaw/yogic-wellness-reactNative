@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { useTheme } from '../hooks/useTheme';
@@ -72,6 +73,27 @@ const SunIcon = ({ color }: { color: string }) => (
 const ChevronRight = ({ color }: { color: string }) => (
   <Svg width={18} height={18} viewBox="0 0 24 24">
     <Path d="M9 6l6 6-6 6" stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const MusicNoteIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
+    <Path
+      d="M9 18V6l12-2v12"
+      stroke={color}
+      strokeWidth={1.8}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle cx="6" cy="18" r="3" stroke={color} strokeWidth={1.8} fill="none" />
+    <Circle cx="18" cy="16" r="3" stroke={color} strokeWidth={1.8} fill="none" />
+  </Svg>
+);
+
+const PlayTriangle = ({ color, size = 14 }: { color: string; size?: number }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path d="M8 5v14l11-7z" fill={color} />
   </Svg>
 );
 
@@ -168,6 +190,7 @@ const StatRing = ({ value, label, sub, color, progress, Icon, ink, muted }: Stat
 };
 
 const HomeScreen = () => {
+  const navigation = useNavigation<any>();
   const { muted, toggleMuted } = useAppMusic();
   const { mode, toggle, colors, images } = useTheme();
   const isNight = mode === 'night';
@@ -200,6 +223,13 @@ const HomeScreen = () => {
               <MenuIcon color={headerIconColor} />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Music')}
+                style={localStyles.headerBtn}
+              >
+                <MusicNoteIcon color={headerIconColor} />
+              </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={toggle}
@@ -242,11 +272,19 @@ const HomeScreen = () => {
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
-          <View style={styles.progressHeader}>
-            <OmIcon color={colors.accent} />
-            <Text style={[styles.progressTitle, { color: colors.textPrimary }]}>
-              Your Progress
-            </Text>
+          <View style={[styles.progressHeader, { justifyContent: 'space-between' }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <OmIcon color={colors.accent} />
+              <Text style={[styles.progressTitle, { color: colors.textPrimary }]}>
+                Your Progress
+              </Text>
+            </View>
+            <TouchableOpacity activeOpacity={0.7} style={localStyles.sectionLink}>
+              <Text style={[localStyles.sectionLinkText, { color: colors.statOrange }]}>
+                View all
+              </Text>
+              <ChevronRight color={colors.statOrange} />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.ringsRow}>
@@ -289,45 +327,50 @@ const HomeScreen = () => {
           style={styles.goalCard}
           imageStyle={styles.goalImage}
         >
-          <View style={styles.goalOverlay} />
-          <Text style={styles.goalTitle}>Today's Goal</Text>
-          <Text style={styles.goalSub}>Keep going, you're doing great!</Text>
+          <View style={isNight ? styles.goalOverlay : localStyles.goalOverlayLight} />
+          <View style={{ width: '60%' }}>
+            <Text style={[styles.goalTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
+              Today's Goal
+            </Text>
+            <Text style={[styles.goalSub, { color: isNight ? 'rgba(255,255,255,0.85)' : '#475569' }]}>
+              Keep going, you're doing great!
+            </Text>
+          </View>
           <View style={styles.goalRow}>
-            <Text style={styles.goalPercent}>75%</Text>
-            <View style={styles.progressBar}>
-              <View style={styles.progressFill} />
+            <Text style={[styles.goalPercent, { color: colors.statYellow }]}>75%</Text>
+            <View style={[styles.progressBar, { backgroundColor: isNight ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)' }]}>
+              <View style={[styles.progressFill, { backgroundColor: colors.statYellow }]} />
             </View>
           </View>
         </ImageBackground>
 
         {/* TODAY'S FOCUS */}
-        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-          Today's Focus
-        </Text>
+        <View style={localStyles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+            Today's Focus
+          </Text>
+          <TouchableOpacity activeOpacity={0.7} style={localStyles.sectionLink}>
+            <Text style={[localStyles.sectionLinkText, { color: colors.statOrange }]}>
+              Edit
+            </Text>
+            <ChevronRight color={colors.statOrange} />
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={[
-            styles.focusCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
-          <View style={[styles.focusIconWrap, { backgroundColor: colors.accentSoft }]}>
-            <OmIcon color={colors.accent} />
+        <TouchableOpacity activeOpacity={0.85} style={localStyles.focusCardLight}>
+          <View style={[localStyles.focusIconCircle, { backgroundColor: colors.statMintSoft }]}>
+            <SunIcon color={colors.statMint} />
           </View>
-          <View style={styles.focusContent}>
-            <Text style={[styles.focusTitle, { color: colors.textPrimary }]}>
-              Surya Namaskar
+          <View style={localStyles.focusBody}>
+            <Text style={[localStyles.focusBodyTitle, { color: colors.textPrimary }]}>
+              Morning Mindfulness
             </Text>
-            <Text style={[styles.focusDesc, { color: colors.textSecondary }]}>
-              Improve strength &amp;
-            </Text>
-            <Text style={[styles.focusMeta, { color: colors.textSecondary }]}>
-              25 min • Intermediate
+            <Text style={[localStyles.focusBodyMeta, { color: colors.textSecondary }]}>
+              10 min • Meditation
             </Text>
           </View>
-          <View style={[styles.focusPlay, { backgroundColor: colors.accent }]}>
-            <ChevronRight color={COLORS.deepBrown} />
+          <View style={[localStyles.focusPlayCircle, { backgroundColor: colors.statMintSoft }]}>
+            <PlayTriangle color={colors.statMint} />
           </View>
         </TouchableOpacity>
       </ScrollView>
@@ -340,9 +383,70 @@ const localStyles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.5)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // — section headers with right-aligned link —
+  sectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 12,
+  },
+  sectionLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  sectionLinkText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // — light-mode Today's Goal overlay —
+  goalOverlayLight: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(254,243,199,0.7)',
+  },
+
+  // — Today's Focus card (Calm-style row) —
+  focusCardLight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 18,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingVertical: 16,
+    paddingLeft: 14,
+    paddingRight: 18,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
+  focusIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  focusBody: { flex: 1, marginLeft: 14 },
+  focusBodyTitle: { fontSize: 16, fontWeight: '700' },
+  focusBodyMeta: { fontSize: 13, marginTop: 3 },
+  focusPlayCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },

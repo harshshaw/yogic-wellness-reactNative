@@ -82,7 +82,7 @@ const nightColors: ThemeColors = {
 };
 
 const dayImages: ThemeImages = {
-  homeHero: require('../assets/images/meditatingGuru.png'),
+  homeHero: require('../assets/images/daylight-guru.png'),
   goalHero: require('../assets/images/goal-day.jpg'),
   sleepHero: require('../assets/images/sleep-hero.jpg'),
   breatheHero: require('../assets/images/breathe-hero.jpg'),

@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import SplashScreen from './SplashScreen';
 import MainTabs from './MainTabs';
+import MusicScreen from './MusicScreen';
 import NowPlayingScreen from './NowPlayingScreen';
 import BreathingSessionScreen from './BreathingSessionScreen';
 import AICompanionScreen from './AICompanionScreen';
@@ -16,6 +17,11 @@ export default function AppNavigator() {
         name="Main"
         component={MainTabs}
         options={{ gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="Music"
+        component={MusicScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen
         name="NowPlaying"
