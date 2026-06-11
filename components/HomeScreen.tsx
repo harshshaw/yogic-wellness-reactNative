@@ -215,7 +215,7 @@ const HomeScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HEADER WITH GURU IMAGE */}

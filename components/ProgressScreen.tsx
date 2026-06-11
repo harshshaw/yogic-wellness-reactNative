@@ -149,7 +149,7 @@ const ProgressScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
