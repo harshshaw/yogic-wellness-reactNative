@@ -75,6 +75,160 @@ export const ChevronRight = ({ size, color = '#fff', strokeWidth = 2.2 }: Props)
   </Svg>
 );
 
+export const ChevronLeft = ({ size, color = '#fff', strokeWidth = 2.2 }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="m15 18-6-6 6-6" stroke={color} />
+  </Svg>
+);
+
+export const Sun = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="12" r="4" stroke={color} />
+    <Path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke={color} />
+  </Svg>
+);
+
+export const Leaf = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.96a1 1 0 0 1 1.5.86V17a7 7 0 0 1-7 7" stroke={color} />
+    <Path d="M2 21c0-3 1.85-5.36 5.08-6" stroke={color} />
+  </Svg>
+);
+
+export const Waveform = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M2 12h2l2-7 4 14 4-10 2 6h6" stroke={color} />
+  </Svg>
+);
+
+export const CloudRain = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M16 13a5 5 0 0 0-9.5-2A4 4 0 0 0 6 19h11a4 4 0 0 0 0-8z" stroke={color} />
+    <Path d="M8 19v3M12 19v3M16 19v3" stroke={color} />
+  </Svg>
+);
+
+export const Bowl = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M3 11h18a9 9 0 0 1-18 0z" stroke={color} />
+    <Path d="M7 4c0 2 2 3 2 5M12 3c0 2 2 3 2 5M17 4c0 2 2 3 2 5" stroke={color} />
+  </Svg>
+);
+
+export const Check = ({ size, color = '#fff', strokeWidth = 2.4 }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M20 6 9 17l-5-5" stroke={color} />
+  </Svg>
+);
+
+export const Star = ({ size, color = '#fff', strokeWidth, filled }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path
+      d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+      stroke={color}
+      fill={filled ? color : 'none'}
+    />
+  </Svg>
+);
+
+export const Stretch = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="4" r="2" stroke={color} />
+    <Path d="M5 9l4 2 3-2 3 2 4-2M9 11v4l-2 5M15 11v4l2 5" stroke={color} />
+  </Svg>
+);
+
+export const Calendar = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M3 8h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke={color} />
+    <Path d="M8 2v4M16 2v4" stroke={color} />
+  </Svg>
+);
+
+export const Pencil = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" stroke={color} />
+  </Svg>
+);
+
+export const Footprints = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M4 16a2 2 0 0 0 2 2c1.5 0 2-1 2-2v-2c0-1.5 1-3 1-5a3 3 0 0 0-6 0c0 1.5 1 3 1 5z" stroke={color} />
+    <Path d="M14 16a2 2 0 0 0 2 2c1.5 0 2-1 2-2v-2c0-1.5 1-3 1-5a3 3 0 0 0-6 0c0 1.5 1 3 1 5z" stroke={color} />
+  </Svg>
+);
+
+export const Clock = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="12" r="10" stroke={color} />
+    <Path d="M12 6v6l4 2" stroke={color} />
+  </Svg>
+);
+
+export const Info = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="12" r="10" stroke={color} />
+    <Path d="M12 16v-4M12 8h.01" stroke={color} />
+  </Svg>
+);
+
+export const Dots = ({ size = 22, color = '#000' }: Props) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="5" cy="12" r="1.8" fill={color} />
+    <Circle cx="12" cy="12" r="1.8" fill={color} />
+    <Circle cx="19" cy="12" r="1.8" fill={color} />
+  </Svg>
+);
+
+export const Frown = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="12" r="10" stroke={color} />
+    <Path d="M16 16s-1.5-2-4-2-4 2-4 2" stroke={color} />
+    <Path d="M9 9h.01M15 9h.01" stroke={color} />
+  </Svg>
+);
+
+export const SleepyFace = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Circle cx="12" cy="12" r="10" stroke={color} />
+    <Path d="M8 14h8" stroke={color} />
+    <Path d="M8 9.5l2-1M14 8.5l2 1" stroke={color} />
+    <Path d="M15 5l3 0-3 3 3 0" stroke={color} />
+  </Svg>
+);
+
+export const Heart = ({ size, color = '#fff', strokeWidth, filled }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path
+      d="M12 21s-7-4.35-7-10a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 19 11c0 5.65-7 10-7 10z"
+      stroke={color}
+      fill={filled ? color : 'none'}
+    />
+  </Svg>
+);
+
+export const Chat = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path
+      d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+      stroke={color}
+    />
+  </Svg>
+);
+
+export const LotusEmblem = ({ size = 64, color = '#A78BFA' }: Props) => (
+  <Svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    {/* center petal */}
+    <Path d="M50 22 C 45 34, 45 50, 50 60 C 55 50, 55 34, 50 22 Z" fill={color} opacity={0.85} />
+    {/* mid left + right */}
+    <Path d="M50 60 C 38 56, 28 46, 26 32 C 36 38, 46 52, 50 60 Z" fill={color} opacity={0.65} />
+    <Path d="M50 60 C 62 56, 72 46, 74 32 C 64 38, 54 52, 50 60 Z" fill={color} opacity={0.65} />
+    {/* outer left + right */}
+    <Path d="M50 60 C 32 58, 18 60, 14 50 C 24 56, 38 60, 50 60 Z" fill={color} opacity={0.5} />
+    <Path d="M50 60 C 68 58, 82 60, 86 50 C 76 56, 62 60, 50 60 Z" fill={color} opacity={0.5} />
+  </Svg>
+);
+
 export const X = ({ size, color = '#fff', strokeWidth = 2 }: Props) => (
   <Svg {...stroke(size, strokeWidth)}>
     <Path d="M18 6 6 18M6 6l12 12" stroke={color} />

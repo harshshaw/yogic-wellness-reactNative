@@ -212,6 +212,9 @@ const AICompanionScreen = () => {
             styles.input,
             { backgroundColor: colors.cardLight, color: colors.textPrimary, borderColor: colors.border },
           ]}
+          multiline
+          textAlignVertical="top"
+          submitBehavior="newline"
           onSubmitEditing={() => send()}
         />
         <TouchableOpacity
@@ -306,7 +309,7 @@ const styles = StyleSheet.create({
 
   composer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: 28,
@@ -323,10 +326,13 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     backgroundColor: COLORS.cardBrown,
-    borderRadius: RADII.pill,
+    borderRadius: 22,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
     fontSize: 14,
+    minHeight: 42,
+    maxHeight: 120,
     color: COLORS.textPrimary,
     borderWidth: 1,
     borderColor: 'rgba(212,175,55,0.12)',

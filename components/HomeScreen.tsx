@@ -91,36 +91,51 @@ const MusicNoteIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
+const HeartPulseIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const CalmIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="m12 3-1.6 4.8a2 2 0 0 1-1 1L4.6 10.4l4.8 1.6a2 2 0 0 1 1 1L12 17.8l1.6-4.8a2 2 0 0 1 1-1L19.4 10.4l-4.8-1.6a2 2 0 0 1-1-1z"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinejoin="round"
+    />
+    <Path d="M5 3v3M19 18v3M3 4h3M17 19h3" stroke={color} strokeWidth={1.8} strokeLinecap="round" />
+  </Svg>
+);
+
+const SleepMoonIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path
+      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 const PlayTriangle = ({ color, size = 14 }: { color: string; size?: number }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
     <Path d="M8 5v14l11-7z" fill={color} />
-  </Svg>
-);
-
-const FlameIcon = ({ color }: { color: string }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24">
-    <Path
-      d="M12 2c1 3.5-2 5-2 8a2 2 0 1 0 4 0c0-1 .5-2 1-2 1 2 3 4 3 7a6 6 0 1 1-12 0c0-4 4-6 6-13z"
-      fill={color}
-    />
-  </Svg>
-);
-
-const StepsIcon = ({ color }: { color: string }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24">
-    <Path
-      d="M7 4c1.5 0 2.5 1.5 2.5 3.5S8.5 11 7 11 4.5 9.5 4.5 7.5 5.5 4 7 4zm0 9c1.5 0 2.5 1 2.5 2.5S8 18 7 18.5c-1 .5-2 1-2 2 0 1 .5 1.5 1.5 1.5h2c1 0 1.5-.5 1.5-1.5 0-2-2-3-2-4.5 0-1 1-2 2-2 1.5 0 2.5-1 2.5-2.5S11 10 10 10c-1.5 0-3 1.5-3 3zm10-9c1.5 0 2.5 1.5 2.5 3.5S18.5 11 17 11s-2.5-1.5-2.5-3.5S15.5 4 17 4zm0 9c1.5 0 2.5 1 2.5 2.5S18 18 17 18.5c-1 .5-2 1-2 2 0 1 .5 1.5 1.5 1.5h2c1 0 1.5-.5 1.5-1.5 0-2-2-3-2-4.5 0-1 1-2 2-2"
-      fill={color}
-    />
-  </Svg>
-);
-
-const ClockIcon = ({ color }: { color: string }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24">
-    <Path
-      d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm.5-13H11v6l5 3 .8-1.3-4.3-2.5z"
-      fill={color}
-    />
   </Svg>
 );
 
@@ -289,32 +304,32 @@ const HomeScreen = () => {
 
           <View style={styles.ringsRow}>
             <StatRing
-              value="520"
-              label="Calories"
-              sub="/700 kcal"
-              color={colors.statOrange}
-              progress={74}
-              Icon={FlameIcon}
+              value="28"
+              label="Anxiety"
+              sub="/ 100"
+              color={colors.statPurple}
+              progress={72}
+              Icon={CalmIcon}
               ink={colors.textPrimary}
               muted={colors.textSecondary}
             />
             <StatRing
-              value="8,243"
-              label="Steps"
-              sub="/10,000"
+              value="62"
+              label="HRV"
+              sub="/ 80 ms"
               color={colors.statMint}
-              progress={82}
-              Icon={StepsIcon}
+              progress={78}
+              Icon={HeartPulseIcon}
               ink={colors.textPrimary}
               muted={colors.textSecondary}
             />
             <StatRing
-              value="52"
-              label="Minutes"
-              sub="/60 min"
-              color={colors.statYellow}
-              progress={86}
-              Icon={ClockIcon}
+              value="7.4h"
+              label="Sleep"
+              sub="/ 8h"
+              color={colors.statOrange}
+              progress={92}
+              Icon={SleepMoonIcon}
               ink={colors.textPrimary}
               muted={colors.textSecondary}
             />

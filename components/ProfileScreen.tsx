@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,322 +7,261 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../styles/colors';
-import { warm, RADII } from '../styles/warm';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
 import {
   Sparkles,
-  Target,
-  Bell,
-  Settings,
-  Lock,
-  Crown,
-  Globe,
-  Moon,
-  User,
-  HeartPulse,
-  ChevronRight,
+  ChevronLeft,
+  Mic,
+  Info,
+  Dots,
+  Frown,
+  SleepyFace,
+  Heart,
+  Chat,
+  LotusEmblem,
 } from './Icons';
 
-type Mode = 'Pranayama Guru' | 'Gita Companion' | 'Sleep Guide' | 'Confidence Coach';
-const modes: { id: Mode; tagline: string; tint: string; Icon: any }[] = [
-  { id: 'Pranayama Guru', tagline: 'Breath coaching', tint: COLORS.primaryGold, Icon: HeartPulse },
-  { id: 'Gita Companion', tagline: 'Wisdom & reflection', tint: COLORS.warmBeige, Icon: Sparkles },
-  { id: 'Sleep Guide', tagline: 'Bedtime support', tint: COLORS.mutedTeal, Icon: Moon },
-  { id: 'Confidence Coach', tagline: 'Encouragement', tint: COLORS.sunsetOrange, Icon: Target },
-];
-
-const settings = [
-  { id: 'goals', label: 'My Goals', Icon: Target },
-  { id: 'companion', label: 'AI Companion Settings', Icon: Sparkles },
-  { id: 'notifs', label: 'Notifications', Icon: Bell },
-  { id: 'reminders', label: 'Reminder Schedule', Icon: Bell },
-  { id: 'theme', label: 'Theme Preferences', Icon: Settings },
-  { id: 'language', label: 'Language', Icon: Globe },
-  { id: 'privacy', label: 'Privacy & Safety', Icon: Lock },
-];
+type ChipMode = {
+  id: string;
+  label: string;
+  prompt: string;
+  Icon: any;
+};
 
 const ProfileScreen = () => {
   const navigation = useNavigation<any>();
-  const [activeMode, setActiveMode] = useState<Mode>('Pranayama Guru');
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
+  const isNight = mode === 'night';
+
+  const heroGradient: readonly [string, string, string] = isNight
+    ? ['#2A2150', '#1F1A40', '#15123A']
+    : ['#F3E8FF', '#EDE9FE', '#E0E7FF'];
+
+  const launch = (companionMode: any, prompt: string) =>
+    navigation.navigate('AICompanion', { mode: companionMode, prompt });
+
+  const chips: ChipMode[] = [
+    { id: 'anxious',    label: 'I feel anxious',  prompt: "I'm feeling anxious right now",  Icon: Frown },
+    { id: 'sleep',      label: "Can't sleep well", prompt: "I can't sleep well",             Icon: SleepyFace },
+    { id: 'motivation', label: 'Need motivation', prompt: 'I need some motivation',         Icon: Heart },
+    { id: 'talk',       label: 'Just want to talk', prompt: 'I just want to talk',           Icon: Chat },
+  ];
 
   return (
-    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
-      <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* HEADER */}
-        <View style={warm.topRow}>
-          <View>
-            <Text style={warm.overline}>Settings</Text>
-            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Profile</Text>
-            <Text style={[warm.body, { color: colors.textSecondary }]}>Your journey, your way.</Text>
-          </View>
+        <View style={styles.headerRow}>
           <TouchableOpacity
-            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('AICompanion', { mode: activeMode })}
+            activeOpacity={0.6}
+            style={styles.backBtn}
+            onPress={() => navigation.canGoBack() && navigation.goBack()}
           >
-            <Sparkles size={18} color={colors.accent} />
+            <ChevronLeft color={colors.textPrimary} size={24} />
           </TouchableOpacity>
-        </View>
-
-        {/* HERO CARD */}
-        <View style={[styles.heroCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={styles.avatar}>
-            <User size={28} color={COLORS.deepBrown} />
-          </View>
-          <Text style={[styles.heroName, { color: colors.textPrimary }]}>Arjun</Text>
-          <Text style={[styles.heroSub, { color: colors.textSecondary }]}>
-            Seeker · Level 3 · 1,250 / 2,000 XP
-          </Text>
-          <View style={styles.xpBar}>
-            <View style={[styles.xpFill, { width: '62%' }]} />
-          </View>
-          <View style={styles.heroStats}>
-            <Stat n="48" l="Days" colors={colors} />
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-            <Stat n="126" l="Sessions" colors={colors} />
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-            <Stat n="89%" l="Consistency" colors={colors} />
-          </View>
-        </View>
-
-        {/* DAILY INTENTION */}
-        <View
-          style={[
-            warm.goldCard,
-            { marginTop: 14, backgroundColor: colors.card, borderColor: colors.borderStrong },
-          ]}
-        >
-          <Text style={warm.overline}>Today’s intention</Text>
-          <Text
-            style={[
-              warm.h3,
-              { marginTop: 6, fontStyle: 'italic', color: colors.textPrimary },
-            ]}
-          >
-            “Breath first. Decisions second.”
-          </Text>
-          <TouchableOpacity style={styles.editLink} activeOpacity={0.7}>
-            <Text style={styles.editLinkTxt}>Edit intention</Text>
-            <ChevronRight size={14} color={colors.accent} />
-          </TouchableOpacity>
-        </View>
-
-        {/* COMPANION MODE */}
-        <View style={warm.sectionRow}>
-          <Text style={[warm.h2, { color: colors.textPrimary }]}>Change companion</Text>
-        </View>
-        <View style={styles.modesGrid}>
-          {modes.map(m => {
-            const active = activeMode === m.id;
-            return (
-              <TouchableOpacity
-                key={m.id}
-                style={[
-                  styles.modeCard,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                  active && {
-                    borderColor: colors.accent,
-                    backgroundColor: colors.accentSoft,
-                  },
-                ]}
-                activeOpacity={0.85}
-                onPress={() => setActiveMode(m.id)}
-              >
-                <View style={[styles.modeIcon, { backgroundColor: hexA(m.tint, 0.16) }]}>
-                  <m.Icon size={18} color={m.tint} />
-                </View>
-                <Text style={[styles.modeName, { color: colors.textPrimary }]}>{m.id}</Text>
-                <Text style={[styles.modeTag, { color: colors.textSecondary }]}>{m.tagline}</Text>
-                {active && <View style={[styles.modeDot, { backgroundColor: colors.accent }]} />}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* SETTINGS LIST */}
-        <View style={warm.sectionRow}>
-          <Text style={[warm.h2, { color: colors.textPrimary }]}>Settings</Text>
-        </View>
-        <View style={[styles.settingsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {settings.map((s, i) => (
+          <View style={styles.headerRight}>
             <TouchableOpacity
-              key={s.id}
-              style={[
-                styles.settingRow,
-                i < settings.length - 1 && [styles.settingDivider, { borderBottomColor: colors.border }],
-              ]}
               activeOpacity={0.7}
+              style={[styles.iconBtnOutline, { borderColor: colors.borderStrong }]}
             >
-              <View style={[styles.settingIcon, { backgroundColor: colors.accentSoft }]}>
-                <s.Icon size={16} color={colors.accent} />
+              <Info size={18} color={colors.textPrimary} />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.7} style={styles.dotsBtn}>
+              <Dots size={22} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* TITLE BLOCK */}
+        <View style={styles.titleBlock}>
+          <View style={styles.overlineRow}>
+            <Sparkles size={14} color={colors.statPurple} />
+            <Text style={[styles.overline, { color: colors.statPurple }]}>AI COMPANION</Text>
+          </View>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Your AI Companion</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Here for you, always.
+          </Text>
+        </View>
+
+        {/* HERO CARD with gradient + lotus + mountains */}
+        <LinearGradient
+          colors={heroGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroCard}
+        >
+          <MountainSilhouette />
+          <View style={styles.lotusWrap}>
+            <LotusEmblem
+              size={72}
+              color={isNight ? '#C4B5FD' : colors.statPurple}
+            />
+          </View>
+          <Text style={[styles.heroPrompt, { color: isNight ? '#F1EBFF' : '#0F172A' }]}>
+            How are you feeling{'\n'}today, Arjun?
+          </Text>
+        </LinearGradient>
+
+        {/* 2x2 CHIP GRID */}
+        <View style={styles.chipGrid}>
+          {chips.map(c => (
+            <TouchableOpacity
+              key={c.id}
+              style={[styles.chip, { backgroundColor: colors.card, borderColor: colors.border }]}
+              activeOpacity={0.85}
+              onPress={() => launch('Pranayama Guru', c.prompt)}
+            >
+              <View style={[styles.chipIcon, { backgroundColor: colors.statPurpleSoft }]}>
+                <c.Icon size={16} color={colors.statPurple} />
               </View>
-              <Text style={[styles.settingLabel, { color: colors.textPrimary }]}>{s.label}</Text>
-              <ChevronRight size={16} color={colors.textSecondary} />
+              <Text style={[styles.chipLabel, { color: colors.textPrimary }]}>{c.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* PREMIUM */}
-        <TouchableOpacity style={styles.premiumCard} activeOpacity={0.9}>
-          <View style={styles.premiumIcon}>
-            <Crown size={20} color={COLORS.deepBrown} />
+        {/* MIC BUTTON */}
+        <View style={styles.micArea}>
+          <View style={[styles.micRing, { backgroundColor: colors.statPurpleSoft }]}>
+            <TouchableOpacity
+              style={[styles.micBtn, { backgroundColor: colors.statPurple }]}
+              activeOpacity={0.85}
+              onPress={() => launch('Pranayama Guru', '')}
+            >
+              <Mic size={28} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.premiumTitle}>Yogic Wellness · Premium</Text>
-            <Text style={styles.premiumSub}>All companions. All sessions. Forever.</Text>
-          </View>
-          <ChevronRight size={18} color={COLORS.deepBrown} />
-        </TouchableOpacity>
+          <Text style={[styles.micLabel, { color: colors.textSecondary }]}>Tap to talk</Text>
+        </View>
       </ScrollView>
     </View>
   );
 };
 
-const Stat = ({
-  n,
-  l,
-  colors,
-}: {
-  n: string;
-  l: string;
-  colors: { textPrimary: string; textSecondary: string };
-}) => (
-  <View style={{ flex: 1, alignItems: 'center' }}>
-    <Text style={[styles.statN, { color: colors.textPrimary }]}>{n}</Text>
-    <Text style={[styles.statL, { color: colors.textSecondary }]}>{l}</Text>
+// ─── Soft mountain silhouettes for the hero ─────────────────────────────
+const MountainSilhouette = () => (
+  <View style={StyleSheet.absoluteFillObject}>
+    <Svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 320 200"
+      preserveAspectRatio="xMidYMax slice"
+    >
+      {/* far mountains */}
+      <Path
+        d="M0 140 L40 120 L80 132 L120 110 L160 124 L200 108 L240 122 L280 112 L320 130 L320 200 L0 200 Z"
+        fill="rgba(167,139,250,0.16)"
+      />
+      {/* trees mid */}
+      <Path
+        d="M0 160 L20 152 L25 148 L30 152 L40 158 L50 150 L55 145 L60 150 L75 158 L90 152 L100 156 L115 148 L120 156 L130 160 L0 160 Z"
+        fill="rgba(139,92,246,0.22)"
+      />
+      <Path
+        d="M200 160 L210 152 L218 156 L228 148 L235 156 L245 150 L255 154 L265 146 L275 154 L285 148 L295 154 L305 150 L320 160 L200 160 Z"
+        fill="rgba(139,92,246,0.22)"
+      />
+    </Svg>
   </View>
 );
 
-const hexA = (hex: string, a: number) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.substring(0, 2), 16);
-  const g = parseInt(h.substring(2, 4), 16);
-  const b = parseInt(h.substring(4, 6), 16);
-  return `rgba(${r},${g},${b},${a})`;
-};
-
 const styles = StyleSheet.create({
-  heroCard: {
-    backgroundColor: COLORS.cardBrown,
-    borderRadius: RADII.card,
-    borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.18)',
-    padding: 22,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 72, height: 72, borderRadius: 36,
-    backgroundColor: COLORS.primaryGold,
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: COLORS.primaryGold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  heroName: { color: COLORS.textPrimary, fontSize: 24, fontWeight: '700', marginTop: 12 },
-  heroSub: { color: COLORS.textSecondary, fontSize: 12, marginTop: 4 },
-  xpBar: {
-    width: '100%',
-    height: 5,
-    backgroundColor: 'rgba(212,175,55,0.15)',
-    borderRadius: 3,
-    marginTop: 14,
-    overflow: 'hidden',
-  },
-  xpFill: { height: '100%', backgroundColor: COLORS.primaryGold, borderRadius: 3 },
-  heroStats: {
+  container: { flex: 1 },
+
+  // HEADER
+  headerRow: {
     flexDirection: 'row',
-    marginTop: 18,
-    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 56,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
   },
-  statDivider: { width: 1, backgroundColor: 'rgba(212,175,55,0.12)' },
-  statN: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '700' },
-  statL: { color: COLORS.textSecondary, fontSize: 11, marginTop: 2 },
+  backBtn: {
+    width: 36, height: 36,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBtnOutline: {
+    width: 36, height: 36, borderRadius: 18,
+    borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  dotsBtn: {
+    width: 36, height: 36,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
-  editLink: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 4 },
-  editLinkTxt: { color: COLORS.primaryGold, fontSize: 12, fontWeight: '600' },
+  // TITLE BLOCK
+  titleBlock: { paddingHorizontal: 20, paddingBottom: 18 },
+  overlineRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  overline: { fontSize: 11, fontWeight: '700', letterSpacing: 2.4 },
+  title: { fontSize: 32, fontWeight: '700', letterSpacing: -0.6, marginTop: 10 },
+  subtitle: { fontSize: 14, marginTop: 6 },
 
-  modesGrid: {
+  // HERO
+  heroCard: {
+    marginHorizontal: 20,
+    height: 230,
+    borderRadius: 24,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lotusWrap: { marginBottom: 12 },
+  heroPrompt: {
+    fontSize: 22,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    textAlign: 'center',
+    lineHeight: 30,
+  },
+
+  // CHIP GRID
+  chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    paddingHorizontal: 20,
+    marginTop: 22,
+    gap: 12,
   },
-  modeCard: {
-    width: '48.5%',
-    backgroundColor: COLORS.cardBrown,
+  chip: {
+    width: '47.5%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.1)',
-    padding: 14,
-    position: 'relative',
   },
-  modeCardActive: {
-    borderColor: COLORS.primaryGold,
-    backgroundColor: 'rgba(212,175,55,0.06)',
-  },
-  modeIcon: {
-    width: 38, height: 38, borderRadius: 12,
-    alignItems: 'center', justifyContent: 'center',
-    marginBottom: 10,
-  },
-  modeName: { color: COLORS.textPrimary, fontSize: 13, fontWeight: '700' },
-  modeTag: { color: COLORS.textSecondary, fontSize: 11, marginTop: 2 },
-  modeDot: {
-    position: 'absolute',
-    top: 12, right: 12,
-    width: 8, height: 8, borderRadius: 4,
-    backgroundColor: COLORS.primaryGold,
-  },
-
-  settingsCard: {
-    backgroundColor: COLORS.cardBrown,
-    borderRadius: RADII.card,
-    borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.1)',
-    overflow: 'hidden',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 12,
-  },
-  settingDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212,175,55,0.06)',
-  },
-  settingIcon: {
-    width: 32, height: 32, borderRadius: 10,
-    backgroundColor: 'rgba(212,175,55,0.1)',
+  chipIcon: {
+    width: 28, height: 28, borderRadius: 14,
     alignItems: 'center', justifyContent: 'center',
   },
-  settingLabel: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '500', flex: 1 },
+  chipLabel: { fontSize: 14, fontWeight: '600' },
 
-  premiumCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.primaryGold,
-    borderRadius: RADII.card,
-    padding: 16,
-    marginTop: 20,
-    gap: 12,
-    shadowColor: COLORS.primaryGold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
+  // MIC
+  micArea: { alignItems: 'center', marginTop: 40 },
+  micRing: {
+    width: 96, height: 96, borderRadius: 48,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  micBtn: {
+    width: 76, height: 76, borderRadius: 38,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#8B5CF6',
+    shadowOpacity: 0.35,
     shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
-  premiumIcon: {
-    width: 44, height: 44, borderRadius: 14,
-    backgroundColor: 'rgba(28,20,15,0.18)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  premiumTitle: { color: COLORS.deepBrown, fontSize: 14, fontWeight: '700' },
-  premiumSub: { color: COLORS.deepBrown, fontSize: 12, marginTop: 2, opacity: 0.8 },
+  micLabel: { fontSize: 14, fontWeight: '600', marginTop: 14 },
 });
 
 export default ProfileScreen;

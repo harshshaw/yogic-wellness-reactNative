@@ -8,128 +8,158 @@ import {
   ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../styles/colors';
-import { warm, RADII } from '../styles/warm';
 import { useTheme } from '../hooks/useTheme';
 import {
   Sparkles,
   Wind,
-  Flame,
-  Moon,
+  Sun,
+  Leaf,
   HeartPulse,
   Play,
   ChevronRight,
+  ChevronLeft,
 } from './Icons';
 
 type SessionCard = {
   id: string;
   title: string;
-  duration: string;
-  level: string;
+  meta: string;
   Icon: any;
   tint: string;
+  tintSoft: string;
 };
-
-const sessions: SessionCard[] = [
-  { id: 'anxiety', title: 'Anxiety Reset', duration: '6 min', level: 'Gentle', Icon: HeartPulse, tint: '#10B981' },
-  { id: 'energy', title: 'Energy Boost', duration: '4 min', level: 'Active', Icon: Flame, tint: '#FB923C' },
-  { id: 'focus', title: 'Focus Mode', duration: '7 min', level: 'Steady', Icon: Wind, tint: '#3B82F6' },
-  { id: 'sleep', title: 'Calm Before Sleep', duration: '10 min', level: 'Soft', Icon: Moon, tint: '#8B5CF6' },
-  { id: 'healing', title: 'Deep Healing', duration: '12 min', level: 'Restorative', Icon: HeartPulse, tint: '#F472B6' },
-];
 
 const BreatheScreen = () => {
   const navigation = useNavigation<any>();
-  const { colors, images } = useTheme();
+  const { colors, images, mode } = useTheme();
+  const isNight = mode === 'night';
 
   const openSession = (id: string, title: string) =>
     navigation.navigate('BreathingSession', { id, title });
 
+  const sessions: SessionCard[] = [
+    { id: 'anxiety',  title: 'Anxiety Reset',   meta: '6 min · Gentle',          Icon: HeartPulse, tint: colors.statMint,   tintSoft: colors.statMintSoft },
+    { id: 'deep',     title: 'Deep Breathing',  meta: '8 min · 4-7-8',           Icon: Wind,       tint: '#3B82F6',         tintSoft: 'rgba(59,130,246,0.14)' },
+    { id: 'energize', title: 'Energize Breath', meta: '5 min · Box Breathing',   Icon: Sun,        tint: colors.statYellow, tintSoft: colors.statYellowSoft },
+    { id: 'focus',    title: 'Focus & Clarity', meta: '5 min · Alternate Nostril', Icon: Leaf,     tint: colors.statPurple, tintSoft: colors.statPurpleSoft },
+  ];
+
   return (
-    <View style={[warm.screen, { backgroundColor: colors.bg }]}>
-      <ScrollView contentContainerStyle={warm.scroll} showsVerticalScrollIndicator={false}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
-        <View style={warm.topRow}>
-          <View>
-            <Text style={warm.overline}>Soundscapes · Practice</Text>
-            <Text style={[warm.h1, { marginTop: 4, color: colors.textPrimary }]}>Breathe</Text>
-            <Text style={[warm.body, { color: colors.textSecondary }]}>Reset your body and mind.</Text>
-          </View>
+        <View style={styles.headerRow}>
+          <TouchableOpacity activeOpacity={0.6} style={styles.backBtn}>
+            <ChevronLeft color={colors.textPrimary} size={24} />
+          </TouchableOpacity>
           <TouchableOpacity
-            style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[styles.sparkleBtn, { borderColor: colors.borderStrong }]}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
           >
-            <Sparkles size={18} color={colors.accent} />
+            <Sparkles size={20} color={colors.statMint} />
           </TouchableOpacity>
         </View>
 
-        {/* AI GURU HERO CARD — image-backed */}
+        {/* TITLE BLOCK */}
+        <View style={styles.titleBlock}>
+          <Text style={[styles.overline, { color: colors.statMint }]}>
+            SOUNDSCAPES · PRACTICE
+          </Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Breathe</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Reset your body and mind.
+          </Text>
+        </View>
+
+        {/* AI GURU HERO CARD */}
         <ImageBackground
           source={images.breatheHero}
-          style={styles.heroCard}
+          style={[styles.heroCard, { borderColor: colors.statMint }]}
           imageStyle={{ borderRadius: 24 }}
         >
-          <View style={styles.heroImageOverlay} />
-          <View style={styles.heroIconRow}>
-            <View style={styles.heroIcon}>
-              <Sparkles size={20} color={COLORS.deepBrown} />
-            </View>
-            <Text style={styles.heroTag}>AI COMPANION</Text>
+          <View
+            style={[
+              styles.heroOverlay,
+              { backgroundColor: isNight ? 'rgba(8,12,28,0.45)' : 'rgba(255,255,255,0.04)' },
+            ]}
+          />
+          <View style={[styles.heroBadge, { backgroundColor: colors.statMintSoft }]}>
+            <Sparkles size={14} color={colors.statMint} />
+            <Text style={[styles.heroBadgeText, { color: colors.statMint }]}>AI COMPANION</Text>
           </View>
-          <Text style={styles.heroTitle}>Pranayama Guru</Text>
-          <Text style={styles.heroSub}>
+          <Text style={[styles.heroTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
+            Pranayama Guru
+          </Text>
+          <Text style={[styles.heroSub, { color: isNight ? 'rgba(255,255,255,0.88)' : '#0F172A' }]}>
             A calm coach for your breath. Personalized in the moment, never preachy.
           </Text>
           <TouchableOpacity
-            style={[warm.pillPrimary, { marginTop: 18, alignSelf: 'flex-start' }]}
+            style={[styles.heroCta, { backgroundColor: isNight ? colors.card : '#FFFFFF' }]}
             activeOpacity={0.9}
-            onPress={() => navigation.navigate('BreathingSession', { id: 'guided', title: 'Guided Session' })}
+            onPress={() =>
+              navigation.navigate('BreathingSession', { id: 'guided', title: 'Guided Session' })
+            }
           >
-            <Play size={13} color={COLORS.deepBrown} />
-            <Text style={warm.pillPrimaryText}>Start Session</Text>
+            <Play size={13} color={colors.statMint} />
+            <Text style={[styles.heroCtaText, { color: colors.textPrimary }]}>Start Session</Text>
           </TouchableOpacity>
         </ImageBackground>
 
-        {/* RECOMMENDED */}
-        <View style={warm.sectionRow}>
-          <Text style={[warm.h2, { color: colors.textPrimary }]}>Recommended for you</Text>
+        {/* RECOMMENDED FOR YOU */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            Recommended for you
+          </Text>
+          <TouchableOpacity activeOpacity={0.7} style={styles.linkRow}>
+            <Text style={[styles.linkText, { color: colors.statMint }]}>View all</Text>
+            <ChevronRight size={16} color={colors.statMint} />
+          </TouchableOpacity>
         </View>
+
         <TouchableOpacity
-          style={[styles.recCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-          activeOpacity={0.9}
+          style={[styles.recCard, { borderColor: colors.border }]}
+          activeOpacity={0.85}
           onPress={() => openSession('anxiety', 'Anxiety Reset')}
         >
           <View style={[styles.recIcon, { backgroundColor: colors.statMintSoft }]}>
-            <HeartPulse size={20} color={colors.statMint} />
+            <HeartPulse size={22} color={colors.statMint} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.recTitle, { color: colors.textPrimary }]}>Anxiety Reset</Text>
-            <Text style={[styles.recMeta, { color: colors.textSecondary }]}>6 min · 4-7-8 protocol · Gentle</Text>
-            <Text style={[styles.recHint, { color: colors.accent }]}>Suggested based on your evening rhythm.</Text>
+            <Text style={[styles.recMeta, { color: colors.textSecondary }]}>
+              6 min · 4-7-8 Breathing · Gentle
+            </Text>
+            <Text style={[styles.recHint, { color: colors.statMint }]}>
+              Suggested based on your{'\n'}evening rhythm.
+            </Text>
           </View>
-          <View style={[styles.recPlay, { backgroundColor: colors.accent }]}>
-            <Play size={14} color={COLORS.deepBrown} />
+          <View style={[styles.recPlay, { backgroundColor: colors.statMintSoft }]}>
+            <Play size={16} color={colors.statMint} />
           </View>
         </TouchableOpacity>
 
-        {/* CATEGORIES */}
-        <View style={warm.sectionRow}>
-          <Text style={[warm.h2, { color: colors.textPrimary }]}>Sessions</Text>
+        {/* SESSIONS */}
+        <View style={[styles.sectionHeader, { marginBottom: 8 }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Sessions</Text>
         </View>
-        {sessions.map(s => (
+
+        {sessions.map((s, i) => (
           <TouchableOpacity
             key={s.id}
-            style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}
-            activeOpacity={0.85}
+            style={[
+              styles.sessionRow,
+              i < sessions.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
+            ]}
+            activeOpacity={0.7}
             onPress={() => openSession(s.id, s.title)}
           >
-            <View style={[styles.rowIcon, { backgroundColor: hexAlpha(s.tint, 0.16) }]}>
+            <View style={[styles.sessionIcon, { backgroundColor: s.tintSoft }]}>
               <s.Icon size={20} color={s.tint} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowTitle, { color: colors.textPrimary }]}>{s.title}</Text>
-              <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{s.duration} · {s.level}</Text>
+              <Text style={[styles.sessionTitle, { color: colors.textPrimary }]}>{s.title}</Text>
+              <Text style={[styles.sessionMeta, { color: colors.textSecondary }]}>{s.meta}</Text>
             </View>
             <ChevronRight size={18} color={colors.textSecondary} />
           </TouchableOpacity>
@@ -139,120 +169,205 @@ const BreatheScreen = () => {
   );
 };
 
-const hexAlpha = (hex: string, alpha: number) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.substring(0, 2), 16);
-  const g = parseInt(h.substring(2, 4), 16);
-  const b = parseInt(h.substring(4, 6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-};
-
 const styles = StyleSheet.create({
-  heroCard: {
-    backgroundColor: COLORS.cardBrown,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.32)',
-    padding: 22,
-    overflow: 'hidden',
-    shadowColor: COLORS.primaryGold,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 20,
-    elevation: 6,
+  container: { flex: 1 },
+
+  // HEADER
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 56,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
   },
-  heroImageOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 24,
-    backgroundColor: 'rgba(20,12,8,0.55)',
-  },
-  heroGlow: {
-    position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(212,175,55,0.12)',
-    right: -50,
-    top: -50,
-  },
-  heroIconRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  heroIcon: {
+  backBtn: {
     width: 36,
     height: 36,
-    borderRadius: 12,
-    backgroundColor: COLORS.primaryGold,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroTag: {
-    color: COLORS.primaryGold,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2.4,
-  },
-  heroTitle: {
-    color: COLORS.textPrimary,
-    fontSize: 26,
-    fontWeight: '700',
-    marginTop: 14,
-    letterSpacing: -0.4,
-  },
-  heroSub: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 6,
+  sparkleBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
+  // TITLE BLOCK
+  titleBlock: {
+    paddingHorizontal: 20,
+    paddingBottom: 18,
+  },
+  overline: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2.5,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: '700',
+    letterSpacing: -0.8,
+    marginTop: 8,
+  },
+  subtitle: {
+    fontSize: 15,
+    marginTop: 4,
+  },
+
+  // HERO CARD
+  heroCard: {
+    marginHorizontal: 20,
+    height: 320,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    overflow: 'hidden',
+    padding: 22,
+    justifyContent: 'flex-start',
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 24,
+  },
+  heroBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  heroBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.6,
+  },
+  heroTitle: {
+    fontSize: 30,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginTop: 14,
+    letterSpacing: -0.5,
+  },
+  heroSub: {
+    color: '#0F172A',
+    fontSize: 14,
+    lineHeight: 21,
+    marginTop: 10,
+    maxWidth: 240,
+  },
+  heroCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 999,
+    marginTop: 'auto',
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  heroCtaText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  // SECTIONS
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 28,
+    marginBottom: 14,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  linkText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // RECOMMENDED CARD
   recCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.cardBrown,
-    borderRadius: RADII.card,
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.16)',
-    padding: 14,
     gap: 14,
   },
   recIcon: {
-    width: 48,
-    height: 48,
+    width: 50,
+    height: 50,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  recTitle: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '700' },
-  recMeta: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
-  recHint: { color: COLORS.primaryGold, fontSize: 11, marginTop: 6, fontStyle: 'italic' },
+  recTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  recMeta: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  recHint: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    marginTop: 8,
+    lineHeight: 18,
+  },
   recPlay: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: COLORS.primaryGold,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  row: {
+  // SESSION ROWS
+  sessionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.cardBrown,
-    borderRadius: RADII.control,
-    borderWidth: 1,
-    borderColor: 'rgba(212,175,55,0.1)',
-    padding: 14,
-    marginBottom: 10,
-    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    gap: 14,
+    marginHorizontal: 20,
   },
-  rowIcon: {
+  sessionIcon: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowTitle: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
-  rowMeta: { color: COLORS.textSecondary, fontSize: 12, marginTop: 3 },
+  sessionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  sessionMeta: {
+    fontSize: 13,
+    marginTop: 3,
+  },
 });
 
 export default BreatheScreen;

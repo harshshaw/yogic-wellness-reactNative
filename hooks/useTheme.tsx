@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 
 export type Mode = 'day' | 'night';
 
@@ -84,15 +84,15 @@ const nightColors: ThemeColors = {
 const dayImages: ThemeImages = {
   homeHero: require('../assets/images/daylight-guru.png'),
   goalHero: require('../assets/images/goal-day.jpg'),
-  sleepHero: require('../assets/images/sleep-hero.jpg'),
-  breatheHero: require('../assets/images/breathe-hero.jpg'),
+  sleepHero: require('../assets/images/pranayama-day.png'),
+  breatheHero: require('../assets/images/breathe-day.jpeg'),
 };
 
 const nightImages: ThemeImages = {
   homeHero: require('../assets/images/home-night.jpg'),
   goalHero: require('../assets/images/goal-night.jpg'),
-  sleepHero: require('../assets/images/goal-night.jpg'),
-  breatheHero: require('../assets/images/breathe-hero.jpg'),
+  sleepHero: require('../assets/images/sleep-night.jpeg'),
+  breatheHero: require('../assets/images/pranayamaNight.jpeg'),
 };
 
 type ThemeContextValue = {
