@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { useTheme } from '../hooks/useTheme';
+import { useReflection } from '../hooks/useReflection';
 
 const MenuIcon = ({ color }: { color: string }) => (
   <Svg width={26} height={26} viewBox="0 0 24 24">
@@ -208,8 +209,19 @@ const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { muted, toggleMuted } = useAppMusic();
   const { mode, toggle, colors, images } = useTheme();
+  const { completed, data } = useReflection();
   const isNight = mode === 'night';
   const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
+
+  // derive a recommendation from reflection data
+  const recommendation = (() => {
+    if (!data) return null;
+    if (data.energy === 'low' || data.mood <= 2)
+      return { name: 'Nadi Shodhana', meta: '6 min · Alternate Nostril · Gentle', hint: 'Calms the nervous system and restores balance.' };
+    if (data.energy === 'high' || data.mood >= 4)
+      return { name: 'Kapalbhati', meta: '5 min · Breath of Fire · Energising', hint: 'Amplifies your natural energy and sharpens focus.' };
+    return { name: 'Box Breathing', meta: '5 min · 4-4-4-4 · Balancing', hint: 'Steadies mood and centers your mind for the day.' };
+  })();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -279,6 +291,56 @@ const HomeScreen = () => {
             </Text>
           </View>
         </ImageBackground>
+
+        {/* MORNING REFLECTION / TODAY'S RECOMMENDATION */}
+        {!completed ? (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={localStyles.reflectionCard}
+            onPress={() => navigation.navigate('MorningReflection')}
+          >
+            <View style={localStyles.reflectionIconWrap}>
+              <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
+                <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={localStyles.reflectionTitle}>Morning Reflection</Text>
+              <Text style={localStyles.reflectionSub}>
+                How are you arriving today?{'\n'}Let's personalize your day.
+              </Text>
+            </View>
+            <View style={{ alignItems: 'center', gap: 4 }}>
+              <View style={localStyles.reflectionPlay}>
+                <PlayTriangle color="#fff" size={16} />
+              </View>
+              <Text style={localStyles.reflectionPlayLabel}>Start Morning{'\n'}Reflection</Text>
+            </View>
+          </TouchableOpacity>
+        ) : recommendation ? (
+          <View style={localStyles.recCard}>
+            <View style={localStyles.recTop}>
+              <View style={localStyles.recIconWrap}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+                  <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </Svg>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={localStyles.recLabel}>Today's Recommendation</Text>
+                <Text style={localStyles.recName}>{recommendation.name}</Text>
+                <Text style={localStyles.recMeta}>{recommendation.meta}</Text>
+              </View>
+              <TouchableOpacity
+                style={localStyles.recPlay}
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate('BreathingSession', { id: 'nadi', title: recommendation.name })}
+              >
+                <PlayTriangle color="#fff" size={16} />
+              </TouchableOpacity>
+            </View>
+            <Text style={localStyles.recHint}>{recommendation.hint}</Text>
+          </View>
+        ) : null}
 
         {/* YOUR PROGRESS CARD */}
         <View
@@ -465,6 +527,73 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  reflectionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 18,
+    marginTop: 14,
+    backgroundColor: '#EDE9FE',
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+  },
+  reflectionIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: 'rgba(124,58,237,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reflectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7C3AED',
+  },
+  reflectionSub: {
+    fontSize: 13,
+    color: '#374151',
+    marginTop: 3,
+    lineHeight: 18,
+  },
+  reflectionPlay: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#7C3AED',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reflectionPlayLabel: {
+    fontSize: 11,
+    color: '#7C3AED',
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 15,
+  },
+
+  recCard: {
+    marginHorizontal: 18,
+    marginTop: 14,
+    backgroundColor: '#EDE9FE',
+    borderRadius: 20,
+    padding: 16,
+  },
+  recTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  recIconWrap: {
+    width: 48, height: 48, borderRadius: 14,
+    backgroundColor: 'rgba(124,58,237,0.15)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  recLabel: { fontSize: 11, fontWeight: '700', color: '#7C3AED', letterSpacing: 1, textTransform: 'uppercase' },
+  recName: { fontSize: 17, fontWeight: '800', color: '#0F172A', marginTop: 2 },
+  recMeta: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  recPlay: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: '#7C3AED', alignItems: 'center', justifyContent: 'center',
+  },
+  recHint: { fontSize: 13, color: '#4C1D95', marginTop: 12, lineHeight: 18 },
 });
 
 export default HomeScreen;

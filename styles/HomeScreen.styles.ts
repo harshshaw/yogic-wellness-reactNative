@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   },
 
   header: {
-    height: 380,
+    height: 340,
     paddingTop: 50,
     paddingHorizontal: 22,
   },
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
   progressCard: {
     backgroundColor: COLORS.cardBrown,
     marginHorizontal: 18,
-    marginTop: -30,
+    marginTop: 14,
     borderRadius: 22,
     padding: 18,
     borderWidth: 1,

@@ -6,6 +6,7 @@ import MusicScreen from './MusicScreen';
 import NowPlayingScreen from './NowPlayingScreen';
 import BreathingSessionScreen from './BreathingSessionScreen';
 import AICompanionScreen from './AICompanionScreen';
+import MorningReflectionScreen from './MorningReflectionScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="AICompanion"
         component={AICompanionScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="MorningReflection"
+        component={MorningReflectionScreen}
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
     </Stack.Navigator>
