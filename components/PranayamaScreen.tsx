@@ -64,6 +64,53 @@ const ChevronRight = ({ size = 16, color = '#6B7280' }) => (
   </Svg>
 );
 
+const SquareIcon = ({ size = 22, color = '#10B981' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M4 4h16v16H4z" stroke={color} strokeWidth="2" strokeLinejoin="round" />
+  </Svg>
+);
+
+const PersonMeditateIcon = ({ size = 22, color = '#8B5CF6' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Circle cx="12" cy="5" r="2.2" fill={color} />
+    <Path d="M6 18c2-3 4-4 6-4s4 1 6 4M4 18h16" stroke={color} strokeWidth="2" strokeLinecap="round" />
+  </Svg>
+);
+
+const MusicNoteIcon = ({ size = 22, color = '#F59E0B' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M9 18V6l10-2v12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="7" cy="18" r="2.2" fill={color} />
+    <Circle cx="17" cy="16" r="2.2" fill={color} />
+  </Svg>
+);
+
+const VideoPlayIcon = ({ size = 22, color = '#EF4444' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke={color} strokeWidth="2" />
+    <Path d="M10 9l5 3-5 3z" fill={color} />
+  </Svg>
+);
+
+const SoundWaveIcon = ({ size = 22, color = '#10B981' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M4 12v0M8 8v8M12 5v14M16 8v8M20 12v0" stroke={color} strokeWidth="2" strokeLinecap="round" />
+  </Svg>
+);
+
+const SunIcon = ({ size = 16, color = '#F59E0B' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Circle cx="12" cy="12" r="4" fill={color} />
+    <Path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5" stroke={color} strokeWidth="2" strokeLinecap="round" />
+  </Svg>
+);
+
+const SunriseIcon = ({ size = 16, color = '#EF4444' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M5 18h14M3 18h0M21 18h0M7 14a5 5 0 0 1 10 0M12 4v3M5.6 7.6L7 9M18.4 7.6L17 9" stroke={color} strokeWidth="2" strokeLinecap="round" />
+  </Svg>
+);
+
 // ── mini sparkline ─────────────────────────────────────────────────────────────
 const Sparkline = ({ color }: { color: string }) => (
   <Svg width={60} height={20} viewBox="0 0 60 20">
@@ -261,45 +308,85 @@ export default function PranayamaScreen() {
           </View>
 
           <View style={[s.recCard, { borderColor: '#E5E7EB' }]}>
-            {/* icon + info */}
-            <View style={s.recTop}>
-              <View style={[s.recIconWrap, { backgroundColor: GREEN_SOFT }]}>
-                <LungsIcon size={28} color={GREEN_MED} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.recName}>Nadi Shodhana</Text>
-                <Text style={s.recMeta}>6 min · Alternate Nostril Breathing · Gentle</Text>
-                <View style={[s.recBadge, { backgroundColor: GREEN_SOFT }]}>
-                  <Text style={[s.recBadgeText, { color: GREEN_MED }]}>Best for balancing &amp; calming</Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={[s.playBtn, { backgroundColor: GREEN }]}
-                activeOpacity={0.85}
-                onPress={() => navigation.navigate('BreathingSession', { id: 'nadi', title: 'Nadi Shodhana' })}
-              >
-                <PlayIcon size={18} color="#fff" />
-              </TouchableOpacity>
-            </View>
+            {(() => {
+              const groups: {
+                label: string;
+                Icon: React.ComponentType<{ size?: number; color?: string }>;
+                iconColor: string;
+                items: {
+                  id: string;
+                  title: string;
+                  meta: string;
+                  Icon: React.ComponentType<{ size?: number; color?: string }>;
+                  tint: string;
+                  tintSoft: string;
+                }[];
+              }[] = [
+                {
+                  label: 'Morning',
+                  Icon: SunIcon,
+                  iconColor: '#F59E0B',
+                  items: [
+                    { id: 'nadi',       title: 'Nadi Shodhan',           meta: '6 min',  Icon: LungsIcon,          tint: GREEN_MED,  tintSoft: GREEN_SOFT },
+                    { id: 'box',        title: 'Box Breathing',          meta: '6 min',  Icon: SquareIcon,         tint: GREEN_MED,  tintSoft: GREEN_SOFT },
+                    { id: 'med-6',      title: '6 mins Meditation',      meta: '6 min',  Icon: PersonMeditateIcon, tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
+                    { id: 'music-am',   title: 'Music Video',            meta: '10 min', Icon: MusicNoteIcon,      tint: '#F59E0B',  tintSoft: '#FEF3C7' },
+                    { id: 'life-am',    title: 'Life & Confidence Video',meta: '8 min',  Icon: VideoPlayIcon,      tint: '#EF4444',  tintSoft: '#FEE2E2' },
+                  ],
+                },
+                {
+                  label: 'Afternoon',
+                  Icon: SunIcon,
+                  iconColor: '#F59E0B',
+                  items: [
+                    { id: 'med-quick',  title: 'Quick Meditation',       meta: '5 min',  Icon: PersonMeditateIcon, tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
+                    { id: 'music-pm',   title: 'Music Video',            meta: '10 min', Icon: MusicNoteIcon,      tint: '#F59E0B',  tintSoft: '#FEF3C7' },
+                    { id: 'life-pm',    title: 'Life & Confidence Video',meta: '8 min',  Icon: VideoPlayIcon,      tint: '#EF4444',  tintSoft: '#FEE2E2' },
+                  ],
+                },
+                {
+                  label: 'Evening',
+                  Icon: SunriseIcon,
+                  iconColor: '#EF4444',
+                  items: [
+                    { id: 'bharmari',   title: 'Bharmari',               meta: '7 min',  Icon: SoundWaveIcon,      tint: GREEN_MED,  tintSoft: GREEN_SOFT },
+                    { id: 'night-music',title: 'Night music',            meta: '20 min', Icon: MoonIcon,           tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
+                  ],
+                },
+              ];
 
-            {/* why */}
-            <Text style={s.whyTitle}>Why this practice?</Text>
-            <View style={s.whyRow}>
-              <View style={s.whyChip}>
-                <BrainIcon size={16} color="#FB923C" />
-                <Text style={s.whyText}>You reported stress{'\n'}yesterday</Text>
-              </View>
-              <View style={s.whyChip}>
-                <MoonIcon size={16} color="#8B5CF6" />
-                <Text style={s.whyText}>You slept 45 mins{'\n'}less than usual</Text>
-              </View>
-              <View style={s.whyChip}>
-                <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center' }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: GREEN_MED, opacity: 0.7 }} />
+              return groups.map((g, gi) => (
+                <View key={g.label} style={{ marginTop: gi === 0 ? 0 : 18 }}>
+                  <View style={s.recGroupHeader}>
+                    <g.Icon size={16} color={g.iconColor} />
+                    <Text style={s.recGroupLabel}>{g.label}</Text>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 10, paddingRight: 4 }}
+                  >
+                    {g.items.map((it) => (
+                      <TouchableOpacity
+                        key={it.id}
+                        activeOpacity={0.85}
+                        onPress={() => navigation.navigate('BreathingSession', { id: it.id, title: it.title })}
+                        style={s.recTile}
+                      >
+                        <View style={[s.recTileIcon, { backgroundColor: it.tintSoft }]}>
+                          <it.Icon size={22} color={it.tint} />
+                        </View>
+                        <Text style={s.recTileTitle} numberOfLines={2}>{it.title}</Text>
+                        <View style={s.recTileFoot}>
+                          <Text style={s.recTileMeta}>{it.meta}</Text>
+                          <ChevronRight size={12} color="#9CA3AF" />
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
-                <Text style={s.whyText}>This technique helped{'\n'}you 3 times last week</Text>
-              </View>
-            </View>
+              ));
+            })()}
           </View>
         </View>
 
@@ -480,6 +567,34 @@ const s = StyleSheet.create({
     borderRadius: 999,
   },
   recBadgeText: { fontSize: 12, fontWeight: '600' },
+
+  recGroupHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+  recGroupLabel: { fontSize: 14, fontWeight: '700', color: '#0F172A' },
+  recTile: {
+    width: 112,
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  recTileIcon: {
+    width: 44, height: 44, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 8,
+  },
+  recTileTitle: { fontSize: 12, fontWeight: '700', color: '#0F172A', lineHeight: 16 },
+  recTileFoot: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginTop: 6,
+  },
+  recTileMeta: { fontSize: 11, color: '#6B7280' },
+
   playBtn: {
     width: 48,
     height: 48,

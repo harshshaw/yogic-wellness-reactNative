@@ -4,237 +4,311 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Ellipse } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { useReflection, ReflectionData } from '../hooks/useReflection';
 
-// ── icons ──────────────────────────────────────────────────────────────────────
-const ChevronLeft = () => (
+const PURPLE      = '#7C3AED';
+const PURPLE_SOFT = '#EDE9FE';
+const ORANGE      = '#F59E0B';
+const ORANGE_SOFT = '#FFF7ED';
+const BLUE        = '#6366F1';
+const BLUE_SOFT   = '#EEF2FF';
+
+// ── back arrow ────────────────────────────────────────────────────────────────
+const BackArrow = () => (
   <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
     <Path d="M15 18l-6-6 6-6" stroke="#374151" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
-const SunriseIcon = () => (
-  <Svg width={28} height={28} viewBox="0 0 24 24" fill="none">
-    <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+// ── shield icon ───────────────────────────────────────────────────────────────
+const ShieldIcon = () => (
+  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 2L4 6v6c0 5.25 3.5 9.74 8 11 4.5-1.26 8-5.75 8-11V6l-8-4z" stroke="#9CA3AF" strokeWidth="1.8" fill="none" />
   </Svg>
 );
 
-// ── mood data ──────────────────────────────────────────────────────────────────
+// ── mood data ─────────────────────────────────────────────────────────────────
 const MOODS = [
-  { value: 1, emoji: '😔', label: 'Low' },
-  { value: 2, emoji: '😕', label: 'Tired' },
-  { value: 3, emoji: '😐', label: 'Okay' },
-  { value: 4, emoji: '🙂', label: 'Good' },
-  { value: 5, emoji: '😄', label: 'Great' },
+  { key: 'calm',        emoji: '😊', label: 'Calm' },
+  { key: 'stressed',    emoji: '😟', label: 'Stressed' },
+  { key: 'anxious',     emoji: '😰', label: 'Anxious' },
+  { key: 'overwhelmed', emoji: '🤯', label: 'Overwhelmed' },
+  { key: 'happy',       emoji: '😁', label: 'Happy' },
+  { key: 'irritable',   emoji: '😠', label: 'Irritable' },
+  { key: 'sad',         emoji: '😢', label: 'Sad' },
+  { key: 'neutral',     emoji: '😐', label: 'Neutral' },
 ];
 
-const ENERGY_OPTIONS: { value: ReflectionData['energy']; label: string; color: string; bg: string }[] = [
-  { value: 'low',    label: '🪫  Low',    color: '#EF4444', bg: '#FEE2E2' },
-  { value: 'medium', label: '⚡ Medium', color: '#F59E0B', bg: '#FEF3C7' },
-  { value: 'high',   label: '🔋 High',   color: '#10B981', bg: '#D1FAE5' },
+// ── energy data ───────────────────────────────────────────────────────────────
+const ENERGY: { value: ReflectionData['energy']; emoji: string; label: string }[] = [
+  { value: 'low',          emoji: '🪫', label: 'Low' },
+  { value: 'slightly_low', emoji: '🌤',  label: 'Slightly Low' },
+  { value: 'moderate',     emoji: '☀️',  label: 'Moderate' },
+  { value: 'high',         emoji: '🌟',  label: 'High' },
+  { value: 'very_high',    emoji: '⚡',  label: 'Very High' },
 ];
 
-const INTENTION_CHIPS = [
-  'Stay calm', 'Focus on work', 'Be present', 'Practice gratitude',
-  'Move my body', 'Rest & recover', 'Connect with others',
+// ── sleep data ────────────────────────────────────────────────────────────────
+const SLEEP: { value: ReflectionData['sleep']; emoji: string; label: string }[] = [
+  { value: 'poor',      emoji: '🌧',  label: 'Poor' },
+  { value: 'average',   emoji: '🌙',  label: 'Average' },
+  { value: 'good',      emoji: '🌙✨', label: 'Good' },
+  { value: 'excellent', emoji: '💫',  label: 'Excellent' },
 ];
 
-const PURPLE = '#7C3AED';
-const PURPLE_SOFT = '#EDE9FE';
+// ── section card ──────────────────────────────────────────────────────────────
+const SectionCard = ({
+  iconBg, iconEmoji, titleColor, title, subtitle, children,
+}: {
+  iconBg: string; iconEmoji: string; titleColor: string;
+  title: string; subtitle: string; children: React.ReactNode;
+}) => (
+  <View style={[sc.card, { borderColor: iconBg }]}>
+    <View style={sc.cardHeader}>
+      <View style={[sc.cardIcon, { backgroundColor: iconBg }]}>
+        <Text style={{ fontSize: 22 }}>{iconEmoji}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[sc.cardTitle, { color: titleColor }]}>{title}</Text>
+        <Text style={sc.cardSub}>{subtitle}</Text>
+      </View>
+    </View>
+    {children}
+  </View>
+);
+
+const sc = StyleSheet.create({
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: '#FAFAF7',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+  cardIcon: {
+    width: 48, height: 48, borderRadius: 24,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  cardTitle: { fontSize: 18, fontWeight: '800' },
+  cardSub: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function MorningReflectionScreen() {
   const navigation = useNavigation<any>();
   const { complete } = useReflection();
 
-  const [mood, setMood] = useState<number>(3);
-  const [energy, setEnergy] = useState<ReflectionData['energy']>('medium');
-  const [intention, setIntention] = useState('');
-  const [selectedChip, setSelectedChip] = useState<string | null>(null);
-
-  const handleChip = (chip: string) => {
-    setSelectedChip(chip === selectedChip ? null : chip);
-    setIntention(chip === selectedChip ? '' : chip);
-  };
+  const [mood, setMood]     = useState<string>('calm');
+  const [energy, setEnergy] = useState<ReflectionData['energy']>('moderate');
+  const [sleep, setSleep]   = useState<ReflectionData['sleep']>('good');
 
   const handleSave = () => {
-    complete({ mood, energy, intention: intention || selectedChip || 'Be present' });
+    complete({ mood, energy, sleep, intention: mood });
     navigation.goBack();
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         style={s.root}
         contentContainerStyle={{ paddingBottom: 48 }}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
       >
-        {/* ── HEADER ── */}
-        <View style={s.header}>
+        {/* ── TOP HEADER ── */}
+        <View style={s.topBar}>
           <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-            <ChevronLeft />
+            <BackArrow />
           </TouchableOpacity>
-          <View style={s.headerCenter}>
-            <View style={s.iconCircle}>
-              <SunriseIcon />
-            </View>
-            <Text style={s.title}>Morning Reflection</Text>
-            <Text style={s.subtitle}>How are you arriving today?{'\n'}Let's personalize your day.</Text>
-          </View>
         </View>
 
-        {/* ── MOOD ── */}
-        <View style={s.section}>
-          <Text style={s.sectionLabel}>How are you feeling?</Text>
-          <View style={s.moodRow}>
+        {/* ── HERO ── */}
+        <View style={s.hero}>
+          <View style={s.lotusCircle}>
+            <Text style={{ fontSize: 48 }}>🪷</Text>
+            <Text style={s.sparklesTL}>✦</Text>
+            <Text style={s.sparklesTR}>✦</Text>
+            <Text style={s.sparklesBL}>✧</Text>
+          </View>
+          <Text style={s.heroTitle}>Today's Reflection</Text>
+          <Text style={s.heroSub}>
+            Take a moment to check in with yourself{'\n'}and personalize your day.
+          </Text>
+        </View>
+
+        {/* ── MOOD SECTION ── */}
+        <SectionCard
+          iconBg={PURPLE_SOFT}
+          iconEmoji="😊"
+          titleColor={PURPLE}
+          title="Mood"
+          subtitle="How are you feeling emotionally?"
+        >
+          <View style={s.moodGrid}>
             {MOODS.map((m) => (
               <TouchableOpacity
-                key={m.value}
-                style={[s.moodItem, mood === m.value && s.moodItemActive]}
-                onPress={() => setMood(m.value)}
+                key={m.key}
+                style={[
+                  s.moodTile,
+                  mood === m.key && { borderColor: PURPLE, backgroundColor: PURPLE_SOFT },
+                ]}
+                onPress={() => setMood(m.key)}
                 activeOpacity={0.75}
               >
                 <Text style={s.moodEmoji}>{m.emoji}</Text>
-                <Text style={[s.moodLabel, mood === m.value && { color: PURPLE, fontWeight: '700' }]}>
+                <Text style={[s.moodLabel, mood === m.key && { color: PURPLE, fontWeight: '700' }]}>
                   {m.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </SectionCard>
 
-        {/* ── ENERGY ── */}
-        <View style={s.section}>
-          <Text style={s.sectionLabel}>What's your energy level?</Text>
-          <View style={s.energyRow}>
-            {ENERGY_OPTIONS.map((e) => (
+        {/* ── ENERGY SECTION ── */}
+        <SectionCard
+          iconBg={ORANGE_SOFT}
+          iconEmoji="☀️"
+          titleColor={ORANGE}
+          title="Energy"
+          subtitle="What's your energy like today?"
+        >
+          <View style={s.energyGrid}>
+            {ENERGY.map((e) => (
               <TouchableOpacity
                 key={e.value}
                 style={[
-                  s.energyBtn,
-                  { borderColor: energy === e.value ? e.color : '#E5E7EB' },
-                  energy === e.value && { backgroundColor: e.bg },
+                  s.energyTile,
+                  energy === e.value && { borderColor: ORANGE, backgroundColor: '#FFF7ED' },
                 ]}
                 onPress={() => setEnergy(e.value)}
-                activeOpacity={0.8}
+                activeOpacity={0.75}
               >
-                <Text style={[s.energyText, { color: energy === e.value ? e.color : '#6B7280' }]}>
+                <Text style={s.energyEmoji}>{e.emoji}</Text>
+                <Text style={[s.energyLabel, energy === e.value && { color: ORANGE, fontWeight: '700' }]}>
                   {e.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </SectionCard>
 
-        {/* ── INTENTION ── */}
-        <View style={s.section}>
-          <Text style={s.sectionLabel}>Set your intention for today</Text>
-          {/* chips */}
-          <View style={s.chipsWrap}>
-            {INTENTION_CHIPS.map((chip) => (
+        {/* ── SLEEP SECTION ── */}
+        <SectionCard
+          iconBg={BLUE_SOFT}
+          iconEmoji="🌙"
+          titleColor={BLUE}
+          title="Sleep"
+          subtitle="How was your sleep last night?"
+        >
+          <View style={s.sleepGrid}>
+            {SLEEP.map((sl) => (
               <TouchableOpacity
-                key={chip}
+                key={sl.value}
                 style={[
-                  s.chip,
-                  selectedChip === chip && { backgroundColor: PURPLE_SOFT, borderColor: PURPLE },
+                  s.sleepTile,
+                  sleep === sl.value && { borderColor: BLUE, backgroundColor: BLUE_SOFT },
                 ]}
-                onPress={() => handleChip(chip)}
+                onPress={() => setSleep(sl.value)}
                 activeOpacity={0.75}
               >
-                <Text style={[s.chipText, selectedChip === chip && { color: PURPLE }]}>
-                  {chip}
+                <Text style={s.sleepEmoji}>{sl.emoji}</Text>
+                <Text style={[s.sleepLabel, sleep === sl.value && { color: BLUE, fontWeight: '700' }]}>
+                  {sl.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-          {/* free text */}
-          <TextInput
-            style={s.textInput}
-            placeholder="Or write your own intention…"
-            placeholderTextColor="#9CA3AF"
-            value={selectedChip ? '' : intention}
-            onChangeText={(t) => { setSelectedChip(null); setIntention(t); }}
-            onFocus={() => setSelectedChip(null)}
-            multiline
-          />
-        </View>
+        </SectionCard>
 
         {/* ── SAVE ── */}
         <TouchableOpacity style={s.saveBtn} onPress={handleSave} activeOpacity={0.88}>
-          <Text style={s.saveBtnText}>Save &amp; Continue →</Text>
+          <Text style={s.saveBtnText}>Save &amp; Continue  →</Text>
         </TouchableOpacity>
+
+        {/* ── PRIVACY NOTE ── */}
+        <View style={s.privacyRow}>
+          <ShieldIcon />
+          <Text style={s.privacyText}>Your reflections are private and secure</Text>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FAFAF7' },
+  root: { flex: 1, backgroundColor: '#FAF8FF' },
 
-  header: { paddingTop: 56, paddingHorizontal: 20, paddingBottom: 4 },
+  topBar: { paddingTop: 56, paddingHorizontal: 20, paddingBottom: 0 },
   backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  headerCenter: { alignItems: 'center', marginTop: 16, paddingBottom: 8 },
-  iconCircle: {
-    width: 64, height: 64, borderRadius: 32,
+
+  // hero
+  hero: { alignItems: 'center', paddingVertical: 24, paddingHorizontal: 24 },
+  lotusCircle: {
+    width: 96, height: 96, borderRadius: 48,
     backgroundColor: PURPLE_SOFT, alignItems: 'center', justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 16, position: 'relative',
   },
-  title: { fontSize: 24, fontWeight: '800', color: PURPLE, letterSpacing: -0.5 },
-  subtitle: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 6, lineHeight: 20 },
+  sparklesTL: { position: 'absolute', top: 6, left: 10, fontSize: 12, color: PURPLE },
+  sparklesTR: { position: 'absolute', top: 4, right: 8, fontSize: 10, color: PURPLE },
+  sparklesBL: { position: 'absolute', bottom: 8, left: 14, fontSize: 10, color: PURPLE },
+  heroTitle: { fontSize: 28, fontWeight: '800', color: '#0F172A', letterSpacing: -0.5 },
+  heroSub: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 8, lineHeight: 21 },
 
-  section: { marginTop: 28, paddingHorizontal: 20 },
-  sectionLabel: { fontSize: 16, fontWeight: '700', color: '#0F172A', marginBottom: 14 },
-
-  // mood
-  moodRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  moodItem: {
-    alignItems: 'center', paddingVertical: 12, paddingHorizontal: 10,
-    borderRadius: 16, borderWidth: 1.5, borderColor: '#E5E7EB',
-    backgroundColor: '#fff', flex: 1, marginHorizontal: 3,
-  },
-  moodItemActive: { borderColor: PURPLE, backgroundColor: PURPLE_SOFT },
-  moodEmoji: { fontSize: 22 },
-  moodLabel: { fontSize: 11, color: '#9CA3AF', marginTop: 4, fontWeight: '500' },
-
-  // energy
-  energyRow: { flexDirection: 'row', gap: 10 },
-  energyBtn: {
-    flex: 1, paddingVertical: 14, borderRadius: 14,
-    borderWidth: 1.5, backgroundColor: '#fff', alignItems: 'center',
-  },
-  energyText: { fontSize: 14, fontWeight: '600' },
-
-  // intention chips
-  chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
-  chip: {
-    paddingVertical: 8, paddingHorizontal: 14,
-    borderRadius: 999, borderWidth: 1, borderColor: '#E5E7EB',
+  // mood grid (4 cols × 2 rows)
+  moodGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  moodTile: {
+    width: '22%', flexGrow: 1,
+    alignItems: 'center', paddingVertical: 12,
+    borderRadius: 14, borderWidth: 1.5, borderColor: '#E5E7EB',
     backgroundColor: '#fff',
   },
-  chipText: { fontSize: 13, color: '#374151', fontWeight: '500' },
+  moodEmoji: { fontSize: 24 },
+  moodLabel: { fontSize: 11, color: '#6B7280', marginTop: 5, fontWeight: '500', textAlign: 'center' },
 
-  textInput: {
-    borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 14,
-    padding: 14, fontSize: 14, color: '#0F172A',
-    backgroundColor: '#fff', minHeight: 60, textAlignVertical: 'top',
+  // energy grid (5 cols)
+  energyGrid: { flexDirection: 'row', gap: 6 },
+  energyTile: {
+    flex: 1, alignItems: 'center', paddingVertical: 14,
+    borderRadius: 14, borderWidth: 1.5, borderColor: '#E5E7EB',
+    backgroundColor: '#fff',
   },
+  energyEmoji: { fontSize: 22 },
+  energyLabel: { fontSize: 10, color: '#6B7280', marginTop: 6, fontWeight: '500', textAlign: 'center' },
 
+  // sleep grid (4 cols)
+  sleepGrid: { flexDirection: 'row', gap: 8 },
+  sleepTile: {
+    flex: 1, alignItems: 'center', paddingVertical: 14,
+    borderRadius: 14, borderWidth: 1.5, borderColor: '#E5E7EB',
+    backgroundColor: '#fff',
+  },
+  sleepEmoji: { fontSize: 26 },
+  sleepLabel: { fontSize: 11, color: '#6B7280', marginTop: 6, fontWeight: '500', textAlign: 'center' },
+
+  // save button
   saveBtn: {
-    marginHorizontal: 20, marginTop: 32,
-    backgroundColor: PURPLE, borderRadius: 16,
+    marginHorizontal: 16, marginTop: 8,
+    backgroundColor: PURPLE, borderRadius: 999,
     paddingVertical: 18, alignItems: 'center',
-    shadowColor: PURPLE, shadowOpacity: 0.3, shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 }, elevation: 6,
+    shadowColor: PURPLE, shadowOpacity: 0.35, shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 }, elevation: 8,
   },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  saveBtnText: { color: '#fff', fontSize: 17, fontWeight: '800', letterSpacing: 0.2 },
+
+  // privacy
+  privacyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 16 },
+  privacyText: { fontSize: 12, color: '#9CA3AF' },
 });

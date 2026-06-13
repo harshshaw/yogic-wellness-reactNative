@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 
 export type ReflectionData = {
-  mood: number;       // 1–5
-  energy: 'low' | 'medium' | 'high';
+  mood: string;
+  energy: 'low' | 'slightly_low' | 'moderate' | 'high' | 'very_high';
+  sleep: 'poor' | 'average' | 'good' | 'excellent';
   intention: string;
 };
 

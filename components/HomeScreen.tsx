@@ -216,11 +216,15 @@ const HomeScreen = () => {
   // derive a recommendation from reflection data
   const recommendation = (() => {
     if (!data) return null;
-    if (data.energy === 'low' || data.mood <= 2)
-      return { name: 'Nadi Shodhana', meta: '6 min · Alternate Nostril · Gentle', hint: 'Calms the nervous system and restores balance.' };
-    if (data.energy === 'high' || data.mood >= 4)
-      return { name: 'Kapalbhati', meta: '5 min · Breath of Fire · Energising', hint: 'Amplifies your natural energy and sharpens focus.' };
-    return { name: 'Box Breathing', meta: '5 min · 4-4-4-4 · Balancing', hint: 'Steadies mood and centers your mind for the day.' };
+    const lowEnergy = data.energy === 'low' || data.energy === 'slightly_low';
+    const highEnergy = data.energy === 'high' || data.energy === 'very_high';
+    const poorSleep = data.sleep === 'poor' || data.sleep === 'average';
+    const calmMood = ['calm', 'neutral', 'happy'].includes(data.mood);
+    if (lowEnergy || poorSleep || ['stressed', 'anxious', 'overwhelmed', 'sad'].includes(data.mood))
+      return { name: 'Nadi Shodhana', meta: '6 min · Alternate Nostril · Gentle', hint: 'Calms the nervous system and restores balance after a rough night or low energy morning.' };
+    if (highEnergy && calmMood)
+      return { name: 'Kapalbhati', meta: '5 min · Breath of Fire · Energising', hint: 'Channel your high energy with focused breath to sharpen concentration.' };
+    return { name: 'Box Breathing', meta: '5 min · 4-4-4-4 · Balancing', hint: 'Steadies mood and centers your mind for the day ahead.' };
   })();
 
   return (
