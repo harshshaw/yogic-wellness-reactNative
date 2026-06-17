@@ -6,11 +6,11 @@ import { styles } from '../styles/BottomTabBar.styles';
 import { useTheme, type ThemeColors } from '../hooks/useTheme';
 
 const ICON_PATHS: Record<string, string> = {
-  Home: 'M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5z',
-  Breathe: 'M2 12h3a3 3 0 1 0 0-6 3 3 0 0 0-3 3M2 12h3a3 3 0 1 1 0 6 3 3 0 0 1-3-3M11 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0zm-2 0H22',
-  Sleep: 'M12 18a8 8 0 0 1-7.94-7.07A1 1 0 0 1 5.4 9.86 6 6 0 0 0 14.14 4.6a1 1 0 0 1 1.07-1.34A8 8 0 0 1 12 18z',
-  Progress: 'M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z',
-  Profile: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 5v3h16v-3c0-3.3-4.7-5-8-5z',
+  Home:        'M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5z',
+  Recommend:   'M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9',
+  Sleep:       'M12 18a8 8 0 0 1-7.94-7.07A1 1 0 0 1 5.4 9.86 6 6 0 0 0 14.14 4.6a1 1 0 0 1 1.07-1.34A8 8 0 0 1 12 18z',
+  Progress:    'M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z',
+  AICompanion: 'M12 2a5 5 0 0 1 5 5c0 1.5-.6 2.8-1.6 3.8L17 22H7l1.6-11.2A5 5 0 0 1 7 7a5 5 0 0 1 5-5zM9 7h6',
 };
 
 // Per-tab signature colors, matching the reference design (Calm-style):
@@ -20,11 +20,11 @@ const tabColor = (
   colors: ThemeColors
 ): { strong: string; soft: string } => {
   switch (name) {
-    case 'Home':     return { strong: colors.statOrange, soft: colors.statOrangeSoft };
-    case 'Breathe':  return { strong: colors.statMint,   soft: colors.statMintSoft };
-    case 'Sleep':    return { strong: colors.statPurple, soft: colors.statPurpleSoft };
-    case 'Progress': return { strong: colors.statPurple, soft: colors.statPurpleSoft };
-    case 'Profile':  return { strong: colors.textSecondary, soft: colors.cardLight };
+    case 'Home':        return { strong: colors.statOrange,  soft: colors.statOrangeSoft };
+    case 'Recommend':   return { strong: colors.statMint,    soft: colors.statMintSoft };
+    case 'Sleep':       return { strong: colors.statPurple,  soft: colors.statPurpleSoft };
+    case 'Progress':    return { strong: colors.statPurple,  soft: colors.statPurpleSoft };
+    case 'AICompanion': return { strong: colors.statYellow,  soft: colors.statYellowSoft };
     default:         return { strong: colors.accent, soft: colors.accentSoft };
   }
 };

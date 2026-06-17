@@ -77,6 +77,13 @@ const ChevronRight = ({ color }: { color: string }) => (
   </Svg>
 );
 
+const ProfileIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 const MusicNoteIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
     <Path
@@ -208,7 +215,7 @@ const StatRing = ({ value, label, sub, color, progress, Icon, ink, muted }: Stat
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { muted, toggleMuted } = useAppMusic();
-  const { mode, toggle, colors, images } = useTheme();
+  const { mode, colors, images } = useTheme();
   const { completed, data } = useReflection();
   const isNight = mode === 'night';
   const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
@@ -263,17 +270,6 @@ const HomeScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={toggle}
-                style={localStyles.headerBtn}
-              >
-                {isNight ? (
-                  <SunIcon color={headerIconColor} />
-                ) : (
-                  <MoonIcon color={headerIconColor} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.7}
                 onPress={toggleMuted}
                 style={localStyles.headerBtn}
               >
@@ -282,6 +278,13 @@ const HomeScreen = () => {
                 ) : (
                   <SoundOnIcon color={headerIconColor} />
                 )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Profile')}
+                style={localStyles.headerBtn}
+              >
+                <ProfileIcon color={headerIconColor} />
               </TouchableOpacity>
             </View>
           </View>

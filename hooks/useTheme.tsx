@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 export type Mode = 'day' | 'night';
 
@@ -109,8 +109,19 @@ const ThemeContext = createContext<ThemeContextValue>({
   images: dayImages,
 });
 
+const getTimeBasedMode = (): Mode => {
+  const hour = new Date().getHours();
+  return hour >= 18 || hour < 6 ? 'night' : 'day';
+};
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [mode, setMode] = useState<Mode>('day');
+  const [mode, setMode] = useState<Mode>(getTimeBasedMode);
+
+  // Re-check every minute so the switch happens automatically at 6am/6pm.
+  useEffect(() => {
+    const id = setInterval(() => setMode(getTimeBasedMode()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   const value = useMemo<ThemeContextValue>(
     () => ({

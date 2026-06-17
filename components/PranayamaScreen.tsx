@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
 import Svg, { Path, Circle, G } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../hooks/useTheme';
+import { useReflection } from '../hooks/useReflection';
+import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
+import StreakCelebration from './StreakCelebration';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -61,6 +64,12 @@ const MicIcon = ({ size = 24, color = '#fff' }) => (
 const ChevronRight = ({ size = 16, color = '#6B7280' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <Path d="M9 18l6-6-6-6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const CheckIcon = ({ size = 14, color = '#fff' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M20 6L9 17l-5-5" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
@@ -199,10 +208,42 @@ const GURU_PROMPTS = [
 export default function PranayamaScreen() {
   const navigation = useNavigation<any>();
   const { colors } = useTheme();
+  const { data: reflectionData } = useReflection();
 
   const GREEN = '#1B5E20';
   const GREEN_SOFT = '#E8F5E9';
   const GREEN_MED = '#2E7D32';
+
+  // ── recommendation completion tracking ──
+  const moodState = reflectionData
+    ? getMoodState(reflectionData.mood, reflectionData.energy, reflectionData.sleep)
+    : 'NEUTRAL';
+  const recGroups = useMemo(() => getRecommendations(moodState), [moodState]);
+
+  const totalItems = useMemo(
+    () => recGroups.reduce((n, g) => n + g.items.length, 0),
+    [recGroups],
+  );
+
+  const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [showCelebration, setShowCelebration] = useState(false);
+  const baseStreak = 5; // current streak before today (mirrors the "5 Days" card)
+
+  const toggleComplete = (id: string) => {
+    setCompleted((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // when every item is marked done, fire the celebration once
+  useEffect(() => {
+    if (totalItems > 0 && completed.size === totalItems) {
+      setShowCelebration(true);
+    }
+  }, [completed, totalItems]);
 
   return (
     <View style={[s.root, { backgroundColor: '#FAFAF7' }]}>
@@ -299,93 +340,101 @@ export default function PranayamaScreen() {
         <View style={[s.section, { paddingHorizontal: 20 }]}>
           <View style={s.sectionRow}>
             <Text style={s.sectionTitle}>Today's Recommendation</Text>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Text style={[s.linkText, { color: GREEN_MED }]}>Why this practice?</Text>
-              <View style={[s.infoBtn, { borderColor: '#D1D5DB' }]}>
-                <Text style={{ fontSize: 11, color: '#9CA3AF', fontWeight: '600' }}>i</Text>
-              </View>
-            </TouchableOpacity>
+            <Text style={[s.linkText, { color: GREEN_MED }]}>
+              {completed.size}/{totalItems} done
+            </Text>
+          </View>
+
+          {/* overall progress bar */}
+          <View style={s.recProgressTrack}>
+            <View
+              style={[
+                s.recProgressFill,
+                { width: totalItems ? `${(completed.size / totalItems) * 100}%` : '0%' },
+              ]}
+            />
           </View>
 
           <View style={[s.recCard, { borderColor: '#E5E7EB' }]}>
             {(() => {
-              const groups: {
-                label: string;
-                Icon: React.ComponentType<{ size?: number; color?: string }>;
-                iconColor: string;
-                items: {
-                  id: string;
-                  title: string;
-                  meta: string;
-                  Icon: React.ComponentType<{ size?: number; color?: string }>;
-                  tint: string;
-                  tintSoft: string;
-                }[];
-              }[] = [
-                {
-                  label: 'Morning',
-                  Icon: SunIcon,
-                  iconColor: '#F59E0B',
-                  items: [
-                    { id: 'nadi',       title: 'Nadi Shodhan',           meta: '6 min',  Icon: LungsIcon,          tint: GREEN_MED,  tintSoft: GREEN_SOFT },
-                    { id: 'box',        title: 'Box Breathing',          meta: '6 min',  Icon: SquareIcon,         tint: GREEN_MED,  tintSoft: GREEN_SOFT },
-                    { id: 'med-6',      title: '6 mins Meditation',      meta: '6 min',  Icon: PersonMeditateIcon, tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
-                    { id: 'music-am',   title: 'Music Video',            meta: '10 min', Icon: MusicNoteIcon,      tint: '#F59E0B',  tintSoft: '#FEF3C7' },
-                    { id: 'life-am',    title: 'Life & Confidence Video',meta: '8 min',  Icon: VideoPlayIcon,      tint: '#EF4444',  tintSoft: '#FEE2E2' },
-                  ],
-                },
-                {
-                  label: 'Afternoon',
-                  Icon: SunIcon,
-                  iconColor: '#F59E0B',
-                  items: [
-                    { id: 'med-quick',  title: 'Quick Meditation',       meta: '5 min',  Icon: PersonMeditateIcon, tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
-                    { id: 'music-pm',   title: 'Music Video',            meta: '10 min', Icon: MusicNoteIcon,      tint: '#F59E0B',  tintSoft: '#FEF3C7' },
-                    { id: 'life-pm',    title: 'Life & Confidence Video',meta: '8 min',  Icon: VideoPlayIcon,      tint: '#EF4444',  tintSoft: '#FEE2E2' },
-                  ],
-                },
-                {
-                  label: 'Evening',
-                  Icon: SunriseIcon,
-                  iconColor: '#EF4444',
-                  items: [
-                    { id: 'bharmari',   title: 'Bharmari',               meta: '7 min',  Icon: SoundWaveIcon,      tint: GREEN_MED,  tintSoft: GREEN_SOFT },
-                    { id: 'night-music',title: 'Night music',            meta: '20 min', Icon: MoonIcon,           tint: '#8B5CF6',  tintSoft: '#EDE9FE' },
-                  ],
-                },
-              ];
+              const typeIcon = (type: string): React.ComponentType<{ size?: number; color?: string }> => {
+                if (type === 'breathing') return LungsIcon;
+                if (type === 'meditation') return PersonMeditateIcon;
+                if (type === 'music') return MusicNoteIcon;
+                return VideoPlayIcon;
+              };
+              const typeTint = (type: string) => {
+                if (type === 'breathing') return { tint: GREEN_MED, tintSoft: GREEN_SOFT };
+                if (type === 'meditation') return { tint: '#8B5CF6', tintSoft: '#EDE9FE' };
+                if (type === 'music') return { tint: '#F59E0B', tintSoft: '#FEF3C7' };
+                return { tint: '#EF4444', tintSoft: '#FEE2E2' };
+              };
+              const groupIcon = (label: string) =>
+                label === 'Evening' ? SunriseIcon : SunIcon;
+              const groupIconColor = (label: string) =>
+                label === 'Evening' ? '#EF4444' : '#F59E0B';
 
-              return groups.map((g, gi) => (
-                <View key={g.label} style={{ marginTop: gi === 0 ? 0 : 18 }}>
-                  <View style={s.recGroupHeader}>
-                    <g.Icon size={16} color={g.iconColor} />
-                    <Text style={s.recGroupLabel}>{g.label}</Text>
+              return recGroups.map((g, gi) => {
+                const GIcon = groupIcon(g.label);
+                const groupDone = g.items.every((it) => completed.has(it.id));
+                return (
+                  <View key={g.label} style={{ marginTop: gi === 0 ? 0 : 18 }}>
+                    <View style={s.recGroupHeader}>
+                      <GIcon size={16} color={groupIconColor(g.label)} />
+                      <Text style={s.recGroupLabel}>{g.label}</Text>
+                      {groupDone && (
+                        <View style={s.recGroupDoneBadge}>
+                          <CheckIcon size={11} color={GREEN_MED} />
+                        </View>
+                      )}
+                    </View>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 10, paddingRight: 4 }}
+                    >
+                      {g.items.map((it) => {
+                        const Icon = typeIcon(it.type);
+                        const { tint, tintSoft } = typeTint(it.type);
+                        const isDone = completed.has(it.id);
+                        return (
+                          <TouchableOpacity
+                            key={it.id}
+                            activeOpacity={0.85}
+                            onPress={() => toggleComplete(it.id)}
+                            style={[s.recTile, isDone && s.recTileDone]}
+                          >
+                            {/* completion check badge */}
+                            <View style={[s.recCheck, isDone ? s.recCheckOn : s.recCheckOff]}>
+                              {isDone && <CheckIcon size={12} color="#fff" />}
+                            </View>
+
+                            <View style={[s.recTileIcon, { backgroundColor: tintSoft }, isDone && { opacity: 0.5 }]}>
+                              <Icon size={22} color={tint} />
+                            </View>
+                            <Text
+                              style={[s.recTileTitle, isDone && s.recTileTitleDone]}
+                              numberOfLines={2}
+                            >
+                              {it.title}
+                            </Text>
+                            <View style={s.recTileFoot}>
+                              <Text style={s.recTileMeta}>{it.meta}</Text>
+                              <TouchableOpacity
+                                onPress={() => navigation.navigate('BreathingSession', { id: it.id, title: it.title })}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                style={[s.recTilePlay, { backgroundColor: tint }]}
+                              >
+                                <PlayIcon size={11} color="#fff" />
+                              </TouchableOpacity>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
                   </View>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ gap: 10, paddingRight: 4 }}
-                  >
-                    {g.items.map((it) => (
-                      <TouchableOpacity
-                        key={it.id}
-                        activeOpacity={0.85}
-                        onPress={() => navigation.navigate('BreathingSession', { id: it.id, title: it.title })}
-                        style={s.recTile}
-                      >
-                        <View style={[s.recTileIcon, { backgroundColor: it.tintSoft }]}>
-                          <it.Icon size={22} color={it.tint} />
-                        </View>
-                        <Text style={s.recTileTitle} numberOfLines={2}>{it.title}</Text>
-                        <View style={s.recTileFoot}>
-                          <Text style={s.recTileMeta}>{it.meta}</Text>
-                          <ChevronRight size={12} color="#9CA3AF" />
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              ));
+                );
+              });
             })()}
           </View>
         </View>
@@ -466,6 +515,12 @@ export default function PranayamaScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <StreakCelebration
+        visible={showCelebration}
+        streakCount={baseStreak + 1}
+        onClose={() => setShowCelebration(false)}
+      />
     </View>
   );
 }
@@ -568,8 +623,26 @@ const s = StyleSheet.create({
   },
   recBadgeText: { fontSize: 12, fontWeight: '600' },
 
+  recProgressTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#E5E7EB',
+    marginTop: 12,
+    overflow: 'hidden',
+  },
+  recProgressFill: {
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: '#2E7D32',
+  },
+
   recGroupHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
   recGroupLabel: { fontSize: 14, fontWeight: '700', color: '#0F172A' },
+  recGroupDoneBadge: {
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: '#E8F5E9',
+    alignItems: 'center', justifyContent: 'center',
+  },
   recTile: {
     width: 112,
     backgroundColor: '#fff',
@@ -583,17 +656,35 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
+  recTileDone: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#86EFAC',
+  },
+  recCheck: {
+    position: 'absolute',
+    top: 8, right: 8,
+    width: 20, height: 20, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+    zIndex: 2,
+  },
+  recCheckOn: { backgroundColor: '#10B981' },
+  recCheckOff: { borderWidth: 1.5, borderColor: '#D1D5DB', backgroundColor: 'transparent' },
   recTileIcon: {
     width: 44, height: 44, borderRadius: 12,
     alignItems: 'center', justifyContent: 'center',
     marginBottom: 8,
   },
   recTileTitle: { fontSize: 12, fontWeight: '700', color: '#0F172A', lineHeight: 16 },
+  recTileTitleDone: { color: '#6B7280', textDecorationLine: 'line-through' },
   recTileFoot: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     marginTop: 6,
   },
   recTileMeta: { fontSize: 11, color: '#6B7280' },
+  recTilePlay: {
+    width: 22, height: 22, borderRadius: 11,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
   playBtn: {
     width: 48,

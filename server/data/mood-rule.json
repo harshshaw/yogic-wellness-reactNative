@@ -1,0 +1,188 @@
+{
+    "recommendations": {
+      "CALM": {
+        "breathing": [
+          "Nadi Shodhana",
+          "Equal Breathing",
+          "Coherent Breathing"
+        ],
+        "meditations": [
+          "Mindfulness Meditation",
+          "Gratitude Meditation",
+          "Body Scan"
+        ],
+        "music": [
+          "Flute",
+          "River Flow",
+          "Birds Chirping",
+          "Soft Piano"
+        ],
+        "videos": [
+          "Ancient Wisdom",
+          "Yogic Philosophy",
+          "Life Lessons"
+        ]
+      },
+  
+      "STRESSED": {
+        "breathing": [
+          "Box Breathing",
+          "Sama Vritti",
+          "Deep Belly Breathing"
+        ],
+        "meditations": [
+          "Guided Relaxation",
+          "Grounding Meditation",
+          "Breath Awareness"
+        ],
+        "music": [
+          "Rain Sounds",
+          "Forest Sounds",
+          "Tibetan Bowls"
+        ],
+        "videos": [
+          "Stress Relief",
+          "Emotional Healing",
+          "Positive Mindset"
+        ]
+      },
+  
+      "ANXIOUS": {
+        "breathing": [
+          "4-7-8 Breathing",
+          "Nadi Shodhana",
+          "Coherent Breathing"
+        ],
+        "meditations": [
+          "Grounding Meditation",
+          "Safe Space Visualization",
+          "Breath Awareness"
+        ],
+        "music": [
+          "Ocean Waves",
+          "Rain Sounds",
+          "Ambient Pads"
+        ],
+        "videos": [
+          "Anxiety Reset",
+          "Emotional Healing",
+          "Stress Relief"
+        ]
+      },
+  
+      "OVERWHELMED": {
+        "breathing": [
+          "Deep Belly Breathing",
+          "Box Breathing",
+          "Coherent Breathing"
+        ],
+        "meditations": [
+          "Grounding Meditation",
+          "Body Scan",
+          "Safe Space Visualization"
+        ],
+        "music": [
+          "Forest Sounds",
+          "Ocean Waves",
+          "Tibetan Bowls"
+        ],
+        "videos": [
+          "Stress Relief",
+          "Anxiety Reset",
+          "Yogic Philosophy"
+        ]
+      },
+  
+      "HAPPY": {
+        "breathing": [
+          "Kapalabhati",
+          "Bhastrika",
+          "Surya Bhedana"
+        ],
+        "meditations": [
+          "Gratitude Meditation",
+          "Mindfulness Meditation",
+          "Visualization Meditation"
+        ],
+        "music": [
+          "Positive Acoustic",
+          "Upbeat Instrumental",
+          "Birds Chirping"
+        ],
+        "videos": [
+          "Positive Mindset",
+          "Life Lessons",
+          "Confidence Building"
+        ]
+      },
+  
+      "IRRITABLE": {
+        "breathing": [
+          "Bhramari",
+          "Nadi Shodhana",
+          "Deep Belly Breathing"
+        ],
+        "meditations": [
+          "Body Scan",
+          "Grounding Meditation",
+          "Guided Relaxation"
+        ],
+        "music": [
+          "Soft Piano",
+          "Flute",
+          "Forest Sounds"
+        ],
+        "videos": [
+          "Emotional Healing",
+          "Stoic Teachings",
+          "Stress Relief"
+        ]
+      },
+  
+      "SAD": {
+        "breathing": [
+          "Deep Belly Breathing",
+          "Coherent Breathing",
+          "Nadi Shodhana"
+        ],
+        "meditations": [
+          "Self-belief Meditation",
+          "Visualization Meditation",
+          "Gratitude Meditation"
+        ],
+        "music": [
+          "Soft Piano",
+          "River Flow",
+          "Birds Chirping"
+        ],
+        "videos": [
+          "Confidence Building",
+          "Positive Mindset",
+          "Life Lessons"
+        ]
+      },
+  
+      "NEUTRAL": {
+        "breathing": [
+          "Alternate Nostril",
+          "Equal Breathing",
+          "Triangle Breathing"
+        ],
+        "meditations": [
+          "Mindfulness Meditation",
+          "Concentration Meditation",
+          "Body Scan"
+        ],
+        "music": [
+          "Lo-fi Focus",
+          "Alpha Waves",
+          "Binaural Focus"
+        ],
+        "videos": [
+          "Focus Techniques",
+          "Deep Work",
+          "Ancient Wisdom"
+        ]
+      }
+    }
+  }
