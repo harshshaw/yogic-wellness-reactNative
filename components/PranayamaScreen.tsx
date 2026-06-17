@@ -25,11 +25,7 @@ const BrainIcon = ({ size = 22, color = '#FB923C' }) => (
   </Svg>
 );
 
-const MoonIcon = ({ size = 22, color = '#8B5CF6' }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Path d="M12 18a8 8 0 0 1-7.94-7.07A1 1 0 0 1 5.4 9.86 6 6 0 0 0 14.14 4.6a1 1 0 0 1 1.07-1.34A8 8 0 0 1 12 18z" fill={color} />
-  </Svg>
-);
+
 
 const BoltIcon = ({ size = 22, color = '#F59E0B' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -128,16 +124,6 @@ const Sparkline = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const BarChart = ({ color }: { color: string }) => {
-  const heights = [6, 10, 8, 14, 12, 10, 8];
-  return (
-    <Svg width={60} height={18} viewBox="0 0 60 18">
-      {heights.map((h, i) => (
-        <Path key={i} d={`M${i * 9 + 1} ${18 - h} L${i * 9 + 1} 18`} stroke={color} strokeWidth="6" strokeLinecap="round" />
-      ))}
-    </Svg>
-  );
-};
 
 // ── circular progress ring ─────────────────────────────────────────────────────
 const CircleRing = ({ percent = 0.83, size = 64, color = '#1B5E20' }) => {
@@ -206,6 +192,7 @@ export default function PranayamaScreen() {
 
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationStreak, setCelebrationStreak] = useState(1);
   const celebrationFired = React.useRef(false);
 
   const toggleComplete = (id: string) => {
@@ -218,11 +205,16 @@ export default function PranayamaScreen() {
     }
     setCompleted(next);
 
-    // fire celebration immediately — persist in background
+    // fire celebration — persist and use returned streak count
     if (totalItems > 0 && next.size === totalItems && !celebrationFired.current) {
       celebrationFired.current = true;
-      setShowCelebration(true);
-      markDayComplete(totalItems, totalItems, totalItems * 6).catch(() => {});
+      markDayComplete(totalItems, totalItems, totalItems * 6).then((updated) => {
+        setCelebrationStreak(updated.currentStreak);
+        setShowCelebration(true);
+      }).catch(() => {
+        setCelebrationStreak(1);
+        setShowCelebration(true);
+      });
     }
   };
 
@@ -280,17 +272,6 @@ export default function PranayamaScreen() {
               <Text style={[s.statStatus, { color: '#FB923C' }]}>Moderate</Text>
               <Text style={s.statValue}>6/10</Text>
               <Sparkline color="#FB923C" />
-            </View>
-
-            {/* Sleep */}
-            <View style={s.statCard}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <MoonIcon size={18} color="#8B5CF6" />
-                <Text style={s.statLabel}>Sleep</Text>
-              </View>
-              <Text style={[s.statStatus, { color: '#8B5CF6' }]}>Good</Text>
-              <Text style={s.statValue}>7h 15m</Text>
-              <BarChart color="#8B5CF6" />
             </View>
 
             {/* Energy */}
@@ -544,7 +525,7 @@ export default function PranayamaScreen() {
 
       <StreakCelebration
         visible={showCelebration}
-        streakCount={streakData.currentStreak}
+        streakCount={celebrationStreak}
         onClose={() => setShowCelebration(false)}
       />
     </View>

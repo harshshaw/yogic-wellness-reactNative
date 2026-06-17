@@ -90,13 +90,13 @@ export function useStreakStorage() {
     });
   }, []);
 
-  // Call this when the user completes all items for the day
+  // Call this when the user completes all items for the day.
+  // Returns the updated StreakData so callers can read the new streak immediately.
   const markDayComplete = useCallback(
-    async (itemsDone: number, totalItems: number, minutesLogged = 0) => {
+    async (itemsDone: number, totalItems: number, minutesLogged = 0): Promise<StreakData> => {
       const current = await readFile();
       const todayStr = today();
 
-      // update or insert today's record
       const idx = current.history.findIndex((r) => r.date === todayStr);
       const record: DayRecord = { date: todayStr, completed: true, itemsDone, totalItems, minutesLogged };
       if (idx >= 0) {
@@ -105,7 +105,6 @@ export function useStreakStorage() {
         current.history.push(record);
       }
 
-      // keep only last 30 days
       current.history = current.history
         .sort((a, b) => a.date.localeCompare(b.date))
         .slice(-30);
@@ -114,8 +113,10 @@ export function useStreakStorage() {
       const totalDaysCompleted = current.history.filter((d) => d.completed).length;
 
       const updated: StreakData = { ...current, currentStreak, longestStreak, totalDaysCompleted };
-      await writeFile(updated);
+
+      // Update UI immediately — don't wait for file write
       setData(updated);
+      writeFile(updated).catch(() => {}); // persist best-effort
       return updated;
     },
     [],
