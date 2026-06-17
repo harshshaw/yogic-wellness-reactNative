@@ -1,0 +1,135 @@
+{
+  "screenName": "REST",
+  "note": "AI Must Generate Dynamic Mixes",
+
+  "aiAssistant": {
+    "prompt": "Can I help you recommend best options based on your current state?",
+    "quickActions": ["Can I write my meal?", "Full Asleep"],
+    "moodOptions": [
+      { "key": "C", "label": "Emotional Healing" },
+      { "key": "E", "label": "Embrace Positivity" },
+      { "key": "H", "label": "Gentle Suggestion" }
+    ],
+    "behavior": "AI will give best suggestions based on above selected option"
+  },
+
+  "sections": [
+    {
+      "id": 1,
+      "name": "Soundscapes (Music)",
+      "uiNote": "Nice tile layout",
+      "categories": [
+        {
+          "id": 1,
+          "name": "Rain Collection",
+          "items": ["Light Rain", "Thunder Storm", "Rain on Window", "Rain in Forest"]
+        },
+        {
+          "id": 2,
+          "name": "Nature",
+          "items": ["Forest", "Waterfall", "Himalayan Winds", "Ocean Waves", "River Flow"]
+        },
+        {
+          "id": 3,
+          "name": "Indian Spiritual",
+          "items": [
+            "Temple Ambience",
+            "River Ganga",
+            "Himalayan Dawn",
+            "Soft Tanpura",
+            "Flute by the River",
+            "Tibetan Bowls",
+            "OM Drone",
+            "Hanuman Chalisa"
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Color Noise",
+          "items": ["White", "Brown", "Pink", "Blue"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Sleep with Positive Mind",
+      "altName": "Night Wisdom / Positive Edge",
+      "categories": [
+        {
+          "id": 1,
+          "name": "Success Stories",
+          "format": "5 to 10 Min Videos",
+          "items": [
+            "How Steve Jobs handled Setbacks",
+            "How Elon Musk overcame his failures",
+            "J.K. Rowling's Rejections",
+            "Abdul Kalam's Journey"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Stoic Wisdom",
+          "items": ["Marcus Aurelius", "Seneca", "Epictetus"]
+        },
+        {
+          "id": 3,
+          "name": "Life Wisdom",
+          "note": "Not Religious Preaching",
+          "items": ["Detachment from Outcomes", "Handling Uncertainty", "Inner Peace"]
+        },
+        {
+          "id": 4,
+          "name": "Confidence Before Sleep",
+          "items": [
+            "Trust Your Journey",
+            "You Are Making Progress",
+            "Tomorrow is a New Day"
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Gratitude Journey",
+          "items": [
+            "5-Min Gratitude Reflection",
+            "Small Wins Today",
+            "Appreciation Practice"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Therapy — Emotional Reset",
+      "categories": [
+        {
+          "id": 1,
+          "name": "Anxiety Before Sleep",
+          "items": [
+            "Overthinking Tonight",
+            "Calming Tomorrow's Worries",
+            "Letting Go of Control"
+          ]
+        },
+        { "id": 2, "name": "Stress Recovery", "items": [] },
+        { "id": 3, "name": "Loneliness", "items": [] },
+        { "id": 4, "name": "Heart Break", "items": [] },
+        { "id": 5, "name": "Confidence Repair", "items": [] }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Baby Music",
+      "categories": []
+    }
+  ],
+
+  "aiPersonalization": {
+    "flow": [
+      "After all content is consumed, screen asks: 'What resonated most with me?'",
+      "User answers",
+      "AI remembers the response",
+      "Over time, the app learns about that person"
+    ],
+    "goal": "Build a long-term understanding of the user's emotional patterns and preferences"
+  }
+}
