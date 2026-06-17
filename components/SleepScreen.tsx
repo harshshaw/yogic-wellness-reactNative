@@ -17,6 +17,7 @@ import {
   Heart, Target,
 } from './Icons';
 import restData from '../utils/rest-screen-plan.json';
+import FeedbackCelebration from './FeedbackCelebration';
 
 const { width: W } = Dimensions.get('window');
 
@@ -191,6 +192,8 @@ export default function SleepScreen() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackItem, setFeedbackItem]       = useState<{ title: string; sub: string } | null>(null);
   const [feedbackGiven, setFeedbackGiven]     = useState(false);
+  const [celebrationVisible, setCelebrationVisible] = useState(false);
+  const [celebrationReaction, setCelebrationReaction] = useState({ emoji: '😌', label: 'Very calming' });
 
   const playAndOpen = () => {
     playTrack();
@@ -589,9 +592,11 @@ export default function SleepScreen() {
                   activeOpacity={0.8}
                   style={[s.reactionBtn, { backgroundColor: isNight ? '#1A2040' : '#F8F9FF', borderColor: BORDER }]}
                   onPress={() => {
-                    setFeedbackGiven(true);
+                    setCelebrationReaction(r);
                     setFeedbackVisible(false);
+                    setFeedbackGiven(true);
                     playedSuggestionRef.current = null;
+                    setCelebrationVisible(true);
                   }}
                 >
                   <Text style={s.reactionEmoji}>{r.emoji}</Text>
@@ -613,6 +618,13 @@ export default function SleepScreen() {
           </View>
         </View>
       )}
+
+      <FeedbackCelebration
+        visible={celebrationVisible}
+        emoji={celebrationReaction.emoji}
+        label={celebrationReaction.label}
+        onClose={() => setCelebrationVisible(false)}
+      />
 
       {/* ── MINI PLAYER ── */}
       {isTrackPlaying && (
