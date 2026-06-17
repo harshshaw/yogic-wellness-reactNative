@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -187,9 +187,47 @@ export default function SleepScreen() {
   const { images, mode } = useTheme();
   const { playTrack, isTrackPlaying, toggleTrack } = useAppMusic();
 
+  const playedSuggestionRef = useRef<{ title: string; sub: string } | null>(null);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackItem, setFeedbackItem]       = useState<{ title: string; sub: string } | null>(null);
+  const [feedbackGiven, setFeedbackGiven]     = useState(false);
+
   const playAndOpen = () => {
     playTrack();
     navigation.navigate('NowPlaying');
+  };
+
+  const playSuggestion = (title: string, sub: string) => {
+    playedSuggestionRef.current = { title, sub };
+    setFeedbackGiven(false);
+    playTrack();
+    navigation.navigate('NowPlaying');
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (playedSuggestionRef.current && !feedbackGiven) {
+        setFeedbackItem(playedSuggestionRef.current);
+        setFeedbackVisible(true);
+      }
+    });
+    return unsubscribe;
+  }, [navigation, feedbackGiven]);
+
+  const FEEDBACK_REACTIONS: { emoji: string; label: string }[] = [
+    { emoji: '😌', label: 'Very calming' },
+    { emoji: '👍', label: 'Helpful' },
+    { emoji: '😐', label: 'Neutral' },
+    { emoji: '😕', label: 'Not for me' },
+  ];
+
+  const MOOD_FEEDBACK_QUESTION: Record<string, string> = {
+    overthinking: 'Did it help quiet your mind?',
+    tired:        'Did you feel more rested?',
+    calm:         'Did it deepen your calm?',
+    emotional:    'Did it bring you comfort?',
+    'low-energy': 'Did it help recharge you?',
+    focus:        'Did it sharpen your focus?',
   };
 
   const isNight = mode === 'night';
@@ -290,7 +328,7 @@ export default function SleepScreen() {
                 key={i}
                 activeOpacity={0.85}
                 style={[s.suggestRow, { backgroundColor: CARD, borderColor: BORDER }]}
-                onPress={playAndOpen}
+                onPress={() => playSuggestion(item.title, item.sub)}
               >
                 <View style={[s.suggestArt, { backgroundColor: item.color }]}>
                   <MusicIcon size={16} color="#fff" />
@@ -299,7 +337,7 @@ export default function SleepScreen() {
                   <Text style={[s.suggestTitle, { color: TEXT }]} numberOfLines={1}>{item.title}</Text>
                   <Text style={[s.suggestSub, { color: MUTED }]}>{item.sub}  ·  {item.duration}</Text>
                 </View>
-                <TouchableOpacity style={[s.suggestPlay, { backgroundColor: PURPLE }]} onPress={playAndOpen}>
+                <TouchableOpacity style={[s.suggestPlay, { backgroundColor: PURPLE }]} onPress={() => playSuggestion(item.title, item.sub)}>
                   <Play size={13} color="#fff" />
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -518,6 +556,64 @@ export default function SleepScreen() {
 
       </ScrollView>
 
+      {/* ── FEEDBACK SHEET ── */}
+      {feedbackVisible && (
+        <View style={s.modalBackdrop}>
+          <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => {
+            setFeedbackGiven(true);
+            setFeedbackVisible(false);
+            playedSuggestionRef.current = null;
+          }} />
+          <View style={[s.modalSheet, { backgroundColor: CARD }]}>
+            <View style={[s.modalHandle, { backgroundColor: BORDER }]} />
+
+            <View style={[s.modalIconWrap, { backgroundColor: PURPLE_SOFT }]}>
+              <Sparkles size={28} color={PURPLE} />
+            </View>
+
+            <Text style={[s.modalTitle, { color: TEXT }]}>
+              {selectedMood && MOOD_FEEDBACK_QUESTION[selectedMood]
+                ? MOOD_FEEDBACK_QUESTION[selectedMood]
+                : 'How did that feel?'}
+            </Text>
+            {feedbackItem && (
+              <Text style={[s.modalSub, { color: MUTED }]}>
+                {feedbackItem.title}  ·  {feedbackItem.sub}
+              </Text>
+            )}
+
+            <View style={s.reactionsRow}>
+              {FEEDBACK_REACTIONS.map((r) => (
+                <TouchableOpacity
+                  key={r.label}
+                  activeOpacity={0.8}
+                  style={[s.reactionBtn, { backgroundColor: isNight ? '#1A2040' : '#F8F9FF', borderColor: BORDER }]}
+                  onPress={() => {
+                    setFeedbackGiven(true);
+                    setFeedbackVisible(false);
+                    playedSuggestionRef.current = null;
+                  }}
+                >
+                  <Text style={s.reactionEmoji}>{r.emoji}</Text>
+                  <Text style={[s.reactionLabel, { color: MUTED }]}>{r.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => {
+                setFeedbackGiven(true);
+                setFeedbackVisible(false);
+                playedSuggestionRef.current = null;
+              }}
+            >
+              <Text style={[s.modalSkip, { color: MUTED }]}>Skip for now</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {/* ── MINI PLAYER ── */}
       {isTrackPlaying && (
         <View style={[s.miniPlayer, { backgroundColor: CARD, borderColor: BORDER }]}>
@@ -692,4 +788,33 @@ const s = StyleSheet.create({
   miniTitle: { fontSize: 13, fontWeight: '600' },
   miniSub: { fontSize: 11, marginTop: 2 },
   miniPlayBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+
+  // feedback sheet
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 100,
+  },
+  modalSheet: {
+    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    padding: 24, paddingBottom: 44, alignItems: 'center',
+  },
+  modalHandle: {
+    width: 40, height: 4, borderRadius: 2, marginBottom: 24,
+  },
+  modalIconWrap: {
+    width: 64, height: 64, borderRadius: 20,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+  },
+  modalTitle: { fontSize: 20, fontWeight: '800', letterSpacing: -0.3, textAlign: 'center', marginBottom: 6 },
+  modalSub: { fontSize: 13, textAlign: 'center', marginBottom: 28 },
+  reactionsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  reactionBtn: {
+    flex: 1, alignItems: 'center', paddingVertical: 14,
+    borderRadius: 16, borderWidth: 1, gap: 6,
+  },
+  reactionEmoji: { fontSize: 28 },
+  reactionLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
+  modalSkip: { fontSize: 14, fontWeight: '600' },
 });
