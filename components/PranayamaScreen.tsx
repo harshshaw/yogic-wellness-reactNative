@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useReflection } from '../hooks/useReflection';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import StreakCelebration from './StreakCelebration';
+import { useStreakStorage } from '../hooks/useStreakStorage';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -157,30 +158,6 @@ const CircleRing = ({ percent = 0.83, size = 64, color = '#1B5E20' }) => {
   );
 };
 
-// ── weekly bar chart ───────────────────────────────────────────────────────────
-const WeekBars = ({ color = '#2E7D32' }) => {
-  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  const heights = [60, 40, 70, 80, 50, 30, 0];
-  const max = 80;
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4 }}>
-      {days.map((d, i) => (
-        <View key={i} style={{ alignItems: 'center', gap: 3 }}>
-          <View
-            style={{
-              width: 18,
-              height: Math.max(4, (heights[i] / max) * 48),
-              backgroundColor: heights[i] > 0 ? color : '#E5E7EB',
-              borderRadius: 4,
-            }}
-          />
-          <Text style={{ fontSize: 10, color: '#9CA3AF' }}>{d}</Text>
-        </View>
-      ))}
-    </View>
-  );
-};
-
 // ── stat dots ──────────────────────────────────────────────────────────────────
 const StreakDots = () => (
   <View style={{ flexDirection: 'row', gap: 4, marginTop: 6 }}>
@@ -225,25 +202,29 @@ export default function PranayamaScreen() {
     [recGroups],
   );
 
+  const { data: streakData, markDayComplete, seedTestData } = useStreakStorage();
+
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
-  const baseStreak = 5; // current streak before today (mirrors the "5 Days" card)
+  const celebrationFired = React.useRef(false);
 
   const toggleComplete = (id: string) => {
-    setCompleted((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  // when every item is marked done, fire the celebration once
-  useEffect(() => {
-    if (totalItems > 0 && completed.size === totalItems) {
-      setShowCelebration(true);
+    const next = new Set(completed);
+    if (next.has(id)) {
+      next.delete(id);
+      celebrationFired.current = false;
+    } else {
+      next.add(id);
     }
-  }, [completed, totalItems]);
+    setCompleted(next);
+
+    // fire celebration immediately — persist in background
+    if (totalItems > 0 && next.size === totalItems && !celebrationFired.current) {
+      celebrationFired.current = true;
+      setShowCelebration(true);
+      markDayComplete(totalItems, totalItems, totalItems * 6).catch(() => {});
+    }
+  };
 
   return (
     <View style={[s.root, { backgroundColor: '#FAFAF7' }]}>
@@ -443,43 +424,88 @@ export default function PranayamaScreen() {
         <View style={[s.section, { paddingHorizontal: 20 }]}>
           <View style={s.sectionRow}>
             <Text style={s.sectionTitle}>Your Journey</Text>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-              <Text style={[s.linkText, { color: GREEN_MED }]}>See full progress</Text>
-              <ChevronRight size={14} color={GREEN_MED} />
+            <TouchableOpacity
+              onPress={seedTestData}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
+            >
+              <Text style={[s.linkText, { color: GREEN_MED }]}>Seed test data</Text>
             </TouchableOpacity>
           </View>
 
+          {/* streak summary row */}
           <View style={[s.journeyCard, { borderColor: '#E5E7EB' }]}>
-            {/* left: streak ring */}
+            {/* streak ring */}
             <View style={{ alignItems: 'center' }}>
               <View style={{ position: 'relative' }}>
-                <CircleRing percent={0.8} size={72} color={GREEN} />
+                <CircleRing
+                  percent={streakData.longestStreak > 0 ? streakData.currentStreak / streakData.longestStreak : 0}
+                  size={72}
+                  color={GREEN}
+                />
                 <View style={s.ringCenter}>
-                  <Text style={[s.ringNum, { color: GREEN }]}>8</Text>
-                  <Text style={s.ringLabel}>Day Streak</Text>
+                  <Text style={[s.ringNum, { color: GREEN }]}>{streakData.currentStreak}</Text>
+                  <Text style={s.ringLabel}>Day{'\n'}Streak</Text>
                 </View>
               </View>
             </View>
 
-            {/* center: message + progress */}
+            {/* stats */}
             <View style={{ flex: 1, paddingHorizontal: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={s.journeyMsg}>You're doing amazing!</Text>
+                <Text style={s.journeyMsg}>
+                  {streakData.currentStreak >= 7
+                    ? 'On fire! 🔥'
+                    : streakData.currentStreak > 0
+                    ? "You're doing amazing!"
+                    : 'Start your streak today!'}
+                </Text>
                 <Text style={{ fontSize: 14 }}>🌿</Text>
               </View>
-              <Text style={s.journeyHint}>Only 2 more sessions{'\n'}to beat your best streak.</Text>
-              <Text style={[s.weekMin, { color: '#0F172A' }]}>
-                This Week{'\n'}<Text style={{ fontSize: 22, fontWeight: '800', color: GREEN }}>72 min</Text>
+              <Text style={s.journeyHint}>
+                Best streak: {streakData.longestStreak} day{streakData.longestStreak !== 1 ? 's' : ''}
               </Text>
-              <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>83% of your goal</Text>
-              {/* progress bar */}
-              <View style={s.progressBg}>
-                <View style={[s.progressFill, { backgroundColor: GREEN, width: '83%' }]} />
-              </View>
+              <Text style={[s.weekMin, { color: '#0F172A' }]}>
+                Total days{'\n'}
+                <Text style={{ fontSize: 22, fontWeight: '800', color: GREEN }}>
+                  {streakData.totalDaysCompleted}
+                </Text>
+              </Text>
             </View>
 
-            {/* right: weekly bars */}
-            <WeekBars color={GREEN_MED} />
+            {/* live bar chart — last 7 records */}
+            {(() => {
+              const last7 = streakData.history.slice(-7);
+              const max = Math.max(...last7.map((d) => d.minutesLogged), 1);
+              const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+              return (
+                <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4 }}>
+                  {last7.map((rec, i) => {
+                    const dayLabel = DAY_LABELS[new Date(rec.date + 'T00:00:00').getDay()];
+                    const barH = Math.max(4, (rec.minutesLogged / max) * 52);
+                    return (
+                      <View key={i} style={{ alignItems: 'center', gap: 3 }}>
+                        <View
+                          style={{
+                            width: 18,
+                            height: barH,
+                            backgroundColor: rec.completed ? GREEN_MED : '#E5E7EB',
+                            borderRadius: 4,
+                          }}
+                        />
+                        <Text style={{ fontSize: 10, color: '#9CA3AF' }}>{dayLabel}</Text>
+                      </View>
+                    );
+                  })}
+                  {/* fill empty slots if fewer than 7 records */}
+                  {Array.from({ length: Math.max(0, 7 - last7.length) }).map((_, i) => (
+                    <View key={`empty-${i}`} style={{ alignItems: 'center', gap: 3 }}>
+                      <View style={{ width: 18, height: 4, backgroundColor: '#E5E7EB', borderRadius: 4 }} />
+                      <Text style={{ fontSize: 10, color: '#E5E7EB' }}>-</Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })()}
           </View>
         </View>
 
@@ -518,7 +544,7 @@ export default function PranayamaScreen() {
 
       <StreakCelebration
         visible={showCelebration}
-        streakCount={baseStreak + 1}
+        streakCount={streakData.currentStreak}
         onClose={() => setShowCelebration(false)}
       />
     </View>
