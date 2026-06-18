@@ -15,6 +15,7 @@ import { useReflection } from '../hooks/useReflection';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import StreakCelebration from './StreakCelebration';
 import { useStreakStorage } from '../hooks/useStreakStorage';
+import { useNotifications } from '../hooks/useNotifications';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -194,6 +195,9 @@ export default function PranayamaScreen() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationStreak, setCelebrationStreak] = useState(1);
   const celebrationFired = React.useRef(false);
+
+  const allDone = totalItems > 0 && completed.size === totalItems;
+  useNotifications(allDone);
 
   const toggleComplete = (id: string) => {
     const next = new Set(completed);

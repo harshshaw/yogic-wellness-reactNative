@@ -212,12 +212,36 @@ const StatRing = ({ value, label, sub, color, progress, Icon, ink, muted }: Stat
   );
 };
 
+const DAILY_INSIGHTS = [
+  { quote: 'The body benefits from movement, the mind benefits from stillness.', author: 'Sakyong Mipham' },
+  { quote: 'Yoga is not about touching your toes. It is what you learn on the way down.', author: 'Jigar Gor' },
+  { quote: 'The quieter you become, the more you are able to hear.', author: 'Rumi' },
+  { quote: 'True meditation is about being fully present — with everything that is, including discomfort.', author: 'Adyashanti' },
+  { quote: 'Inhale the future, exhale the past.', author: 'Yogic Proverb' },
+  { quote: 'Where attention goes, energy flows.', author: 'James Redfield' },
+  { quote: 'Your task is not to seek for love, but to find all the barriers within yourself.', author: 'Rumi' },
+];
+
+const DAILY_AFFIRMATIONS = [
+  'I am exactly where I need to be right now.',
+  'With every breath, I release tension and invite peace.',
+  'I have the strength to face whatever today brings.',
+  'I am worthy of rest, joy, and wholeness.',
+  'I choose to meet myself with compassion today.',
+  'My mind is clear, my heart is open, my spirit is at ease.',
+  'I grow stronger, calmer, and wiser with every practice.',
+];
+
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { muted, toggleMuted } = useAppMusic();
   const { mode, colors, images } = useTheme();
   const { completed, data } = useReflection();
   const isNight = mode === 'night';
+
+  const dayIndex = new Date().getDay();
+  const insight     = DAILY_INSIGHTS[dayIndex % DAILY_INSIGHTS.length];
+  const affirmation = DAILY_AFFIRMATIONS[dayIndex % DAILY_AFFIRMATIONS.length];
   const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
 
   // derive a recommendation from reflection data
@@ -349,6 +373,33 @@ const HomeScreen = () => {
           </View>
         ) : null}
 
+        {/* QUICK ACCESS */}
+        <View style={localStyles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+            Quick Access
+          </Text>
+        </View>
+        <View style={localStyles.quickRow}>
+          {[
+            { label: 'Breathe',  emoji: '🌬️', color: '#10B981', soft: 'rgba(16,185,129,0.12)', nav: 'Recommend' },
+            { label: 'Sleep',    emoji: '🌙', color: '#6366F1', soft: 'rgba(99,102,241,0.12)',  nav: 'Sleep' },
+            { label: 'Music',    emoji: '🎵', color: '#F59E0B', soft: 'rgba(245,158,11,0.12)',  nav: 'Music' },
+            { label: 'Reflect',  emoji: '🪷', color: '#EC4899', soft: 'rgba(236,72,153,0.12)',  nav: 'MorningReflection' },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.label}
+              activeOpacity={0.8}
+              style={[localStyles.quickTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
+              onPress={() => navigation.navigate(item.nav)}
+            >
+              <View style={[localStyles.quickIcon, { backgroundColor: item.soft }]}>
+                <Text style={{ fontSize: 22 }}>{item.emoji}</Text>
+              </View>
+              <Text style={[localStyles.quickLabel, { color: colors.textPrimary }]}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {/* YOUR PROGRESS CARD */}
         <View
           style={[
@@ -428,6 +479,20 @@ const HomeScreen = () => {
           </View>
         </ImageBackground>
 
+        {/* INSIGHT OF THE DAY */}
+        <View style={localStyles.sectionRow}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+            Insight of the Day
+          </Text>
+        </View>
+        <View style={[localStyles.insightCard, { backgroundColor: isNight ? colors.cardLight : '#FFFBEB', borderColor: isNight ? colors.border : '#FDE68A' }]}>
+          <Text style={localStyles.insightEmoji}>💡</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[localStyles.insightQuote, { color: colors.textPrimary }]}>"{insight.quote}"</Text>
+            <Text style={[localStyles.insightAuthor, { color: colors.textSecondary }]}>— {insight.author}</Text>
+          </View>
+        </View>
+
         {/* TODAY'S FOCUS */}
         <View style={localStyles.sectionRow}>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
@@ -457,6 +522,13 @@ const HomeScreen = () => {
             <PlayTriangle color={colors.statMint} />
           </View>
         </TouchableOpacity>
+
+        {/* DAILY AFFIRMATION */}
+        <View style={[localStyles.affirmCard, { backgroundColor: isNight ? '#1A1040' : '#F5F3FF', borderColor: isNight ? 'rgba(139,92,246,0.25)' : '#DDD6FE' }]}>
+          <Text style={localStyles.affirmTop}>✨ Daily Affirmation</Text>
+          <Text style={[localStyles.affirmText, { color: colors.textPrimary }]}>"{affirmation}"</Text>
+        </View>
+
       </ScrollView>
     </View>
   );
@@ -601,6 +673,39 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#7C3AED', alignItems: 'center', justifyContent: 'center',
   },
   recHint: { fontSize: 13, color: '#4C1D95', marginTop: 12, lineHeight: 18 },
+
+  // quick access
+  quickRow: {
+    flexDirection: 'row', gap: 10,
+    paddingHorizontal: 18, marginBottom: 6,
+  },
+  quickTile: {
+    flex: 1, alignItems: 'center', paddingVertical: 16,
+    borderRadius: 18, borderWidth: 1, gap: 8,
+  },
+  quickIcon: {
+    width: 48, height: 48, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  quickLabel: { fontSize: 12, fontWeight: '700' },
+
+  // insight of the day
+  insightCard: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 12,
+    marginHorizontal: 18, marginBottom: 6,
+    borderRadius: 18, borderWidth: 1, padding: 16,
+  },
+  insightEmoji: { fontSize: 28, marginTop: 2 },
+  insightQuote: { fontSize: 14, fontWeight: '600', lineHeight: 21, fontStyle: 'italic' },
+  insightAuthor: { fontSize: 12, marginTop: 6, fontWeight: '500' },
+
+  // daily affirmation
+  affirmCard: {
+    marginHorizontal: 18, marginTop: 22, marginBottom: 8,
+    borderRadius: 20, borderWidth: 1, padding: 20, alignItems: 'center',
+  },
+  affirmTop: { fontSize: 12, fontWeight: '700', color: '#8B5CF6', letterSpacing: 0.5, marginBottom: 10 },
+  affirmText: { fontSize: 16, fontWeight: '700', textAlign: 'center', lineHeight: 24, fontStyle: 'italic' },
 });
 
 export default HomeScreen;
