@@ -249,6 +249,20 @@ export const Mic = ({ size, color = '#fff', strokeWidth }: Props) => (
   </Svg>
 );
 
+export const Volume2 = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M11 5 6 9H2v6h4l5 4z" stroke={color} />
+    <Path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke={color} />
+  </Svg>
+);
+
+export const VolumeX = ({ size, color = '#fff', strokeWidth }: Props) => (
+  <Svg {...stroke(size, strokeWidth)}>
+    <Path d="M11 5 6 9H2v6h4l5 4z" stroke={color} />
+    <Path d="m23 9-6 6M17 9l6 6" stroke={color} />
+  </Svg>
+);
+
 export const Send = ({ size, color = '#fff', strokeWidth }: Props) => (
   <Svg {...stroke(size, strokeWidth)}>
     <Path d="m22 2-7 20-4-9-9-4Z" stroke={color} />

@@ -22,11 +22,16 @@
       "url": "https://u.expo.dev/1c36a2b4-712b-468b-b4b3-4cb35dc98a2e"
     },
     "android": {
-      "permissions": ["RECEIVE_BOOT_COMPLETED", "SCHEDULE_EXACT_ALARM"]
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "SCHEDULE_EXACT_ALARM",
+        "RECORD_AUDIO"
+      ]
     },
     "ios": {
       "infoPlist": {
-        "UIBackgroundModes": ["fetch", "remote-notification"]
+        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "NSMicrophoneUsageDescription": "Allow microphone access so you can speak to your AI companion and have it transcribed."
       }
     },
     "plugins": [
@@ -35,6 +40,12 @@
         {
           "color": "#8B5CF6",
           "sounds": []
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow microphone access so you can speak to your AI companion and have it transcribed."
         }
       ]
     ]

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,16 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
+import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
-import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target } from './Icons';
-import { sendToCompanion, type CompanionMode } from '../lib/aiCompanion';
+import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Volume2, VolumeX } from './Icons';
+import { sendToCompanion, transcribeAudio, type CompanionMode } from '../lib/aiCompanion';
 import { useTheme } from '../hooks/useTheme';
 
 type Mode = CompanionMode;
@@ -63,6 +67,100 @@ const AICompanionScreen = () => {
   const [draft, setDraft] = useState('');
   const [pending, setPending] = useState(false);
 
+  // ── Voice output (text-to-speech for AI replies) ──
+  const [voiceOn, setVoiceOn] = useState(true);
+  const voiceOnRef = useRef(true);
+  voiceOnRef.current = voiceOn;
+
+  const speak = async (text: string) => {
+    if (!voiceOnRef.current || !text) return;
+    Speech.stop();
+    try {
+      // Route audio to the main loudspeaker (not the quiet iOS earpiece),
+      // play even when the ringer switch is silent, and don't duck.
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        playThroughEarpieceAndroid: false,
+        shouldDuckAndroid: false,
+      });
+    } catch {
+      // ignore — fall back to default routing
+    }
+    Speech.speak(text, { pitch: 1.0, rate: 0.95, volume: 1.0 });
+  };
+
+  const toggleVoice = () => {
+    setVoiceOn(v => {
+      const next = !v;
+      if (!next) Speech.stop();
+      return next;
+    });
+  };
+
+  // ── Voice input (record → Whisper transcription) ──
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const startRecording = async () => {
+    try {
+      Speech.stop();
+      const perm = await Audio.requestPermissionsAsync();
+      if (!perm.granted) {
+        setDraft('Microphone access is needed to speak.');
+        return;
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      recordingRef.current = recording;
+      setIsRecording(true);
+    } catch (err) {
+      console.warn('startRecording failed', err);
+      setIsRecording(false);
+    }
+  };
+
+  const stopAndTranscribe = async () => {
+    const recording = recordingRef.current;
+    recordingRef.current = null;
+    setIsRecording(false);
+    if (!recording) return;
+
+    setIsTranscribing(true);
+    try {
+      await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+      const uri = recording.getURI();
+      if (!uri) return;
+
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: 'base64' as any,
+      });
+      const ext = uri.split('.').pop()?.toLowerCase() || 'm4a';
+      const text = await transcribeAudio(base64, ext);
+
+      if (text) {
+        setDraft(d => (d ? `${d} ${text}` : text));
+      }
+    } catch (err) {
+      console.warn('transcription failed', err);
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  const toggleMic = () => {
+    if (isTranscribing) return;
+    if (isRecording) stopAndTranscribe();
+    else startRecording();
+  };
+
   const send = async (forced?: string) => {
     const text = (forced ?? draft).trim();
     if (!text || pending) return;
@@ -84,6 +182,7 @@ const AICompanionScreen = () => {
           ? reply.citations.map(c => c.ref).join(' · ')
           : undefined;
       setMessages(m => [...m, { from: 'ai', text: reply.content, cite, time: timeStamp() }]);
+      speak(reply.content);
     } catch (err: any) {
       setMessages(m => [
         ...m,
@@ -101,6 +200,9 @@ const AICompanionScreen = () => {
 
   const hasUser = useMemo(() => messages.some(m => m.from === 'user'), [messages]);
   const { colors } = useTheme();
+
+  // Stop any in-flight speech when the screen unmounts.
+  useEffect(() => () => { Speech.stop(); }, []);
 
   return (
     <KeyboardAvoidingView
@@ -127,7 +229,17 @@ const AICompanionScreen = () => {
             <Text style={[styles.status, { color: colors.textSecondary }]}>Listening</Text>
           </View>
         </View>
-        <View style={warm.iconBtn} />
+        <TouchableOpacity
+          style={[warm.iconBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
+          activeOpacity={0.7}
+          onPress={toggleVoice}
+        >
+          {voiceOn ? (
+            <Volume2 size={18} color={colors.statPurple} />
+          ) : (
+            <VolumeX size={18} color={colors.textSecondary} />
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* THREAD */}
@@ -198,15 +310,30 @@ const AICompanionScreen = () => {
         ]}
       >
         <TouchableOpacity
-          style={[styles.micBtn, { backgroundColor: colors.statPurpleSoft }]}
+          style={[
+            styles.micBtn,
+            { backgroundColor: isRecording ? colors.statPurple : colors.statPurpleSoft },
+          ]}
           activeOpacity={0.7}
+          onPress={toggleMic}
+          disabled={isTranscribing}
         >
-          <Mic size={18} color={colors.statPurple} />
+          {isTranscribing ? (
+            <ActivityIndicator size="small" color={colors.statPurple} />
+          ) : (
+            <Mic size={18} color={isRecording ? '#FFFFFF' : colors.statPurple} />
+          )}
         </TouchableOpacity>
         <TextInput
           value={draft}
           onChangeText={setDraft}
-          placeholder="Speak your truth…"
+          placeholder={
+            isRecording
+              ? 'Listening… tap mic to stop'
+              : isTranscribing
+              ? 'Transcribing…'
+              : 'Speak your truth…'
+          }
           placeholderTextColor={colors.textSecondary}
           style={[
             styles.input,

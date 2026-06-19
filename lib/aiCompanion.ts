@@ -26,6 +26,27 @@ export type ChatResponse = {
   citations: Citation[];
 };
 
+// Sends a recorded voice clip to the Whisper endpoint and returns the transcript.
+// `uri` is the local file URI from expo-av; `format` is the file extension.
+export async function transcribeAudio(
+  base64: string,
+  format = 'm4a'
+): Promise<string> {
+  const res = await fetch(`${AI_API_URL}/api/transcribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ audio: base64, format }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Transcription failed (${res.status}): ${text}`);
+  }
+
+  const json = (await res.json()) as { text: string };
+  return json.text ?? '';
+}
+
 export async function sendToCompanion(
   mode: CompanionMode,
   messages: ChatMessage[]
