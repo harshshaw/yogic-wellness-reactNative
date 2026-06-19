@@ -12,7 +12,7 @@ type AudioContextValue = {
   muted: boolean;
   toggleMuted: () => void;
   isTrackPlaying: boolean;
-  playTrack: () => void;
+  playTrack: (source?: ReturnType<typeof require>) => void;
   pauseTrack: () => void;
   toggleTrack: () => void;
 };
@@ -124,12 +124,31 @@ export const AppMusicProvider = ({ children }: { children: React.ReactNode }) =>
     })();
   }, [muted]);
 
-  const playTrack = async () => {
+  const playTrack = async (source?: ReturnType<typeof require>) => {
     const bg = bgRef.current;
+    if (bg) await bg.pauseAsync().catch(() => {});
+
+    // If a new source is provided, swap out the current track sound
+    if (source !== undefined) {
+      const old = trackRef.current;
+      trackRef.current = null;
+      if (old) await old.unloadAsync().catch(() => {});
+      try {
+        const { sound } = await Audio.Sound.createAsync(source, {
+          shouldPlay: false,
+          isLooping: true,
+          volume: 0.7,
+        });
+        trackRef.current = sound;
+      } catch (err) {
+        console.warn('Track swap failed', err);
+        return;
+      }
+    }
+
     const track = trackRef.current;
     if (!track) return;
     try {
-      if (bg) await bg.pauseAsync();
       await track.playAsync();
       trackPlayingRef.current = true;
       setIsTrackPlaying(true);

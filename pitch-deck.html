@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YogicWellness — Pitch Deck</title>
+<style>
+  :root{
+    --ink:#1A1530;
+    --muted:#6B6480;
+    --purple:#7C3AED;
+    --purple-d:#5B21B6;
+    --pink:#F472B6;
+    --blue:#1E3A8A;
+    --mint:#34D399;
+    --amber:#F59E0B;
+    --bg:#FBFAFF;
+    --card:#FFFFFF;
+    --line:#EBE7F5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:#E9E6F2;
+  }
+
+  /* Each slide = one printed page, 16:9 */
+  .slide{
+    position:relative;
+    width:1280px;
+    height:720px;
+    margin:24px auto;
+    background:var(--bg);
+    overflow:hidden;
+    box-shadow:0 12px 40px rgba(30,20,60,.18);
+    padding:64px 72px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  @media print{
+    body{background:#fff;}
+    .slide{
+      margin:0;
+      box-shadow:none;
+      page-break-after:always;
+      break-after:page;
+    }
+    @page{size:1280px 720px;margin:0;}
+  }
+
+  /* ── shared bits ── */
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:3px;
+    font-size:13px;
+    font-weight:800;
+    color:var(--purple);
+  }
+  h1{font-size:60px;line-height:1.04;letter-spacing:-1.5px;font-weight:800;}
+  h2{font-size:40px;line-height:1.1;letter-spacing:-1px;font-weight:800;margin-bottom:8px;}
+  .lead{font-size:21px;color:var(--muted);line-height:1.5;font-weight:500;}
+  .slide-num{
+    position:absolute;bottom:30px;right:40px;
+    font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;
+  }
+  .brandmark{
+    position:absolute;bottom:28px;left:48px;
+    font-size:13px;font-weight:800;color:var(--ink);letter-spacing:.5px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .brandmark .om{color:var(--purple);font-size:18px;}
+
+  .header-row{margin-bottom:30px;}
+  .header-row .eyebrow{margin-bottom:14px;}
+
+  /* grids / cards */
+  .grid{display:grid;gap:18px;flex:1;}
+  .g2{grid-template-columns:1fr 1fr;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .g2x2{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:26px 26px;
+    display:flex;flex-direction:column;
+    box-shadow:0 4px 14px rgba(40,20,80,.04);
+  }
+  .card .ico{font-size:30px;margin-bottom:14px;}
+  .card h3{font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px;}
+  .card p{font-size:15px;color:var(--muted);line-height:1.5;font-weight:500;}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#F1ECFD;color:var(--purple-d);
+    font-weight:700;font-size:14px;
+    padding:8px 16px;border-radius:999px;
+  }
+
+  /* gradient title slide */
+  .cover{
+    background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 52%,var(--pink) 100%);
+    color:#fff;
+    justify-content:center;
+  }
+  .cover .om-big{
+    position:absolute;right:-40px;top:50%;transform:translateY(-50%);
+    font-size:560px;color:rgba(255,255,255,.10);line-height:1;font-weight:400;
+  }
+  .cover .eyebrow{color:rgba(255,255,255,.85);}
+  .cover h1{font-size:82px;letter-spacing:-2.5px;margin:18px 0 22px;}
+  .cover .lead{color:rgba(255,255,255,.92);font-size:25px;max-width:720px;}
+  .cover .brandmark{color:#fff;}
+  .cover .brandmark .om{color:#fff;}
+  .cover .tags{margin-top:38px;display:flex;gap:12px;}
+  .cover .tag{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.28);
+    color:#fff;font-weight:700;font-size:14px;
+    padding:9px 18px;border-radius:999px;backdrop-filter:blur(4px);
+  }
+
+  /* problem stat strip */
+  .stat-row{display:flex;gap:20px;flex:1;align-items:stretch;}
+  .stat{
+    flex:1;background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:30px;display:flex;flex-direction:column;justify-content:center;
+  }
+  .stat .big{font-size:54px;font-weight:800;letter-spacing:-2px;
+    background:linear-gradient(120deg,var(--purple),var(--pink));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .stat p{font-size:15px;color:var(--muted);margin-top:8px;font-weight:600;line-height:1.45;}
+
+  /* solution split */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:40px;flex:1;align-items:center;}
+  .phone{
+    justify-self:center;
+    width:300px;height:600px;border-radius:42px;
+    background:linear-gradient(160deg,var(--blue),var(--purple) 55%,var(--pink));
+    box-shadow:0 24px 60px rgba(60,30,120,.32);
+    border:10px solid #15102B;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .phone .om{font-size:140px;color:rgba(255,255,255,.92);}
+  .phone .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    width:120px;height:26px;background:#15102B;border-radius:14px;}
+  .phone .ptitle{color:#fff;font-size:24px;font-weight:800;margin-top:10px;}
+  .phone .psub{color:rgba(255,255,255,.85);font-size:14px;margin-top:6px;}
+
+  .feat-list{display:flex;flex-direction:column;gap:18px;}
+  .feat{display:flex;gap:16px;align-items:flex-start;}
+  .feat .dot{
+    flex:0 0 44px;height:44px;border-radius:13px;
+    background:#F1ECFD;display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+  }
+  .feat h4{font-size:18px;font-weight:800;margin-bottom:3px;}
+  .feat p{font-size:14px;color:var(--muted);line-height:1.45;font-weight:500;}
+
+  /* AI personas */
+  .persona .ico{
+    width:54px;height:54px;border-radius:15px;display:flex;align-items:center;
+    justify-content:center;font-size:26px;margin-bottom:14px;
+  }
+  .p-guru .ico{background:#FEF0E2;}
+  .p-gita .ico{background:#E8F0FE;}
+  .p-sleep .ico{background:#EEE8FE;}
+  .p-coach .ico{background:#E6FAF1;}
+
+  /* engine flow */
+  .flow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex:1;}
+  .node{
+    flex:1;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:24px 18px;text-align:center;align-self:stretch;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .node .ico{font-size:34px;margin-bottom:12px;}
+  .node h4{font-size:17px;font-weight:800;margin-bottom:6px;}
+  .node p{font-size:13px;color:var(--muted);line-height:1.4;font-weight:500;}
+  .arrow{flex:0 0 30px;font-size:30px;color:var(--purple);font-weight:800;text-align:center;}
+  .mood-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;justify-content:center;}
+  .mood-tags .mt{background:#F1ECFD;color:var(--purple-d);font-weight:700;font-size:13px;
+    padding:7px 15px;border-radius:999px;}
+
+  /* market / why now bullets */
+  .why{display:flex;flex-direction:column;gap:20px;flex:1;justify-content:center;}
+  .why .row{display:flex;gap:18px;align-items:flex-start;}
+  .why .num{flex:0 0 46px;height:46px;border-radius:14px;
+    background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;
+    font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;}
+  .why h4{font-size:20px;font-weight:800;margin-bottom:4px;}
+  .why p{font-size:15px;color:var(--muted);line-height:1.5;font-weight:500;}
+
+  /* closing */
+  .closing{
+    background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 52%,var(--pink) 100%);
+    color:#fff;justify-content:center;align-items:flex-start;
+  }
+  .closing .om-big{position:absolute;left:-60px;bottom:-120px;font-size:500px;
+    color:rgba(255,255,255,.10);}
+  .closing .eyebrow{color:rgba(255,255,255,.85);}
+  .closing h1{font-size:62px;margin:16px 0 20px;}
+  .closing .lead{color:rgba(255,255,255,.92);max-width:760px;}
+  .closing .cta{margin-top:36px;display:flex;gap:14px;}
+  .closing .cta .b1{background:#fff;color:var(--purple-d);font-weight:800;font-size:16px;
+    padding:15px 30px;border-radius:999px;}
+  .closing .cta .b2{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);
+    color:#fff;font-weight:800;font-size:16px;padding:15px 30px;border-radius:999px;}
+  .closing .brandmark{color:#fff;}.closing .brandmark .om{color:#fff;}
+
+  .footnote{font-size:12px;color:var(--muted);margin-top:14px;font-style:italic;}
+</style>
+</head>
+<body>
+
+<!-- 1 · COVER -->
+<section class="slide cover">
+  <div class="om-big">ॐ</div>
+  <div class="eyebrow">Ancient wisdom · Modern wellness</div>
+  <h1>YogicWellness</h1>
+  <p class="lead">An AI-guided wellness companion that meets you in your mood — pranayama, sleep, and emotional support rooted in yogic tradition.</p>
+  <div class="tags">
+    <span class="tag">🧘 Pranayama</span>
+    <span class="tag">🌙 Sleep &amp; Rest</span>
+    <span class="tag">🤖 AI Companions</span>
+    <span class="tag">📿 Yogic Philosophy</span>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+</section>
+
+<!-- 2 · PROBLEM -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">The Problem</div>
+    <h2>Wellness apps treat everyone the same</h2>
+    <p class="lead">People reach for calm in very different states — and generic content libraries don't adapt.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="big">1 size</div>
+      <p>Most apps serve the same meditation to a panicked user and a sleepy one. No emotional context.</p>
+    </div>
+    <div class="stat">
+      <div class="big">Shallow</div>
+      <p>Soundscapes and timers, but no living guidance — no one to actually ask when the mind won't settle.</p>
+    </div>
+    <div class="stat">
+      <div class="big">Rootless</div>
+      <p>Wellness stripped of the traditions it came from. Breathing and philosophy reduced to a stopwatch.</p>
+    </div>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">02</div>
+</section>
+
+<!-- 3 · SOLUTION -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">The Solution</div>
+    <h2>A companion that adapts to how you feel</h2>
+  </div>
+  <div class="split">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="om">ॐ</div>
+      <div class="ptitle">Breathe mindfully.</div>
+      <div class="psub">Live fully.</div>
+    </div>
+    <div class="feat-list">
+      <div class="feat">
+        <div class="dot">🌅</div>
+        <div><h4>Morning reflection</h4><p>A quick mood, energy &amp; sleep check-in sets the tone for everything you see that day.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">🎯</div>
+        <div><h4>Mood-driven recommendations</h4><p>Breathing, meditation, music &amp; video tuned to one of 8 emotional states.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">🤖</div>
+        <div><h4>Four AI companions</h4><p>Voice-first guides for breath, philosophy, sleep and confidence — not one generic bot.</p></div>
+      </div>
+      <div class="feat">
+        <div class="dot">🔥</div>
+        <div><h4>Habit &amp; streak system</h4><p>Time-based progress rings, streaks and celebrations that make consistency feel good.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">03</div>
+</section>
+
+<!-- 4 · PRODUCT / FEATURES -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">The Product</div>
+    <h2>Five connected experiences</h2>
+  </div>
+  <div class="grid g3" style="grid-template-rows:1fr 1fr;">
+    <div class="card"><div class="ico">🏠</div><h3>Home</h3><p>Personalized daily focus, rotating yogic insights &amp; affirmations, quick-access tiles and goal progress.</p></div>
+    <div class="card"><div class="ico">🌬️</div><h3>Pranayama</h3><p>Mood-based breathing plans, animated guided sessions, streak journey card and a voice "Guru".</p></div>
+    <div class="card"><div class="ico">🌙</div><h3>Rest</h3><p>Time-aware mood check-in, soundscapes, therapy resets, night wisdom and a structured wind-down plan.</p></div>
+    <div class="card"><div class="ico">💬</div><h3>AI Companion</h3><p>Four specialized personas with tailored greetings, suggested prompts and source citations.</p></div>
+    <div class="card"><div class="ico">📊</div><h3>Progress</h3><p>Overview, trends, insights &amp; achievements — streaks, multi-metric rings and weekly charts.</p></div>
+    <div class="card" style="background:linear-gradient(135deg,#F1ECFD,#FCE7F3);border:none;">
+      <div class="ico">✨</div><h3>Woven together</h3><p>Reflection feeds recommendations feed AI feed progress — one adaptive loop, not five silos.</p></div>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">04</div>
+</section>
+
+<!-- 5 · PERSONALIZATION ENGINE -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">The Differentiator</div>
+    <h2>A mood-driven recommendation engine</h2>
+    <p class="lead">The app reads your emotional state and personalizes every suggestion — the core of the experience.</p>
+  </div>
+  <div class="flow">
+    <div class="node"><div class="ico">📝</div><h4>Check-in</h4><p>Mood, energy &amp; sleep quality from morning reflection</p></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="ico">🧠</div><h4>Classify</h4><p>Mapped &amp; escalated into one of 8 mood states</p></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="ico">🎛️</div><h4>Match</h4><p>Breathing, meditation, music &amp; video selected per state</p></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="ico">💜</div><h4>Learn</h4><p>Emoji feedback after each session refines what comes next</p></div>
+  </div>
+  <div class="mood-tags">
+    <span class="mt">CALM</span><span class="mt">HAPPY</span><span class="mt">STRESSED</span>
+    <span class="mt">ANXIOUS</span><span class="mt">OVERWHELMED</span><span class="mt">IRRITABLE</span>
+    <span class="mt">SAD</span><span class="mt">NEUTRAL</span>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">05</div>
+</section>
+
+<!-- 6 · AI COMPANIONS -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">AI, Done Right</div>
+    <h2>Not one chatbot — four specialists</h2>
+  </div>
+  <div class="grid g4">
+    <div class="card persona p-guru"><div class="ico">🧘</div><h3>Pranayama Guru</h3><p>Voice-first coach for breath techniques and yoga questions, hands-free.</p></div>
+    <div class="card persona p-gita"><div class="ico">📿</div><h3>Gita Companion</h3><p>Philosophical guidance inspired by the Bhagavad Gita, with citations.</p></div>
+    <div class="card persona p-sleep"><div class="ico">🌙</div><h3>Sleep Guide</h3><p>Personalized wind-down and rest coaching for evening use.</p></div>
+    <div class="card persona p-coach"><div class="ico">💪</div><h3>Confidence Coach</h3><p>Daily motivation and goal support to keep momentum going.</p></div>
+  </div>
+  <div style="margin-top:22px;display:flex;gap:12px;">
+    <span class="pill">🎙️ Voice-first input</span>
+    <span class="pill">📚 Source citations</span>
+    <span class="pill">💡 Suggested prompts</span>
+    <span class="pill">⏱️ Context-aware replies</span>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">06</div>
+</section>
+
+<!-- 7 · ENGAGEMENT / RETENTION -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">Built for Retention</div>
+    <h2>Habits that actually stick</h2>
+  </div>
+  <div class="grid g2x2">
+    <div class="card"><div class="ico">🔥</div><h3>Streaks &amp; journeys</h3><p>Current vs. longest streak, total days, and "On fire!" milestones at 7+ days keep users returning daily.</p></div>
+    <div class="card"><div class="ico">⭕</div><h3>Time-based progress</h3><p>Rings fill by actual minutes practiced — half-done is half-full, so progress feels honest and motivating.</p></div>
+    <div class="card"><div class="ico">🎉</div><h3>Celebration moments</h3><p>3D streak and feedback celebrations reward completion and reinforce the loop.</p></div>
+    <div class="card"><div class="ico">🔔</div><h3>Smart reminders</h3><p>Notifications nudge users to finish the day's plan — and cancel themselves once it's done.</p></div>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">07</div>
+</section>
+
+<!-- 8 · WHY NOW / MARKET -->
+<section class="slide">
+  <div class="header-row">
+    <div class="eyebrow">Why Now</div>
+    <h2>The moment for adaptive, rooted wellness</h2>
+  </div>
+  <div class="why">
+    <div class="row"><div class="num">1</div><div><h4>AI makes true personalization cheap</h4><p>Conversational AI lets a wellness app feel like a real guide — not a static content library — for the first time.</p></div></div>
+    <div class="row"><div class="num">2</div><div><h4>Burnout &amp; sleep are mainstream concerns</h4><p>Demand for emotional and sleep support has moved from niche to everyday across every age group.</p></div></div>
+    <div class="row"><div class="num">3</div><div><h4>Authenticity is a moat</h4><p>Grounding in pranayama, Sanskrit and the Gita differentiates from interchangeable meditation timers.</p></div></div>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+  <div class="slide-num">08</div>
+</section>
+
+<!-- 9 · CLOSING -->
+<section class="slide closing">
+  <div class="om-big">ॐ</div>
+  <div class="eyebrow">Join us</div>
+  <h1>Wellness that meets<br>you where you are.</h1>
+  <p class="lead">YogicWellness blends ancient practice with adaptive AI to build a daily ritual people actually keep. Let's bring it to the world.</p>
+  <div class="cta">
+    <span class="b1">Partner with us</span>
+    <span class="b2">karmanawellness@gmail.com</span>
+  </div>
+  <div class="brandmark"><span class="om">ॐ</span> YogicWellness</div>
+</section>
+
+</body>
+</html>

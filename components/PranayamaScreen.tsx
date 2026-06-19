@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  Modal,
 } from 'react-native';
 import Svg, { Path, Circle, G } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
@@ -16,6 +17,7 @@ import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import StreakCelebration from './StreakCelebration';
 import { useStreakStorage } from '../hooks/useStreakStorage';
 import { useNotifications } from '../hooks/useNotifications';
+import { getSessionMedia } from '../utils/sessionMedia';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -171,12 +173,23 @@ const GURU_PROMPTS = [
 
 export default function PranayamaScreen() {
   const navigation = useNavigation<any>();
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const { data: reflectionData } = useReflection();
 
   const GREEN = '#1B5E20';
   const GREEN_SOFT = '#E8F5E9';
   const GREEN_MED = '#2E7D32';
+  const isNight = mode === 'night';
+
+  const BG       = isNight ? '#0B1024' : '#FAFAF7';
+  const CARD     = isNight ? '#161B33' : '#FFFFFF';
+  const CARD_ALT = isNight ? '#1A2040' : '#F9FAFB';
+  const BORDER   = isNight ? 'rgba(255,255,255,0.08)' : '#E5E7EB';
+  const BORDER_L = isNight ? 'rgba(255,255,255,0.06)' : '#F1F5F9';
+  const TEXT     = isNight ? '#E8E9F3' : '#0F172A';
+  const MUTED    = isNight ? '#8B92B0' : '#6B7280';
+  const TILE_DONE = isNight ? 'rgba(16,185,129,0.15)' : '#F0FDF4';
+  const TILE_DONE_BORDER = isNight ? 'rgba(134,239,172,0.25)' : '#86EFAC';
 
   // ── recommendation completion tracking ──
   const moodState = reflectionData
@@ -191,39 +204,73 @@ export default function PranayamaScreen() {
 
   const { data: streakData, markDayComplete, seedTestData } = useStreakStorage();
 
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
+  // time-based progress: 0–1 per item id
+  const [timeProgress, setTimeProgress] = useState<Record<string, number>>({});
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationStreak, setCelebrationStreak] = useState(1);
-  const celebrationFired = React.useRef(false);
+  const celebrationFired = useRef(false);
 
-  const allDone = totalItems > 0 && completed.size === totalItems;
+  // tracks the session currently playing
+  const activeSession = useRef<{ id: string; startedAt: number; durationSecs: number } | null>(null);
+
+  // parse "6 min" → 360 seconds
+  const parseDuration = (meta: string): number => {
+    const m = meta.match(/(\d+(?:\.\d+)?)\s*min/i);
+    return m ? Math.round(parseFloat(m[1]) * 60) : 300;
+  };
+
+  const doneCount = useMemo(
+    () => Object.values(timeProgress).filter((p) => p >= 1).length,
+    [timeProgress],
+  );
+  const allDone = totalItems > 0 && doneCount === totalItems;
   useNotifications(allDone);
+  const [showWhyModal, setShowWhyModal] = useState(false);
 
-  const toggleComplete = (id: string) => {
-    const next = new Set(completed);
-    if (next.has(id)) {
-      next.delete(id);
-      celebrationFired.current = false;
-    } else {
-      next.add(id);
-    }
-    setCompleted(next);
+  // when screen regains focus, settle elapsed time for the active session
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      const sess = activeSession.current;
+      if (!sess) return;
+      const elapsed = (Date.now() - sess.startedAt) / 1000;
+      const ratio = Math.min(elapsed / sess.durationSecs, 1);
+      activeSession.current = null;
 
-    // fire celebration — persist and use returned streak count
-    if (totalItems > 0 && next.size === totalItems && !celebrationFired.current) {
-      celebrationFired.current = true;
-      markDayComplete(totalItems, totalItems, totalItems * 6).then((updated) => {
-        setCelebrationStreak(updated.currentStreak);
-        setShowCelebration(true);
-      }).catch(() => {
-        setCelebrationStreak(1);
-        setShowCelebration(true);
+      setTimeProgress((prev) => {
+        const next = { ...prev, [sess.id]: Math.max(prev[sess.id] ?? 0, ratio) };
+        const newDone = Object.values(next).filter((p) => p >= 1).length;
+        if (totalItems > 0 && newDone === totalItems && !celebrationFired.current) {
+          celebrationFired.current = true;
+          markDayComplete(totalItems, totalItems, totalItems * 6)
+            .then((updated) => { setCelebrationStreak(updated.currentStreak); setShowCelebration(true); })
+            .catch(() => { setCelebrationStreak(1); setShowCelebration(true); });
+        }
+        return next;
       });
+    });
+    return unsubscribe;
+  }, [navigation, totalItems]);
+
+  const startSession = (id: string, meta: string, type: string, title: string) => {
+    activeSession.current = { id, startedAt: Date.now(), durationSecs: parseDuration(meta) };
+    const media = getSessionMedia(id, type as any);
+    // music/video/meditation types → NowPlaying with dynamic video+audio
+    // breathing types → BreathingSession (animated guide)
+    if (type === 'music' || type === 'video' || type === 'meditation') {
+      navigation.navigate('NowPlaying' as any, {
+        id,
+        title,
+        videoSource: media.video,
+        audioSource: media.audio,
+        mediaLabel: media.label,
+      });
+    } else {
+      navigation.navigate('BreathingSession' as any, { id, title });
     }
   };
 
   return (
-    <View style={[s.root, { backgroundColor: '#FAFAF7' }]}>
+    <View style={[s.root, { backgroundColor: BG }]}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
@@ -235,10 +282,10 @@ export default function PranayamaScreen() {
               <Text style={[s.headerTitle, { color: GREEN }]}>Pranayama</Text>
               <Text style={{ fontSize: 22 }}>🌿</Text>
             </View>
-            <Text style={s.headerSub}>Breathe mindfully. Live fully.</Text>
+            <Text style={[s.headerSub, { color: MUTED }]}>Breathe mindfully. Live fully.</Text>
           </View>
           <TouchableOpacity
-            style={[s.guruBtn, { borderColor: '#E5E7EB', backgroundColor: '#fff' }]}
+            style={[s.guruBtn, { borderColor: BORDER, backgroundColor: CARD }]}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
           >
@@ -250,7 +297,9 @@ export default function PranayamaScreen() {
         {/* ── HERO CHARACTER IMAGE ── */}
         <View style={s.heroWrap}>
           <Image
-            source={require('../assets/images/pranayama-character-day.png')}
+            source={isNight
+              ? require('../assets/images/pranyama-actor-night.png')
+              : require('../assets/images/pranayama-character-day.png')}
             style={s.heroImg}
             resizeMode="cover"
           />
@@ -259,7 +308,7 @@ export default function PranayamaScreen() {
         {/* ── TODAY'S STATE ── */}
         <View style={s.section}>
           <View style={s.sectionRow}>
-            <Text style={s.sectionTitle}>Today's State</Text>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Today's State</Text>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <Text style={[s.linkText, { color: GREEN_MED }]}>View details</Text>
               <ChevronRight size={14} color={GREEN_MED} />
@@ -268,35 +317,35 @@ export default function PranayamaScreen() {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
             {/* Stress */}
-            <View style={[s.statCard, { marginLeft: 20 }]}>
+            <View style={[s.statCard, { marginLeft: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <BrainIcon size={18} color="#FB923C" />
-                <Text style={s.statLabel}>Stress</Text>
+                <Text style={[s.statLabel, { color: MUTED }]}>Stress</Text>
               </View>
               <Text style={[s.statStatus, { color: '#FB923C' }]}>Moderate</Text>
-              <Text style={s.statValue}>6/10</Text>
+              <Text style={[s.statValue, { color: TEXT }]}>6/10</Text>
               <Sparkline color="#FB923C" />
             </View>
 
             {/* Energy */}
-            <View style={s.statCard}>
+            <View style={[s.statCard, { backgroundColor: CARD, borderColor: BORDER_L }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <BoltIcon size={18} color="#F59E0B" />
-                <Text style={s.statLabel}>Energy</Text>
+                <Text style={[s.statLabel, { color: MUTED }]}>Energy</Text>
               </View>
               <Text style={[s.statStatus, { color: '#FB923C' }]}>Low</Text>
-              <Text style={s.statValue}>4/10</Text>
+              <Text style={[s.statValue, { color: TEXT }]}>4/10</Text>
               <Sparkline color="#F59E0B" />
             </View>
 
             {/* Breathing Streak */}
-            <View style={[s.statCard, { marginRight: 20 }]}>
+            <View style={[s.statCard, { marginRight: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <LungsIcon size={18} color={GREEN_MED} />
-                <Text style={s.statLabel}>Breathing Streak</Text>
+                <Text style={[s.statLabel, { color: MUTED }]}>Breathing Streak</Text>
               </View>
-              <Text style={[s.statValue, { fontSize: 22, color: '#0F172A', marginTop: 4 }]}>5 Days</Text>
-              <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Keep going! 🔥</Text>
+              <Text style={[s.statValue, { fontSize: 22, color: TEXT, marginTop: 4 }]}>5 Days</Text>
+              <Text style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>Keep going! 🔥</Text>
               <StreakDots />
             </View>
           </ScrollView>
@@ -305,23 +354,32 @@ export default function PranayamaScreen() {
         {/* ── TODAY'S RECOMMENDATION ── */}
         <View style={[s.section, { paddingHorizontal: 20 }]}>
           <View style={s.sectionRow}>
-            <Text style={s.sectionTitle}>Today's Recommendation</Text>
-            <Text style={[s.linkText, { color: GREEN_MED }]}>
-              {completed.size}/{totalItems} done
-            </Text>
+            <View>
+              <Text style={[s.sectionTitle, { color: TEXT }]}>Today's Recommendation</Text>
+              <Text style={[s.linkText, { color: GREEN_MED, marginTop: 3 }]}>
+                {doneCount}/{totalItems} done
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setShowWhyModal(true)}
+              style={[s.whyBtn, { backgroundColor: isNight ? 'rgba(46,125,50,0.15)' : '#E8F5E9', borderColor: isNight ? 'rgba(46,125,50,0.3)' : '#A7F3D0' }]}
+              activeOpacity={0.75}
+            >
+              <Text style={[s.whyBtnText, { color: GREEN_MED }]}>Why this? 💡</Text>
+            </TouchableOpacity>
           </View>
 
           {/* overall progress bar */}
-          <View style={s.recProgressTrack}>
+          <View style={[s.recProgressTrack, { backgroundColor: BORDER }]}>
             <View
               style={[
                 s.recProgressFill,
-                { width: totalItems ? `${(completed.size / totalItems) * 100}%` : '0%' },
+                { width: totalItems ? `${(doneCount / totalItems) * 100}%` : '0%' },
               ]}
             />
           </View>
 
-          <View style={[s.recCard, { borderColor: '#E5E7EB' }]}>
+          <View style={[s.recCard, { backgroundColor: CARD, borderColor: BORDER }]}>
             {(() => {
               const typeIcon = (type: string): React.ComponentType<{ size?: number; color?: string }> => {
                 if (type === 'breathing') return LungsIcon;
@@ -342,12 +400,12 @@ export default function PranayamaScreen() {
 
               return recGroups.map((g, gi) => {
                 const GIcon = groupIcon(g.label);
-                const groupDone = g.items.every((it) => completed.has(it.id));
+                const groupDone = g.items.every((it) => (timeProgress[it.id] ?? 0) >= 1);
                 return (
                   <View key={g.label} style={{ marginTop: gi === 0 ? 0 : 18 }}>
                     <View style={s.recGroupHeader}>
                       <GIcon size={16} color={groupIconColor(g.label)} />
-                      <Text style={s.recGroupLabel}>{g.label}</Text>
+                      <Text style={[s.recGroupLabel, { color: TEXT }]}>{g.label}</Text>
                       {groupDone && (
                         <View style={s.recGroupDoneBadge}>
                           <CheckIcon size={11} color={GREEN_MED} />
@@ -362,32 +420,54 @@ export default function PranayamaScreen() {
                       {g.items.map((it) => {
                         const Icon = typeIcon(it.type);
                         const { tint, tintSoft } = typeTint(it.type);
-                        const isDone = completed.has(it.id);
+                        const progress = timeProgress[it.id] ?? 0;
+                        const isDone = progress >= 1;
+                        // SVG progress ring constants
+                        const R = 13; const CIRC = 2 * Math.PI * R;
                         return (
                           <TouchableOpacity
                             key={it.id}
                             activeOpacity={0.85}
-                            onPress={() => toggleComplete(it.id)}
-                            style={[s.recTile, isDone && s.recTileDone]}
+                            onPress={() => startSession(it.id, it.meta, it.type, it.title)}
+                            style={[s.recTile, { backgroundColor: isDone ? TILE_DONE : CARD, borderColor: isDone ? TILE_DONE_BORDER : BORDER_L }]}
                           >
-                            {/* completion check badge */}
-                            <View style={[s.recCheck, isDone ? s.recCheckOn : s.recCheckOff]}>
-                              {isDone && <CheckIcon size={12} color="#fff" />}
+                            {/* time-based progress ring badge */}
+                            <View style={s.recRingWrap}>
+                              <Svg width={30} height={30}>
+                                <Circle cx={15} cy={15} r={R} stroke={BORDER} strokeWidth={2.5} fill="none" />
+                                <Circle
+                                  cx={15} cy={15} r={R}
+                                  stroke={isDone ? GREEN_MED : tint}
+                                  strokeWidth={2.5} fill="none"
+                                  strokeDasharray={CIRC}
+                                  strokeDashoffset={CIRC * (1 - progress)}
+                                  strokeLinecap="round"
+                                  transform="rotate(-90 15 15)"
+                                />
+                                {isDone && (
+                                  <Path
+                                    d="M10 15l3.5 3.5L20 11"
+                                    stroke={GREEN_MED} strokeWidth={2}
+                                    strokeLinecap="round" strokeLinejoin="round"
+                                    fill="none"
+                                  />
+                                )}
+                              </Svg>
                             </View>
 
                             <View style={[s.recTileIcon, { backgroundColor: tintSoft }, isDone && { opacity: 0.5 }]}>
                               <Icon size={22} color={tint} />
                             </View>
                             <Text
-                              style={[s.recTileTitle, isDone && s.recTileTitleDone]}
+                              style={[s.recTileTitle, { color: isDone ? MUTED : TEXT }, isDone && s.recTileTitleDone]}
                               numberOfLines={2}
                             >
                               {it.title}
                             </Text>
                             <View style={s.recTileFoot}>
-                              <Text style={s.recTileMeta}>{it.meta}</Text>
+                              <Text style={[s.recTileMeta, { color: MUTED }]}>{it.meta}</Text>
                               <TouchableOpacity
-                                onPress={() => navigation.navigate('BreathingSession', { id: it.id, title: it.title })}
+                                onPress={() => startSession(it.id, it.meta, it.type, it.title)}
                                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                                 style={[s.recTilePlay, { backgroundColor: tint }]}
                               >
@@ -408,7 +488,7 @@ export default function PranayamaScreen() {
         {/* ── YOUR JOURNEY ── */}
         <View style={[s.section, { paddingHorizontal: 20 }]}>
           <View style={s.sectionRow}>
-            <Text style={s.sectionTitle}>Your Journey</Text>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Your Journey</Text>
             <TouchableOpacity
               onPress={seedTestData}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
@@ -418,7 +498,7 @@ export default function PranayamaScreen() {
           </View>
 
           {/* streak summary row */}
-          <View style={[s.journeyCard, { borderColor: '#E5E7EB' }]}>
+          <View style={[s.journeyCard, { backgroundColor: CARD, borderColor: BORDER }]}>
             {/* streak ring */}
             <View style={{ alignItems: 'center' }}>
               <View style={{ position: 'relative' }}>
@@ -429,7 +509,7 @@ export default function PranayamaScreen() {
                 />
                 <View style={s.ringCenter}>
                   <Text style={[s.ringNum, { color: GREEN }]}>{streakData.currentStreak}</Text>
-                  <Text style={s.ringLabel}>Day{'\n'}Streak</Text>
+                  <Text style={[s.ringLabel, { color: MUTED }]}>Day{'\n'}Streak</Text>
                 </View>
               </View>
             </View>
@@ -437,7 +517,7 @@ export default function PranayamaScreen() {
             {/* stats */}
             <View style={{ flex: 1, paddingHorizontal: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={s.journeyMsg}>
+                <Text style={[s.journeyMsg, { color: TEXT }]}>
                   {streakData.currentStreak >= 7
                     ? 'On fire! 🔥'
                     : streakData.currentStreak > 0
@@ -446,10 +526,10 @@ export default function PranayamaScreen() {
                 </Text>
                 <Text style={{ fontSize: 14 }}>🌿</Text>
               </View>
-              <Text style={s.journeyHint}>
+              <Text style={[s.journeyHint, { color: MUTED }]}>
                 Best streak: {streakData.longestStreak} day{streakData.longestStreak !== 1 ? 's' : ''}
               </Text>
-              <Text style={[s.weekMin, { color: '#0F172A' }]}>
+              <Text style={[s.weekMin, { color: TEXT }]}>
                 Total days{'\n'}
                 <Text style={{ fontSize: 22, fontWeight: '800', color: GREEN }}>
                   {streakData.totalDaysCompleted}
@@ -473,19 +553,19 @@ export default function PranayamaScreen() {
                           style={{
                             width: 18,
                             height: barH,
-                            backgroundColor: rec.completed ? GREEN_MED : '#E5E7EB',
+                            backgroundColor: rec.completed ? GREEN_MED : BORDER,
                             borderRadius: 4,
                           }}
                         />
-                        <Text style={{ fontSize: 10, color: '#9CA3AF' }}>{dayLabel}</Text>
+                        <Text style={{ fontSize: 10, color: MUTED }}>{dayLabel}</Text>
                       </View>
                     );
                   })}
                   {/* fill empty slots if fewer than 7 records */}
                   {Array.from({ length: Math.max(0, 7 - last7.length) }).map((_, i) => (
                     <View key={`empty-${i}`} style={{ alignItems: 'center', gap: 3 }}>
-                      <View style={{ width: 18, height: 4, backgroundColor: '#E5E7EB', borderRadius: 4 }} />
-                      <Text style={{ fontSize: 10, color: '#E5E7EB' }}>-</Text>
+                      <View style={{ width: 18, height: 4, backgroundColor: BORDER, borderRadius: 4 }} />
+                      <Text style={{ fontSize: 10, color: MUTED }}>-</Text>
                     </View>
                   ))}
                 </View>
@@ -498,8 +578,8 @@ export default function PranayamaScreen() {
         <View style={[s.section, { paddingHorizontal: 20 }]}>
           <View style={s.sectionRow}>
             <View>
-              <Text style={s.sectionTitle}>Ask Your Guru</Text>
-              <Text style={[s.guruSub, { color: '#9CA3AF' }]}>Your personal AI coach</Text>
+              <Text style={[s.sectionTitle, { color: TEXT }]}>Ask Your Guru</Text>
+              <Text style={[s.guruSub, { color: MUTED }]}>Your personal AI coach</Text>
             </View>
           </View>
 
@@ -508,11 +588,11 @@ export default function PranayamaScreen() {
               {GURU_PROMPTS.map((p, i) => (
                 <TouchableOpacity
                   key={i}
-                  style={[s.promptChip, { borderColor: '#E5E7EB', backgroundColor: '#fff' }]}
+                  style={[s.promptChip, { borderColor: BORDER, backgroundColor: CARD }]}
                   activeOpacity={0.75}
                   onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
                 >
-                  <Text style={s.promptText}>{p}</Text>
+                  <Text style={[s.promptText, { color: TEXT }]}>{p}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -526,6 +606,41 @@ export default function PranayamaScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* ── WHY THIS RECOMMENDATION MODAL ── */}
+      <Modal visible={showWhyModal} transparent animationType="slide" onRequestClose={() => setShowWhyModal(false)}>
+        <View style={s.whyBackdrop}>
+          <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setShowWhyModal(false)} />
+          <View style={[s.whySheet, { backgroundColor: CARD }]}>
+            <View style={[s.whyHandle, { backgroundColor: BORDER }]} />
+            <Text style={[s.whySheetTitle, { color: TEXT }]}>Why this recommendation? 💡</Text>
+            <Text style={[s.whySheetSub, { color: MUTED }]}>
+              Based on your morning check-in, here's what we picked for you today.
+            </Text>
+            {recGroups.map((g) => (
+              <View key={g.label} style={[s.whyGroup, { borderColor: BORDER }]}>
+                <Text style={[s.whyGroupLabel, { color: GREEN_MED }]}>{g.label}</Text>
+                {g.items.map((it) => (
+                  <View key={it.id} style={s.whyItem}>
+                    <View style={[s.whyDot, { backgroundColor: GREEN_MED }]} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[s.whyItemTitle, { color: TEXT }]}>{it.title}</Text>
+                      <Text style={[s.whyItemMeta, { color: MUTED }]}>{it.meta}  ·  {it.type}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ))}
+            <TouchableOpacity
+              style={[s.whyCloseBtn, { backgroundColor: GREEN_MED }]}
+              activeOpacity={0.88}
+              onPress={() => setShowWhyModal(false)}
+            >
+              <Text style={s.whyCloseBtnText}>Got it</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <StreakCelebration
         visible={showCelebration}
@@ -680,6 +795,11 @@ const s = StyleSheet.create({
   },
   recCheckOn: { backgroundColor: '#10B981' },
   recCheckOff: { borderWidth: 1.5, borderColor: '#D1D5DB', backgroundColor: 'transparent' },
+  recRingWrap: {
+    position: 'absolute',
+    top: 6, right: 6,
+    zIndex: 2,
+  },
   recTileIcon: {
     width: 44, height: 44, borderRadius: 12,
     alignItems: 'center', justifyContent: 'center',
@@ -784,4 +904,34 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
   },
+
+  // why this recommendation
+  whyBtn: {
+    paddingVertical: 7, paddingHorizontal: 12,
+    borderRadius: 10, borderWidth: 1,
+  },
+  whyBtnText: { fontSize: 13, fontWeight: '700' },
+
+  whyBackdrop: {
+    flex: 1, justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  whySheet: {
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: 24, paddingBottom: 44,
+    maxHeight: '80%',
+  },
+  whyHandle: { width: 40, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
+  whySheetTitle: { fontSize: 19, fontWeight: '800', marginBottom: 6 },
+  whySheetSub: { fontSize: 13, lineHeight: 19, marginBottom: 18 },
+  whyGroup: { borderTopWidth: 1, paddingTop: 14, marginBottom: 14 },
+  whyGroupLabel: { fontSize: 13, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 10 },
+  whyItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 },
+  whyDot: { width: 7, height: 7, borderRadius: 4, marginTop: 5 },
+  whyItemTitle: { fontSize: 14, fontWeight: '700' },
+  whyItemMeta: { fontSize: 12, marginTop: 2 },
+  whyCloseBtn: {
+    borderRadius: 999, paddingVertical: 14, alignItems: 'center', marginTop: 6,
+  },
+  whyCloseBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
 });

@@ -21,7 +21,7 @@ export default function MainTabs() {
         component={PranayamaScreen}
         options={{ tabBarLabel: "Today's Rec" }}
       />
-      <Tab.Screen name="Sleep" component={SleepScreen} />
+      <Tab.Screen name="Sleep" component={SleepScreen} options={{ tabBarLabel: 'Rest' }} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen
         name="AICompanion"

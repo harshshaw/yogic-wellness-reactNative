@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Video, ResizeMode } from 'expo-av';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
 
-const BG_VIDEO = require('../assets/background-video/portrait2.mp4');
+const DEFAULT_VIDEO = require('../assets/background-video/portrait2.mp4');
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 const ChevronDown = ({ color }: { color: string }) => (
@@ -89,9 +89,36 @@ const Pause = ({ color, size = 28 }: { color: string; size?: number }) => (
 // ─── SCREEN ─────────────────────────────────────────────────────────────
 const NowPlayingScreen = () => {
   const navigation = useNavigation();
-  const { isTrackPlaying, toggleTrack } = useAppMusic();
+  const route = useRoute();
+  const params = (route.params ?? {}) as {
+    id?: string;
+    videoSource?: ReturnType<typeof require>;
+    audioSource?: ReturnType<typeof require>;
+    title?: string;
+    mediaLabel?: string;
+  };
+  const bgVideo = params.videoSource ?? DEFAULT_VIDEO;
+  const trackTitle = params.title ?? 'Himalayan Dawn';
+
+  const { isTrackPlaying, playTrack, toggleTrack } = useAppMusic();
   const [liked, setLiked] = useState(false);
   const [immersive, setImmersive] = useState(false);
+
+  // Track last session id so we only swap audio when the session actually changes
+  const lastSessionId = useRef<string | undefined>(undefined);
+  useFocusEffect(
+    React.useCallback(() => {
+      const currentId = params.id as string | undefined;
+      if (currentId !== lastSessionId.current) {
+        lastSessionId.current = currentId;
+        if (params.audioSource) {
+          playTrack(params.audioSource);
+        } else {
+          playTrack();
+        }
+      }
+    }, [params.id, params.audioSource])
+  );
 
   // Same hero gradient as the mini player's current track, for visual continuity.
   const gradient: readonly [string, string, string] = ['#1E3A8A', '#7C3AED', '#F472B6'];
@@ -101,7 +128,7 @@ const NowPlayingScreen = () => {
     return (
       <View style={styles.immersiveContainer}>
         <Video
-          source={BG_VIDEO}
+          source={bgVideo}
           style={StyleSheet.absoluteFillObject}
           resizeMode={ResizeMode.COVER}
           isLooping
@@ -126,13 +153,17 @@ const NowPlayingScreen = () => {
   };
 
   return (
-    <LinearGradient
-      colors={gradient}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
-      {/* Soft dark veil so white text stays readable */}
+    <View style={styles.container}>
+      {/* Background video — always visible, changes per session */}
+      <Video
+        source={bgVideo}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode={ResizeMode.COVER}
+        isLooping
+        isMuted
+        shouldPlay
+      />
+      {/* Dark overlay so white text stays readable */}
       <View style={styles.veil} />
 
       <Pressable style={{ flex: 1 }} onPress={onSurfacePress}>
@@ -174,8 +205,8 @@ const NowPlayingScreen = () => {
         {/* TRACK INFO */}
         <View style={styles.trackInfo}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.trackTitle}>Himalayan Dawn</Text>
-            <Text style={styles.trackArtist}>Sitar &amp; Singing Bowls · Sleep</Text>
+            <Text style={styles.trackTitle}>{trackTitle}</Text>
+            <Text style={styles.trackArtist}>{params.mediaLabel ?? 'Sitar & Singing Bowls · Sleep'}</Text>
           </View>
           <TouchableOpacity activeOpacity={0.7} onPress={() => setLiked(l => !l)}>
             <Heart color={liked ? '#FCA5A5' : '#FFFFFF'} filled={liked} />
@@ -234,7 +265,7 @@ const NowPlayingScreen = () => {
       <View style={styles.dismissHint}>
         <View style={styles.dismissBar} />
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -268,7 +299,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   veil: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
 
   // ── IMMERSIVE MODE ────────────────────────────────────────

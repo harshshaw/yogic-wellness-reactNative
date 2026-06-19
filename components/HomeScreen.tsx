@@ -46,19 +46,6 @@ const SoundOffIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const MoonIcon = ({ color }: { color: string }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24">
-    <Path
-      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-      stroke={color}
-      strokeWidth={1.8}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
-
 const SunIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
     <Circle cx="12" cy="12" r="4" stroke={color} strokeWidth={1.8} fill="none" />
@@ -81,21 +68,6 @@ const ProfileIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
     <Path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-  </Svg>
-);
-
-const MusicNoteIcon = ({ color }: { color: string }) => (
-  <Svg width={22} height={22} viewBox="0 0 24 24">
-    <Path
-      d="M9 18V6l12-2v12"
-      stroke={color}
-      strokeWidth={1.8}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <Circle cx="6" cy="18" r="3" stroke={color} strokeWidth={1.8} fill="none" />
-    <Circle cx="18" cy="16" r="3" stroke={color} strokeWidth={1.8} fill="none" />
   </Svg>
 );
 
@@ -285,14 +257,7 @@ const HomeScreen = () => {
               <MenuIcon color={headerIconColor} />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate('Music')}
-                style={localStyles.headerBtn}
-              >
-                <MusicNoteIcon color={headerIconColor} />
-              </TouchableOpacity>
-              <TouchableOpacity
+<TouchableOpacity
                 activeOpacity={0.7}
                 onPress={toggleMuted}
                 style={localStyles.headerBtn}
