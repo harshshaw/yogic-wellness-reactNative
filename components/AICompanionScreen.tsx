@@ -204,6 +204,13 @@ const AICompanionScreen = () => {
   // Stop any in-flight speech when the screen unmounts.
   useEffect(() => () => { Speech.stop(); }, []);
 
+  // Keep the thread pinned to the newest message.
+  const scrollRef = useRef<ScrollView | null>(null);
+  useEffect(() => {
+    const t = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+    return () => clearTimeout(t);
+  }, [messages, pending]);
+
   return (
     <KeyboardAvoidingView
       style={[warm.screen, { backgroundColor: colors.bg }]}
@@ -244,10 +251,12 @@ const AICompanionScreen = () => {
 
       {/* THREAD */}
       <ScrollView
+        ref={scrollRef}
         style={{ flex: 1 }}
         contentContainerStyle={styles.thread}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
       >
         {messages.map((m, i) =>
           m.from === 'ai' ? (
