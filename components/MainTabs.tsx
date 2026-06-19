@@ -4,7 +4,7 @@ import HomeScreen from './HomeScreen';
 import PranayamaScreen from './PranayamaScreen';
 import SleepScreen from './SleepScreen';
 import ProgressScreen from './ProgressScreen';
-import AICompanionScreen from './AICompanionScreen';
+import ProfileScreen from './ProfileScreen';
 import BottomTabBar from './BottomTabBar';
 
 const Tab = createBottomTabNavigator();
@@ -25,7 +25,7 @@ export default function MainTabs() {
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen
         name="AICompanion"
-        component={AICompanionScreen}
+        component={ProfileScreen}
         options={{ tabBarLabel: 'AI Companion' }}
       />
     </Tab.Navigator>

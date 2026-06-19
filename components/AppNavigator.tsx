@@ -36,7 +36,7 @@ export default function AppNavigator() {
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen
-        name="AICompanion"
+        name="AICompanionChat"
         component={AICompanionScreen}
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />

@@ -287,7 +287,7 @@ export default function PranayamaScreen() {
           <TouchableOpacity
             style={[s.guruBtn, { borderColor: BORDER, backgroundColor: CARD }]}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
+            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
           >
             <SparklesIcon size={16} color={GREEN_MED} />
             <Text style={[s.guruBtnText, { color: GREEN_MED }]}>AI Pranayama Guru</Text>
@@ -590,7 +590,7 @@ export default function PranayamaScreen() {
                   key={i}
                   style={[s.promptChip, { borderColor: BORDER, backgroundColor: CARD }]}
                   activeOpacity={0.75}
-                  onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
+                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
                 >
                   <Text style={[s.promptText, { color: TEXT }]}>{p}</Text>
                 </TouchableOpacity>
@@ -599,7 +599,7 @@ export default function PranayamaScreen() {
             <TouchableOpacity
               style={[s.micBtn, { backgroundColor: GREEN }]}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
+              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
             >
               <MicIcon size={22} color="#fff" />
             </TouchableOpacity>

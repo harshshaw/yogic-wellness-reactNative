@@ -55,7 +55,7 @@ const BreatheScreen = () => {
           <TouchableOpacity
             style={[styles.sparkleBtn, { borderColor: colors.borderStrong }]}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('AICompanion', { mode: 'Pranayama Guru' })}
+            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
           >
             <Sparkles size={20} color={colors.statMint} />
           </TouchableOpacity>

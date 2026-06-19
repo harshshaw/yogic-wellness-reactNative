@@ -40,7 +40,7 @@ const ProfileScreen = () => {
     : ['#F3E8FF', '#EDE9FE', '#E0E7FF'];
 
   const launch = (companionMode: any, prompt: string) =>
-    navigation.navigate('AICompanion', { mode: companionMode, prompt });
+    navigation.navigate('AICompanionChat', { mode: companionMode, prompt });
 
   const chips: ChipMode[] = [
     { id: 'anxious',    label: 'I feel anxious',  prompt: "I'm feeling anxious right now",  Icon: Frown },
