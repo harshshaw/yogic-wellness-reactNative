@@ -1,5 +1,7 @@
 const VIDEO_ROCKY    = require('../assets/background-video/scenicViewrockyhills.mp4');
-const VIDEO_OCEANIC  = require('../assets/background-video/scenicViewocenic.mp4');
+// NOTE: scenicViewocenic.mp4 was removed (exceeded GitHub's 100MB limit / pending recovery).
+// The ocean/water keyword falls back to portrait2 until the file is restored.
+const VIDEO_OCEANIC  = require('../assets/background-video/portrait2.mp4');
 const VIDEO_BALLOON  = require('../assets/background-video/scenicViewballons.mp4');
 const VIDEO_PORTRAIT = require('../assets/background-video/portrait2.mp4');
 
