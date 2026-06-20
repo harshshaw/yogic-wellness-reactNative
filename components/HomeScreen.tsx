@@ -1,24 +1,18 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
   ImageBackground,
-  TouchableOpacity,
+  ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
-import { COLORS, styles } from '../styles/HomeScreen.styles';
 import { useAppMusic } from '../hooks/useAppMusic';
-import { useTheme } from '../hooks/useTheme';
 import { useReflection } from '../hooks/useReflection';
-
-const MenuIcon = ({ color }: { color: string }) => (
-  <Svg width={26} height={26} viewBox="0 0 24 24">
-    <Path d="M3 6h18M3 12h18M3 18h18" stroke={color} strokeWidth={2} strokeLinecap="round" />
-  </Svg>
-);
+import { useTheme } from '../hooks/useTheme';
+import { COLORS, styles } from '../styles/HomeScreen.styles';
 
 const SoundOnIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
@@ -253,9 +247,6 @@ const HomeScreen = () => {
           )}
 
           <View style={styles.topBar}>
-            <TouchableOpacity activeOpacity={0.7} style={localStyles.headerBtn}>
-              <MenuIcon color={headerIconColor} />
-            </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 10 }}>
 <TouchableOpacity
                 activeOpacity={0.7}
