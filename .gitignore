@@ -44,3 +44,7 @@ app-example
 
 # freellmapi service (separate deploy)
 freellmapi/
+
+# large video assets — exceed GitHub's 100MB limit, kept locally only
+assets/background-video/scenicViewocenic.mp4
+assets/background-video/screen-recording-track.mp4
