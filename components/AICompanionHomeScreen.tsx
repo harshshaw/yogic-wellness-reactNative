@@ -1,26 +1,26 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
 import {
-  Sparkles,
+  Chat,
   ChevronLeft,
-  Mic,
-  Info,
   Dots,
   Frown,
-  SleepyFace,
   Heart,
-  Chat,
+  Info,
   LotusEmblem,
+  Mic,
+  SleepyFace,
+  Sparkles,
 } from './Icons';
 
 type ChipMode = {
@@ -38,6 +38,7 @@ const AICompanionHomeScreen = () => {
   const heroGradient: readonly [string, string, string] = isNight
     ? ['#2A2150', '#1F1A40', '#15123A']
     : ['#F3E8FF', '#EDE9FE', '#E0E7FF'];
+    
 
   const launch = (companionMode: any, prompt: string) =>
     navigation.navigate('AICompanionChat', { mode: companionMode, prompt });
