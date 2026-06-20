@@ -3,8 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './HomeScreen';
 import PranayamaScreen from './PranayamaScreen';
 import SleepScreen from './SleepScreen';
-import ProgressScreen from './ProgressScreen';
-import ProfileScreen from './ProfileScreen';
+import AICompanionHomeScreen from './AICompanionHomeScreen';
 import BottomTabBar from './BottomTabBar';
 
 const Tab = createBottomTabNavigator();
@@ -22,10 +21,9 @@ export default function MainTabs() {
         options={{ tabBarLabel: "Today's Rec" }}
       />
       <Tab.Screen name="Sleep" component={SleepScreen} options={{ tabBarLabel: 'Rest' }} />
-      <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen
         name="AICompanion"
-        component={ProfileScreen}
+        component={AICompanionHomeScreen}
         options={{ tabBarLabel: 'AI Companion' }}
       />
     </Tab.Navigator>

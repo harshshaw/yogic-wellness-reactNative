@@ -1,173 +1,244 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
+import { useStreakStorage } from '../hooks/useStreakStorage';
 import {
-  Sparkles,
   ChevronLeft,
-  Mic,
+  ChevronRight,
+  Pencil,
+  Crown,
+  Flame,
+  Star,
+  Calendar,
+  Clock,
+  Bell,
+  Moon,
+  Lock,
+  Globe,
   Info,
-  Dots,
-  Frown,
-  SleepyFace,
-  Heart,
-  Chat,
-  LotusEmblem,
+  Activity,
+  Leaf,
 } from './Icons';
 
-type ChipMode = {
-  id: string;
-  label: string;
-  prompt: string;
-  Icon: any;
+// Static user profile — swap for real auth/user data when available.
+const USER = {
+  name: 'Arjun Sharma',
+  email: 'arjun.sharma@gmail.com',
+  initials: 'AS',
+  memberSince: 'Jan 2026',
 };
+
+const APP_VERSION = '1.0.0';
 
 const ProfileScreen = () => {
   const navigation = useNavigation<any>();
-  const { colors, mode } = useTheme();
+  const { colors, mode, toggle } = useTheme();
   const isNight = mode === 'night';
+  const { data } = useStreakStorage();
+
+  const totalMinutes = useMemo(
+    () => data.history.reduce((sum, d) => sum + (d.minutesLogged ?? 0), 0),
+    [data.history]
+  );
+
+  const stats = [
+    { label: 'Day streak',  value: String(data.currentStreak),     Icon: Flame,    tint: colors.statOrange, soft: colors.statOrangeSoft },
+    { label: 'Best streak', value: String(data.longestStreak),     Icon: Star,     tint: colors.statYellow, soft: colors.statYellowSoft },
+    { label: 'Total days',  value: String(data.totalDaysCompleted), Icon: Calendar, tint: colors.statPurple, soft: colors.statPurpleSoft },
+    { label: 'Minutes',     value: String(totalMinutes),            Icon: Clock,    tint: colors.statMint,   soft: colors.statMintSoft },
+  ];
 
   const heroGradient: readonly [string, string, string] = isNight
     ? ['#2A2150', '#1F1A40', '#15123A']
-    : ['#F3E8FF', '#EDE9FE', '#E0E7FF'];
+    : ['#7C3AED', '#8B5CF6', '#A78BFA'];
 
-  const launch = (companionMode: any, prompt: string) =>
-    navigation.navigate('AICompanionChat', { mode: companionMode, prompt });
-
-  const chips: ChipMode[] = [
-    { id: 'anxious',    label: 'I feel anxious',  prompt: "I'm feeling anxious right now",  Icon: Frown },
-    { id: 'sleep',      label: "Can't sleep well", prompt: "I can't sleep well",             Icon: SleepyFace },
-    { id: 'motivation', label: 'Need motivation', prompt: 'I need some motivation',         Icon: Heart },
-    { id: 'talk',       label: 'Just want to talk', prompt: 'I just want to talk',           Icon: Chat },
-  ];
+  const premiumGradient: readonly [string, string] = ['#F59E0B', '#FB923C'];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      {/* HEADER */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          style={styles.backBtn}
+          onPress={() => navigation.canGoBack() && navigation.goBack()}
+        >
+          <ChevronLeft color={colors.textPrimary} size={24} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Profile</Text>
+        <View style={styles.backBtn} />
+      </View>
+
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* HEADER */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            style={styles.backBtn}
-            onPress={() => navigation.canGoBack() && navigation.goBack()}
-          >
-            <ChevronLeft color={colors.textPrimary} size={24} />
-          </TouchableOpacity>
-          <View style={styles.headerRight}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={[styles.iconBtnOutline, { borderColor: colors.borderStrong }]}
-            >
-              <Info size={18} color={colors.textPrimary} />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} style={styles.dotsBtn}>
-              <Dots size={22} color={colors.textPrimary} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* TITLE BLOCK */}
-        <View style={styles.titleBlock}>
-          <View style={styles.overlineRow}>
-            <Sparkles size={14} color={colors.statPurple} />
-            <Text style={[styles.overline, { color: colors.statPurple }]}>AI COMPANION</Text>
-          </View>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Your AI Companion</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Here for you, always.
-          </Text>
-        </View>
-
-        {/* HERO CARD with gradient + lotus + mountains */}
+        {/* ── PROFILE CARD ── */}
         <LinearGradient
           colors={heroGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.heroCard}
+          style={styles.profileCard}
         >
-          <MountainSilhouette />
-          <View style={styles.lotusWrap}>
-            <LotusEmblem
-              size={72}
-              color={isNight ? '#C4B5FD' : colors.statPurple}
-            />
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{USER.initials}</Text>
           </View>
-          <Text style={[styles.heroPrompt, { color: isNight ? '#F1EBFF' : '#0F172A' }]}>
-            How are you feeling{'\n'}today, Arjun?
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.profileName}>{USER.name}</Text>
+            <Text style={styles.profileEmail}>{USER.email}</Text>
+            <Text style={styles.memberSince}>Member since {USER.memberSince}</Text>
+          </View>
+          <TouchableOpacity style={styles.editBtn} activeOpacity={0.8}>
+            <Pencil size={16} color="#FFFFFF" />
+          </TouchableOpacity>
         </LinearGradient>
 
-        {/* 2x2 CHIP GRID */}
-        <View style={styles.chipGrid}>
-          {chips.map(c => (
-            <TouchableOpacity
-              key={c.id}
-              style={[styles.chip, { backgroundColor: colors.card, borderColor: colors.border }]}
-              activeOpacity={0.85}
-              onPress={() => launch('Pranayama Guru', c.prompt)}
+        {/* ── SUBSCRIPTION ── */}
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>SUBSCRIPTION</Text>
+        <LinearGradient
+          colors={premiumGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.subCard}
+        >
+          <View style={styles.subTopRow}>
+            <View style={styles.subBadge}>
+              <Crown size={16} color="#FFFFFF" />
+              <Text style={styles.subBadgeText}>FREE PLAN</Text>
+            </View>
+            <Text style={styles.subPrice}>₹0/mo</Text>
+          </View>
+          <Text style={styles.subTitle}>Unlock Karmana Premium</Text>
+          <Text style={styles.subDesc}>
+            Unlimited AI companion sessions, all soundscapes, advanced insights &amp; offline downloads.
+          </Text>
+          <TouchableOpacity style={styles.upgradeBtn} activeOpacity={0.9}>
+            <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
+            <ChevronRight size={18} color="#B45309" />
+          </TouchableOpacity>
+        </LinearGradient>
+
+        {/* ── PROGRESS ── */}
+        <View style={styles.sectionHeadRow}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginTop: 0 }]}>YOUR PROGRESS</Text>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('Main', { screen: 'Progress' })}
+          >
+            <Text style={[styles.viewAll, { color: colors.statPurple }]}>View all</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.statsGrid}>
+          {stats.map(s => (
+            <View
+              key={s.label}
+              style={[styles.statTile, { backgroundColor: colors.card, borderColor: colors.border }]}
             >
-              <View style={[styles.chipIcon, { backgroundColor: colors.statPurpleSoft }]}>
-                <c.Icon size={16} color={colors.statPurple} />
+              <View style={[styles.statIcon, { backgroundColor: s.soft }]}>
+                <s.Icon size={18} color={s.tint} />
               </View>
-              <Text style={[styles.chipLabel, { color: colors.textPrimary }]}>{c.label}</Text>
-            </TouchableOpacity>
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>{s.value}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{s.label}</Text>
+            </View>
           ))}
         </View>
 
-        {/* MIC BUTTON */}
-        <View style={styles.micArea}>
-          <View style={[styles.micRing, { backgroundColor: colors.statPurpleSoft }]}>
-            <TouchableOpacity
-              style={[styles.micBtn, { backgroundColor: colors.statPurple }]}
-              activeOpacity={0.85}
-              onPress={() => launch('Pranayama Guru', '')}
-            >
-              <Mic size={28} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.micLabel, { color: colors.textSecondary }]}>Tap to talk</Text>
+        {/* ── ACCOUNT SETTINGS ── */}
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>ACCOUNT SETTINGS</Text>
+        <View style={[styles.group, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Row Icon={Bell} tint={colors.statRose} soft={colors.statRoseSoft} label="Notifications"
+            sub="Reminders & nudges" colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row
+            Icon={Moon} tint={colors.statPurple} soft={colors.statPurpleSoft}
+            label="Dark mode" sub={isNight ? 'On' : 'Off'} colors={colors}
+            right={
+              <Switch
+                value={isNight}
+                onValueChange={toggle}
+                trackColor={{ false: colors.borderStrong, true: colors.statPurple }}
+                thumbColor="#FFFFFF"
+              />
+            }
+          />
+          <Divider colors={colors} />
+          <Row Icon={Clock} tint={colors.statMint} soft={colors.statMintSoft} label="Daily reminder"
+            sub="8:00 PM" colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row Icon={Lock} tint={colors.statOrange} soft={colors.statOrangeSoft} label="Privacy & Security"
+            colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row Icon={Globe} tint={colors.statYellow} soft={colors.statYellowSoft} label="Language"
+            sub="English" colors={colors} onPress={() => {}} />
         </View>
+
+        {/* ── PREFERENCES / GENERAL ── */}
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>GENERAL</Text>
+        <View style={[styles.group, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Row Icon={Activity} tint={colors.statMint} soft={colors.statMintSoft} label="Goals & targets"
+            colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row Icon={Star} tint={colors.statYellow} soft={colors.statYellowSoft} label="Rate the app"
+            colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row Icon={Info} tint={colors.statPurple} soft={colors.statPurpleSoft} label="Help & Support"
+            colors={colors} onPress={() => {}} />
+          <Divider colors={colors} />
+          <Row Icon={Leaf} tint={colors.statOrange} soft={colors.statOrangeSoft} label="About Karmana"
+            colors={colors} onPress={() => {}} />
+        </View>
+
+        {/* ── SIGN OUT ── */}
+        <TouchableOpacity
+          style={[styles.signOut, { borderColor: colors.borderStrong }]}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+
+        <Text style={[styles.version, { color: colors.textSecondary }]}>
+          Karmana · v{APP_VERSION}
+        </Text>
       </ScrollView>
     </View>
   );
 };
 
-// ─── Soft mountain silhouettes for the hero ─────────────────────────────
-const MountainSilhouette = () => (
-  <View style={StyleSheet.absoluteFillObject}>
-    <Svg
-      width="100%"
-      height="100%"
-      viewBox="0 0 320 200"
-      preserveAspectRatio="xMidYMax slice"
-    >
-      {/* far mountains */}
-      <Path
-        d="M0 140 L40 120 L80 132 L120 110 L160 124 L200 108 L240 122 L280 112 L320 130 L320 200 L0 200 Z"
-        fill="rgba(167,139,250,0.16)"
-      />
-      {/* trees mid */}
-      <Path
-        d="M0 160 L20 152 L25 148 L30 152 L40 158 L50 150 L55 145 L60 150 L75 158 L90 152 L100 156 L115 148 L120 156 L130 160 L0 160 Z"
-        fill="rgba(139,92,246,0.22)"
-      />
-      <Path
-        d="M200 160 L210 152 L218 156 L228 148 L235 156 L245 150 L255 154 L265 146 L275 154 L285 148 L295 154 L305 150 L320 160 L200 160 Z"
-        fill="rgba(139,92,246,0.22)"
-      />
-    </Svg>
-  </View>
+// ─── Settings row ───────────────────────────────────────────────────────
+const Row = ({
+  Icon, tint, soft, label, sub, colors, right, onPress,
+}: {
+  Icon: any; tint: string; soft: string; label: string; sub?: string;
+  colors: any; right?: React.ReactNode; onPress?: () => void;
+}) => (
+  <TouchableOpacity
+    style={styles.row}
+    activeOpacity={onPress ? 0.6 : 1}
+    onPress={onPress}
+    disabled={!onPress}
+  >
+    <View style={[styles.rowIcon, { backgroundColor: soft }]}>
+      <Icon size={18} color={tint} />
+    </View>
+    <View style={{ flex: 1 }}>
+      <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>{label}</Text>
+      {sub ? <Text style={[styles.rowSub, { color: colors.textSecondary }]}>{sub}</Text> : null}
+    </View>
+    {right ?? <ChevronRight size={18} color={colors.textSecondary} />}
+  </TouchableOpacity>
+);
+
+const Divider = ({ colors }: { colors: any }) => (
+  <View style={[styles.divider, { backgroundColor: colors.border }]} />
 );
 
 const styles = StyleSheet.create({
@@ -176,92 +247,115 @@ const styles = StyleSheet.create({
   // HEADER
   headerRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
     paddingTop: 56,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
-  backBtn: {
-    width: 36, height: 36,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBtnOutline: {
-    width: 36, height: 36, borderRadius: 18,
-    borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  dotsBtn: {
-    width: 36, height: 36,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  backBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 18, fontWeight: '700' },
 
-  // TITLE BLOCK
-  titleBlock: { paddingHorizontal: 20, paddingBottom: 18 },
-  overlineRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  overline: { fontSize: 11, fontWeight: '700', letterSpacing: 2.4 },
-  title: { fontSize: 32, fontWeight: '700', letterSpacing: -0.6, marginTop: 10 },
-  subtitle: { fontSize: 14, marginTop: 6 },
-
-  // HERO
-  heroCard: {
+  // PROFILE CARD
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
     marginHorizontal: 20,
-    height: 230,
-    borderRadius: 24,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 8,
+    padding: 18,
+    borderRadius: 22,
   },
-  lotusWrap: { marginBottom: 12 },
-  heroPrompt: {
-    fontSize: 22,
-    fontWeight: '600',
-    letterSpacing: -0.2,
-    textAlign: 'center',
-    lineHeight: 30,
+  avatar: {
+    width: 62, height: 62, borderRadius: 31,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderWidth: 2, borderColor: 'rgba(255,255,255,0.45)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', letterSpacing: 0.5 },
+  profileName: { color: '#FFFFFF', fontSize: 19, fontWeight: '800', letterSpacing: -0.3 },
+  profileEmail: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 2 },
+  memberSince: { color: 'rgba(255,255,255,0.7)', fontSize: 11, marginTop: 6, fontWeight: '600' },
+  editBtn: {
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center', justifyContent: 'center',
   },
 
-  // CHIP GRID
-  chipGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 20,
-    marginTop: 22,
-    gap: 12,
+  // SECTION LABELS
+  sectionLabel: {
+    fontSize: 11, fontWeight: '800', letterSpacing: 1.6,
+    marginTop: 26, marginBottom: 12, marginHorizontal: 24,
   },
-  chip: {
+  sectionHeadRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginTop: 26, marginHorizontal: 24, marginBottom: 12,
+  },
+  viewAll: { fontSize: 13, fontWeight: '700' },
+
+  // SUBSCRIPTION
+  subCard: { marginHorizontal: 20, borderRadius: 22, padding: 20 },
+  subTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  subBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999,
+  },
+  subBadgeText: { color: '#FFFFFF', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  subPrice: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  subTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', marginTop: 16, letterSpacing: -0.3 },
+  subDesc: { color: 'rgba(255,255,255,0.9)', fontSize: 13, lineHeight: 19, marginTop: 6 },
+  upgradeBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    backgroundColor: '#FFFFFF', borderRadius: 14,
+    paddingVertical: 13, marginTop: 16,
+  },
+  upgradeBtnText: { color: '#B45309', fontSize: 15, fontWeight: '800' },
+
+  // PROGRESS STATS
+  statsGrid: {
+    flexDirection: 'row', flexWrap: 'wrap',
+    paddingHorizontal: 20, gap: 12,
+  },
+  statTile: {
     width: '47.5%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 16,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 18, borderWidth: 1,
+    padding: 16,
   },
-  chipIcon: {
-    width: 28, height: 28, borderRadius: 14,
-    alignItems: 'center', justifyContent: 'center',
+  statIcon: {
+    width: 36, height: 36, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
   },
-  chipLabel: { fontSize: 14, fontWeight: '600' },
+  statValue: { fontSize: 26, fontWeight: '800', letterSpacing: -0.5 },
+  statLabel: { fontSize: 13, fontWeight: '600', marginTop: 2 },
 
-  // MIC
-  micArea: { alignItems: 'center', marginTop: 40 },
-  micRing: {
-    width: 96, height: 96, borderRadius: 48,
+  // GROUPS / ROWS
+  group: {
+    marginHorizontal: 20,
+    borderRadius: 18, borderWidth: 1,
+    overflow: 'hidden',
+  },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    paddingHorizontal: 16, paddingVertical: 14,
+  },
+  rowIcon: {
+    width: 36, height: 36, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
   },
-  micBtn: {
-    width: 76, height: 76, borderRadius: 38,
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#8B5CF6',
-    shadowOpacity: 0.35,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+  rowLabel: { fontSize: 15, fontWeight: '600' },
+  rowSub: { fontSize: 12, marginTop: 2 },
+  divider: { height: 1, marginLeft: 66 },
+
+  // SIGN OUT
+  signOut: {
+    marginHorizontal: 20, marginTop: 28,
+    borderRadius: 14, borderWidth: 1.5,
+    paddingVertical: 15, alignItems: 'center',
   },
-  micLabel: { fontSize: 14, fontWeight: '600', marginTop: 14 },
+  signOutText: { color: '#EF4444', fontSize: 15, fontWeight: '800' },
+
+  version: { textAlign: 'center', fontSize: 12, marginTop: 18, fontWeight: '600' },
 });
 
 export default ProfileScreen;
