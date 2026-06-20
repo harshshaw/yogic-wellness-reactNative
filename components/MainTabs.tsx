@@ -4,6 +4,7 @@ import HomeScreen from './HomeScreen';
 import PranayamaScreen from './PranayamaScreen';
 import SleepScreen from './SleepScreen';
 import AICompanionHomeScreen from './AICompanionHomeScreen';
+import SubscriptionScreen from './SubscriptionScreen';
 import BottomTabBar from './BottomTabBar';
 
 const Tab = createBottomTabNavigator();
@@ -25,6 +26,11 @@ export default function MainTabs() {
         name="AICompanion"
         component={AICompanionHomeScreen}
         options={{ tabBarLabel: 'AI Companion' }}
+      />
+      <Tab.Screen
+        name="Plans"
+        component={SubscriptionScreen}
+        options={{ tabBarLabel: 'Premium' }}
       />
     </Tab.Navigator>
   );

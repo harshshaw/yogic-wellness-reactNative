@@ -11,6 +11,7 @@ const ICON_PATHS: Record<string, string> = {
   Sleep:       'M12 18a8 8 0 0 1-7.94-7.07A1 1 0 0 1 5.4 9.86 6 6 0 0 0 14.14 4.6a1 1 0 0 1 1.07-1.34A8 8 0 0 1 12 18z',
   Progress:    'M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7 3h4v11h-4V10z',
   AICompanion: 'M12 2a5 5 0 0 1 5 5c0 1.5-.6 2.8-1.6 3.8L17 22H7l1.6-11.2A5 5 0 0 1 7 7a5 5 0 0 1 5-5zM9 7h6',
+  Plans:       'M11.6 3.8a.5.5 0 0 1 .8 0l3 4.2 4.4-3.5a.5.5 0 0 1 .8.5l-2 11a1 1 0 0 1-1 .8H6.4a1 1 0 0 1-1-.8l-2-11a.5.5 0 0 1 .8-.5l4.4 3.5z',
 };
 
 // Per-tab signature colors, matching the reference design (Calm-style):
@@ -25,6 +26,7 @@ const tabColor = (
     case 'Sleep':       return { strong: colors.statPurple,  soft: colors.statPurpleSoft };
     case 'Progress':    return { strong: colors.statPurple,  soft: colors.statPurpleSoft };
     case 'AICompanion': return { strong: colors.statYellow,  soft: colors.statYellowSoft };
+    case 'Plans':       return { strong: colors.statRose,    soft: colors.statRoseSoft };
     default:         return { strong: colors.accent, soft: colors.accentSoft };
   }
 };
