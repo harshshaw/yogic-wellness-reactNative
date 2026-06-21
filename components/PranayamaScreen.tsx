@@ -279,19 +279,11 @@ export default function PranayamaScreen() {
         <View style={s.header}>
           <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={[s.headerTitle, { color: GREEN }]}>Pranayama</Text>
+              <Text style={[s.headerTitle, { color: GREEN }]}>Your Daily Flow</Text>
               <Text style={{ fontSize: 22 }}>🌿</Text>
             </View>
             <Text style={[s.headerSub, { color: MUTED }]}>Breathe mindfully. Live fully.</Text>
           </View>
-          <TouchableOpacity
-            style={[s.guruBtn, { borderColor: BORDER, backgroundColor: CARD }]}
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
-          >
-            <SparklesIcon size={16} color={GREEN_MED} />
-            <Text style={[s.guruBtnText, { color: GREEN_MED }]}>AI Pranayama Guru</Text>
-          </TouchableOpacity>
         </View>
 
         {/* ── HERO CHARACTER IMAGE ── */}

@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import BrandLogo from './BrandLogo';
 
 type RootStackParamList = {
   Splash: undefined;
@@ -21,11 +22,7 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/images/karmanaLogo.jpg')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+      <BrandLogo size={160} radius={32} style={styles.logo} />
       <Text style={styles.title}>Karmana</Text>
       <Text style={styles.tagline}>Breathe. Rest. Grow.</Text>
       <Text style={styles.subtitle}>Your daily wellness companion</Text>

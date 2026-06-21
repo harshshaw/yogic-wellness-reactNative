@@ -8,7 +8,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useTheme } from '../hooks/useTheme';
-import { Crown, Check, Sparkles } from './Icons';
+import { Check, Sparkles } from './Icons';
+import BrandLogo from './BrandLogo';
 
 type Plan = {
   id: string;
@@ -70,11 +71,7 @@ export default function SubscriptionScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View
-            style={[styles.crownWrap, { backgroundColor: colors.statYellowSoft }]}
-          >
-            <Crown size={32} color={colors.statYellow} />
-          </View>
+          <BrandLogo size={72} style={{ marginBottom: 16 }} />
           <Text style={[styles.title, { color: colors.textPrimary }]}>
             Karmana Premium
           </Text>

@@ -17,11 +17,11 @@ import {
   Frown,
   Heart,
   Info,
-  LotusEmblem,
   Mic,
   SleepyFace,
   Sparkles,
 } from './Icons';
+import BrandLogo from './BrandLogo';
 
 type ChipMode = {
   id: string;
@@ -99,10 +99,7 @@ const AICompanionHomeScreen = () => {
         >
           <MountainSilhouette />
           <View style={styles.lotusWrap}>
-            <LotusEmblem
-              size={72}
-              color={isNight ? '#C4B5FD' : colors.statPurple}
-            />
+            <BrandLogo size={72} />
           </View>
           <Text style={[styles.heroPrompt, { color: isNight ? '#F1EBFF' : '#0F172A' }]}>
             How are you feeling{'\n'}today, Arjun?

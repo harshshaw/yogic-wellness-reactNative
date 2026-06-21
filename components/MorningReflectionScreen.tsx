@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import Svg, { Path, Circle, Ellipse } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withDelay,
+  Easing,
+} from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { useReflection, ReflectionData } from '../hooks/useReflection';
 
@@ -106,6 +114,70 @@ const sc = StyleSheet.create({
   cardSub: { fontSize: 13, color: '#6B7280', marginTop: 2 },
 });
 
+// ── success animation overlay ───────────────────────────────────────────────────
+const SaveSuccessOverlay = () => {
+  const backdrop = useSharedValue(0);
+  const scale    = useSharedValue(0);
+  const check    = useSharedValue(0);
+  const textY    = useSharedValue(16);
+  const textOp   = useSharedValue(0);
+
+  useEffect(() => {
+    backdrop.value = withTiming(1, { duration: 220 });
+    scale.value    = withSpring(1, { damping: 9, stiffness: 130 });
+    check.value    = withDelay(180, withTiming(1, { duration: 320, easing: Easing.out(Easing.cubic) }));
+    textOp.value   = withDelay(260, withTiming(1, { duration: 300 }));
+    textY.value    = withDelay(260, withSpring(0, { damping: 12 }));
+  }, []);
+
+  const backdropStyle = useAnimatedStyle(() => ({ opacity: backdrop.value }));
+  const circleStyle   = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const checkStyle    = useAnimatedStyle(() => ({
+    opacity: check.value,
+    transform: [{ scale: 0.6 + check.value * 0.4 }],
+  }));
+  const textStyle     = useAnimatedStyle(() => ({
+    opacity: textOp.value,
+    transform: [{ translateY: textY.value }],
+  }));
+
+  return (
+    <Animated.View style={[ov.backdrop, backdropStyle]} pointerEvents="auto">
+      <Animated.View style={[ov.circle, circleStyle]}>
+        <Animated.View style={checkStyle}>
+          <Svg width={56} height={56} viewBox="0 0 24 24" fill="none">
+            <Path d="M5 13l4 4L19 7" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </Animated.View>
+      </Animated.View>
+      <Animated.View style={[ov.textBlock, textStyle]}>
+        <Text style={ov.title}>Reflection saved 🌿</Text>
+        <Text style={ov.sub}>Personalizing today's recommendations…</Text>
+      </Animated.View>
+    </Animated.View>
+  );
+};
+
+const ov = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(15,12,30,0.82)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 50,
+  },
+  circle: {
+    width: 110, height: 110, borderRadius: 55,
+    backgroundColor: PURPLE,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: PURPLE, shadowOpacity: 0.5, shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 }, elevation: 12,
+  },
+  textBlock: { alignItems: 'center', marginTop: 28 },
+  title: { fontSize: 22, fontWeight: '800', color: '#fff', letterSpacing: -0.3 },
+  sub: { fontSize: 14, color: 'rgba(255,255,255,0.78)', marginTop: 8 },
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function MorningReflectionScreen() {
@@ -115,14 +187,40 @@ export default function MorningReflectionScreen() {
   const [mood, setMood]     = useState<string>('calm');
   const [energy, setEnergy] = useState<ReflectionData['energy']>('moderate');
   const [sleep, setSleep]   = useState<ReflectionData['sleep']>('good');
+  const [saving, setSaving] = useState(false);
 
   const handleSave = () => {
+    if (saving) return;
     complete({ mood, energy, sleep, intention: mood });
-    navigation.goBack();
+    setSaving(true);
+    // Let the animation play, then jump to today's recommendation screen.
+    // Reset the root stack so the reflection modal is removed (not left on top)
+    // and the "Recommend" tab is selected.
+    setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Main',
+            state: {
+              index: 1,
+              routes: [
+                { name: 'Home' },
+                { name: 'Recommend' },
+                { name: 'Sleep' },
+                { name: 'AICompanion' },
+                { name: 'Plans' },
+              ],
+            },
+          },
+        ],
+      });
+    }, 1500);
   };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {saving && <SaveSuccessOverlay />}
       <ScrollView
         style={s.root}
         contentContainerStyle={{ paddingBottom: 48 }}
