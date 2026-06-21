@@ -39,6 +39,12 @@ export default function AuthScreen() {
   const goToMain = () =>
     navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
 
+  // New sign-ups go through onboarding; returning sign-ins go straight in.
+  const proceed = () => {
+    if (isSignup) navigation.navigate('Onboarding');
+    else goToMain();
+  };
+
   // TODO: TEMP — bypass auth for testing. Set to false to re-enable validation.
   const BYPASS_AUTH = true;
 
@@ -46,7 +52,7 @@ export default function AuthScreen() {
     setError(null);
 
     if (BYPASS_AUTH) {
-      goToMain();
+      proceed();
       return;
     }
 
@@ -67,7 +73,7 @@ export default function AuthScreen() {
       setSubmitting(true);
       if (isSignup) await signUp(name, email, password);
       else await logIn(email, password);
-      goToMain();
+      proceed();
     } catch (e: any) {
       setError(e?.message ?? 'Something went wrong. Please try again.');
     } finally {

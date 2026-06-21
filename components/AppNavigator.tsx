@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import SplashScreen from './SplashScreen';
 import AuthScreen from './AuthScreen';
+import OnboardingScreen from './OnboardingScreen';
 import MainTabs from './MainTabs';
 import MusicScreen from './MusicScreen';
 import NowPlayingScreen from './NowPlayingScreen';
@@ -17,6 +18,7 @@ export default function AppNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen
         name="Main"
         component={MainTabs}
