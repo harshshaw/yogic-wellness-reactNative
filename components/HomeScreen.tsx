@@ -13,6 +13,34 @@ import { useAppMusic } from '../hooks/useAppMusic';
 import { useReflection } from '../hooks/useReflection';
 import { useTheme } from '../hooks/useTheme';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
+import restData from '../utils/rest-screen-plan.json';
+
+// Nature-related soundscapes pulled from the Rest screen's data so the two
+// stay in sync. We surface the "Nature" and "Rain Collection" categories.
+const NATURE_EMOJI: Record<string, string> = {
+  Forest: '🌲',
+  Waterfall: '💦',
+  'Himalayan Winds': '🏔️',
+  'Ocean Waves': '🌊',
+  'River Flow': '🏞️',
+  'Light Rain': '🌦️',
+  'Thunder Storm': '⛈️',
+  'Rain on Window': '🌧️',
+  'Rain in Forest': '🌳',
+};
+
+const NATURE_SOUNDS = (() => {
+  const soundscapes = restData.sections.find((s) => s.id === 1);
+  const cats = soundscapes?.categories ?? [];
+  const wanted = cats.filter((c) => c.name === 'Nature' || c.name === 'Rain Collection');
+  return wanted.flatMap((c) =>
+    c.items.map((title) => ({
+      title,
+      sub: c.name,
+      emoji: NATURE_EMOJI[title] ?? '🌿',
+    }))
+  );
+})();
 
 const SoundOnIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
@@ -329,32 +357,44 @@ const HomeScreen = () => {
           </View>
         ) : null}
 
-        {/* QUICK ACCESS */}
+        {/* NATURE THERAPY */}
         <View style={localStyles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
-            Quick Access
-          </Text>
+          <View>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+              Nature Therapy
+            </Text>
+            <Text style={[localStyles.natureSub, { color: colors.textSecondary }]}>
+              Calming nature soundscapes
+            </Text>
+          </View>
         </View>
-        <View style={localStyles.quickRow}>
-          {[
-            { label: 'Breathe',  emoji: '🌬️', color: '#10B981', soft: 'rgba(16,185,129,0.12)', nav: 'Recommend' },
-            { label: 'Sleep',    emoji: '🌙', color: '#6366F1', soft: 'rgba(99,102,241,0.12)',  nav: 'Sleep' },
-            { label: 'Music',    emoji: '🎵', color: '#F59E0B', soft: 'rgba(245,158,11,0.12)',  nav: 'Music' },
-            { label: 'Reflect',  emoji: '🪷', color: '#EC4899', soft: 'rgba(236,72,153,0.12)',  nav: 'MorningReflection' },
-          ].map((item) => (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={localStyles.natureRow}
+        >
+          {NATURE_SOUNDS.map((item) => (
             <TouchableOpacity
-              key={item.label}
-              activeOpacity={0.8}
-              style={[localStyles.quickTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
-              onPress={() => navigation.navigate(item.nav)}
+              key={item.title}
+              activeOpacity={0.85}
+              style={[localStyles.natureTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
+              onPress={() => navigation.navigate('Sleep', { autoPlay: { title: item.title, sub: item.sub } })}
             >
-              <View style={[localStyles.quickIcon, { backgroundColor: item.soft }]}>
-                <Text style={{ fontSize: 22 }}>{item.emoji}</Text>
+              <View style={[localStyles.natureIcon, { backgroundColor: 'rgba(16,185,129,0.12)' }]}>
+                <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
               </View>
-              <Text style={[localStyles.quickLabel, { color: colors.textPrimary }]}>{item.label}</Text>
+              <Text style={[localStyles.natureTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text style={[localStyles.natureMeta, { color: colors.textSecondary }]} numberOfLines={1}>
+                {item.sub}
+              </Text>
+              <View style={localStyles.naturePlay}>
+                <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '700' }}>▶ Play</Text>
+              </View>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
 
         {/* YOUR PROGRESS CARD */}
         <View
@@ -644,6 +684,20 @@ const localStyles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   quickLabel: { fontSize: 12, fontWeight: '700' },
+
+  // nature therapy
+  natureSub: { fontSize: 13, marginTop: 2 },
+  natureRow: { paddingHorizontal: 18, gap: 12, paddingVertical: 4 },
+  natureTile: {
+    width: 132, padding: 14, borderRadius: 18, borderWidth: 1, gap: 6,
+  },
+  natureIcon: {
+    width: 52, height: 52, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 4,
+  },
+  natureTitle: { fontSize: 14, fontWeight: '700' },
+  natureMeta: { fontSize: 12 },
+  naturePlay: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
 
   // insight of the day
   insightCard: {

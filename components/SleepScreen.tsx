@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../hooks/useTheme';
 import { useAppMusic } from '../hooks/useAppMusic';
 import {
@@ -206,6 +206,19 @@ export default function SleepScreen() {
     playTrack();
     navigation.navigate('NowPlaying');
   };
+
+  // When opened from Home's "Nature Therapy" with an autoPlay param, start the
+  // chosen soundscape and open the player, then clear the param so it doesn't
+  // re-fire on subsequent focuses.
+  const route = useRoute<any>();
+  useEffect(() => {
+    const autoPlay = route.params?.autoPlay;
+    if (autoPlay?.title) {
+      playSuggestion(autoPlay.title, autoPlay.sub ?? 'Nature');
+      navigation.setParams({ autoPlay: undefined });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route.params?.autoPlay]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
