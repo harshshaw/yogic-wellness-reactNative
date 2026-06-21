@@ -256,7 +256,7 @@ const HomeScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HEADER WITH GURU IMAGE */}
@@ -357,45 +357,7 @@ const HomeScreen = () => {
           </View>
         ) : null}
 
-        {/* NATURE THERAPY */}
-        <View style={localStyles.sectionRow}>
-          <View>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
-              Nature Therapy
-            </Text>
-            <Text style={[localStyles.natureSub, { color: colors.textSecondary }]}>
-              Calming nature soundscapes
-            </Text>
-          </View>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={localStyles.natureRow}
-        >
-          {NATURE_SOUNDS.map((item) => (
-            <TouchableOpacity
-              key={item.title}
-              activeOpacity={0.85}
-              style={[localStyles.natureTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
-              onPress={() => navigation.navigate('Sleep', { autoPlay: { title: item.title, sub: item.sub } })}
-            >
-              <View style={[localStyles.natureIcon, { backgroundColor: 'rgba(16,185,129,0.12)' }]}>
-                <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
-              </View>
-              <Text style={[localStyles.natureTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                {item.title}
-              </Text>
-              <Text style={[localStyles.natureMeta, { color: colors.textSecondary }]} numberOfLines={1}>
-                {item.sub}
-              </Text>
-              <View style={localStyles.naturePlay}>
-                <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '700' }}>▶ Play</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
+       
         {/* YOUR PROGRESS CARD */}
         <View
           style={[
@@ -451,6 +413,44 @@ const HomeScreen = () => {
             />
           </View>
         </View>
+ {/* NATURE THERAPY */}
+ <View style={localStyles.sectionRow}>
+          <View>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
+              Nature Therapy
+            </Text>
+            <Text style={[localStyles.natureSub, { color: colors.textSecondary }]}>
+              Calming nature soundscapes
+            </Text>
+          </View>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={localStyles.natureRow}
+        >
+          {NATURE_SOUNDS.map((item) => (
+            <TouchableOpacity
+              key={item.title}
+              activeOpacity={0.85}
+              style={[localStyles.natureTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
+              onPress={() => navigation.navigate('Sleep', { autoPlay: { title: item.title, sub: item.sub } })}
+            >
+              <View style={[localStyles.natureIcon, { backgroundColor: 'rgba(16,185,129,0.12)' }]}>
+                <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
+              </View>
+              <Text style={[localStyles.natureTitle, { color: colors.textPrimary }]} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text style={[localStyles.natureMeta, { color: colors.textSecondary }]} numberOfLines={1}>
+                {item.sub}
+              </Text>
+              <View style={localStyles.naturePlay}>
+                <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '700' }}>▶ Play</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* TODAY'S GOAL */}
         <ImageBackground
@@ -475,19 +475,7 @@ const HomeScreen = () => {
           </View>
         </ImageBackground>
 
-        {/* INSIGHT OF THE DAY */}
-        <View style={localStyles.sectionRow}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
-            Insight of the Day
-          </Text>
-        </View>
-        <View style={[localStyles.insightCard, { backgroundColor: isNight ? colors.cardLight : '#FFFBEB', borderColor: isNight ? colors.border : '#FDE68A' }]}>
-          <Text style={localStyles.insightEmoji}>💡</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={[localStyles.insightQuote, { color: colors.textPrimary }]}>"{insight.quote}"</Text>
-            <Text style={[localStyles.insightAuthor, { color: colors.textSecondary }]}>— {insight.author}</Text>
-          </View>
-        </View>
+        
 
         {/* TODAY'S FOCUS */}
         <View style={localStyles.sectionRow}>

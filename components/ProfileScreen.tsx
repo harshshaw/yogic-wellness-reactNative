@@ -8,6 +8,7 @@ import {
   Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../hooks/useTheme';
 import { useStreakStorage } from '../hooks/useStreakStorage';
@@ -41,6 +42,7 @@ const APP_VERSION = '1.0.0';
 
 const ProfileScreen = () => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const { colors, mode, toggle } = useTheme();
   const isNight = mode === 'night';
   const { data } = useStreakStorage();
@@ -64,7 +66,7 @@ const ProfileScreen = () => {
   const premiumGradient: readonly [string, string] = ['#F59E0B', '#FB923C'];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+    <View style={[styles.container, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
       {/* HEADER */}
       <View style={styles.headerRow}>
         <TouchableOpacity
@@ -249,7 +251,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
+    paddingTop: 12,
     paddingHorizontal: 16,
     paddingBottom: 8,
   },

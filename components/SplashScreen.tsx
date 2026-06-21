@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import BrandLogo from './BrandLogo';
 
 type RootStackParamList = {
@@ -25,7 +25,7 @@ const SplashScreen = () => {
       <BrandLogo size={160} radius={32} style={styles.logo} />
       <Text style={styles.title}>Karmana</Text>
       <Text style={styles.tagline}>Breathe. Rest. Grow.</Text>
-      <Text style={styles.subtitle}>Your daily wellness companion</Text>
+      <Text style={styles.subtitle}>Your personalised wellness companion</Text>
     </View>
   );
 };

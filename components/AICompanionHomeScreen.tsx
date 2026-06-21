@@ -8,20 +8,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
+import BrandLogo from './BrandLogo';
 import {
   Chat,
-  ChevronLeft,
-  Dots,
   Frown,
   Heart,
-  Info,
   Mic,
   SleepyFace,
-  Sparkles,
+  Sparkles
 } from './Icons';
-import BrandLogo from './BrandLogo';
 
 type ChipMode = {
   id: string;
@@ -33,6 +31,7 @@ type ChipMode = {
 const AICompanionHomeScreen = () => {
   const navigation = useNavigation<any>();
   const { colors, mode } = useTheme();
+  const insets = useSafeAreaInsets();
   const isNight = mode === 'night';
 
   const heroGradient: readonly [string, string, string] = isNight
@@ -51,32 +50,13 @@ const AICompanionHomeScreen = () => {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+    <View style={[styles.container, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HEADER */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            style={styles.backBtn}
-            onPress={() => navigation.canGoBack() && navigation.goBack()}
-          >
-            <ChevronLeft color={colors.textPrimary} size={24} />
-          </TouchableOpacity>
-          <View style={styles.headerRight}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={[styles.iconBtnOutline, { borderColor: colors.borderStrong }]}
-            >
-              <Info size={18} color={colors.textPrimary} />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} style={styles.dotsBtn}>
-              <Dots size={22} color={colors.textPrimary} />
-            </TouchableOpacity>
-          </View>
-        </View>
+       
 
         {/* TITLE BLOCK */}
         <View style={styles.titleBlock}>
@@ -176,7 +156,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 56,
+    paddingTop: 12,
     paddingHorizontal: 20,
     paddingBottom: 12,
   },
@@ -196,7 +176,7 @@ const styles = StyleSheet.create({
   },
 
   // TITLE BLOCK
-  titleBlock: { paddingHorizontal: 20, paddingBottom: 18 },
+  titleBlock: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 18 },
   overlineRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   overline: { fontSize: 11, fontWeight: '700', letterSpacing: 2.4 },
   title: { fontSize: 32, fontWeight: '700', letterSpacing: -0.6, marginTop: 10 },

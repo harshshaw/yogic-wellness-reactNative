@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path, Polyline, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, type ThemeColors } from '../hooks/useTheme';
 import { useReflection } from '../hooks/useReflection';
 import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
@@ -148,6 +149,7 @@ type Tab = (typeof TABS)[number];
 const ProgressScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
 
   const { completed, data } = useReflection();
@@ -156,7 +158,7 @@ const ProgressScreen = () => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+    <View style={[styles.container, { backgroundColor: colors.bg, paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={styles.headerRow}>
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingTop: 56,
+    paddingTop: 16,
     paddingHorizontal: 20,
     paddingBottom: 18,
     gap: 10,

@@ -271,7 +271,7 @@ export default function SleepScreen() {
 
   return (
     <View style={[s.root, { backgroundColor: BG }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
 
         {/* ── HEADER ── */}
         <View style={s.header}>

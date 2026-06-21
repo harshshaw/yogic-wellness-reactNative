@@ -1,25 +1,25 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Dimensions,
-  Modal,
-} from 'react-native';
-import Svg, { Path, Circle, G } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../hooks/useTheme';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { useNotifications } from '../hooks/useNotifications';
 import { useReflection } from '../hooks/useReflection';
+import { useStreakStorage } from '../hooks/useStreakStorage';
+import { useTheme } from '../hooks/useTheme';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
+import { getSessionMedia } from '../utils/sessionMedia';
 import { Heart } from './Icons';
 import StreakCelebration from './StreakCelebration';
-import { useStreakStorage } from '../hooks/useStreakStorage';
-import { useNotifications } from '../hooks/useNotifications';
-import { getSessionMedia } from '../utils/sessionMedia';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -292,7 +292,7 @@ export default function PranayamaScreen() {
   return (
     <View style={[s.root, { backgroundColor: BG }]}>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 110 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {/* ── HEADER ── */}
@@ -401,15 +401,7 @@ export default function PranayamaScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* overall progress bar */}
-          <View style={[s.recProgressTrack, { backgroundColor: BORDER }]}>
-            <View
-              style={[
-                s.recProgressFill,
-                { width: totalItems ? `${(doneCount / totalItems) * 100}%` : '0%' },
-              ]}
-            />
-          </View>
+ 
 
           <View style={[s.recCard, { backgroundColor: CARD, borderColor: BORDER }]}>
             {(() => {
@@ -939,13 +931,13 @@ const s = StyleSheet.create({
 
   // why this recommendation
   whyBtn: {
-    paddingVertical: 7, paddingHorizontal: 12,
+    paddingVertical: 7, paddingHorizontal:  2,
     borderRadius: 10, borderWidth: 1,
   },
   whyBtnText: { fontSize: 13, fontWeight: '700' },
 
   whyBackdrop: {
-    flex: 1, justifyContent: 'flex-end',
+    flex: 2, justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   whySheet: {
