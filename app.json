@@ -3,6 +3,23 @@
     "name": "YogicWellness",
     "slug": "yogicwellness",
     "version": "1.0.0",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "SCHEDULE_EXACT_ALARM",
+        "RECORD_AUDIO"
+      ]
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -20,13 +37,6 @@
     "runtimeVersion": "exposdk:54.0.0",
     "updates": {
       "url": "https://u.expo.dev/1c36a2b4-712b-468b-b4b3-4cb35dc98a2e"
-    },
-    "android": {
-      "permissions": [
-        "RECEIVE_BOOT_COMPLETED",
-        "SCHEDULE_EXACT_ALARM",
-        "RECORD_AUDIO"
-      ]
     },
     "ios": {
       "infoPlist": {

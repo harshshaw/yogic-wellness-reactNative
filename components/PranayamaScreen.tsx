@@ -14,6 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../hooks/useTheme';
 import { useReflection } from '../hooks/useReflection';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
+import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
+import { Heart } from './Icons';
 import StreakCelebration from './StreakCelebration';
 import { useStreakStorage } from '../hooks/useStreakStorage';
 import { useNotifications } from '../hooks/useNotifications';
@@ -197,6 +199,24 @@ export default function PranayamaScreen() {
     : 'NEUTRAL';
   const recGroups = useMemo(() => getRecommendations(moodState), [moodState]);
 
+  // ── Today's State, derived from this morning's reflection ──
+  const reflection = reflectionData ? computeReflectionProgress(reflectionData) : null;
+  const to10 = (n: number) => Math.max(1, Math.round(n / 10));
+  // Stress is the inverse of mood positivity (calmer mood → lower stress).
+  const stressScore = reflection ? 100 - reflection.mood : 0;
+  // For "good = high" metrics (energy/sleep): green when high, orange when low.
+  const upLevel = (score: number) => {
+    if (score >= 70) return { label: 'High', color: GREEN_MED };
+    if (score >= 40) return { label: 'Moderate', color: '#FB923C' };
+    return { label: 'Low', color: '#FB923C' };
+  };
+  // For stress (high = bad): green when low, red when high.
+  const stressLevel = (score: number) => {
+    if (score >= 66) return { label: 'High', color: '#EF4444' };
+    if (score >= 40) return { label: 'Moderate', color: '#FB923C' };
+    return { label: 'Low', color: GREEN_MED };
+  };
+
   const totalItems = useMemo(
     () => recGroups.reduce((n, g) => n + g.items.length, 0),
     [recGroups],
@@ -297,50 +317,70 @@ export default function PranayamaScreen() {
           />
         </View>
 
-        {/* ── TODAY'S STATE ── */}
+        {/* ── HOW YOU'RE FEELING (from morning reflection) ── */}
         <View style={s.section}>
-          <View style={s.sectionRow}>
-            <Text style={[s.sectionTitle, { color: TEXT }]}>Today's State</Text>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-              <Text style={[s.linkText, { color: GREEN_MED }]}>View details</Text>
-              <ChevronRight size={14} color={GREEN_MED} />
-            </TouchableOpacity>
+          <View style={[s.sectionRow, { paddingHorizontal: 20 }]}>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>How You're Feeling</Text>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
-            {/* Stress */}
-            <View style={[s.statCard, { marginLeft: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <BrainIcon size={18} color="#FB923C" />
-                <Text style={[s.statLabel, { color: MUTED }]}>Stress</Text>
+          {reflection ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
+              {/* Stress (inverse of mood) */}
+              <View style={[s.statCard, { marginLeft: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <BrainIcon size={18} color={stressLevel(stressScore).color} />
+                  <Text style={[s.statLabel, { color: MUTED }]}>Stress</Text>
+                </View>
+                <Text style={[s.statStatus, { color: stressLevel(stressScore).color }]}>
+                  {stressLevel(stressScore).label}
+                </Text>
+                <Text style={[s.statValue, { color: TEXT }]}>{to10(stressScore)}/10</Text>
+                <Sparkline color={stressLevel(stressScore).color} />
               </View>
-              <Text style={[s.statStatus, { color: '#FB923C' }]}>Moderate</Text>
-              <Text style={[s.statValue, { color: TEXT }]}>6/10</Text>
-              <Sparkline color="#FB923C" />
-            </View>
 
-            {/* Energy */}
-            <View style={[s.statCard, { backgroundColor: CARD, borderColor: BORDER_L }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <BoltIcon size={18} color="#F59E0B" />
-                <Text style={[s.statLabel, { color: MUTED }]}>Energy</Text>
+              {/* Mood */}
+              <View style={[s.statCard, { backgroundColor: CARD, borderColor: BORDER_L }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Heart size={18} color={colors.statPurple} />
+                  <Text style={[s.statLabel, { color: MUTED }]}>Mood</Text>
+                </View>
+                <Text style={[s.statStatus, { color: colors.statPurple }]} numberOfLines={1}>
+                  {moodLabel(reflectionData!.mood)}
+                </Text>
+                <Text style={[s.statValue, { color: TEXT }]}>{to10(reflection.mood)}/10</Text>
+                <Sparkline color={colors.statPurple} />
               </View>
-              <Text style={[s.statStatus, { color: '#FB923C' }]}>Low</Text>
-              <Text style={[s.statValue, { color: TEXT }]}>4/10</Text>
-              <Sparkline color="#F59E0B" />
-            </View>
 
-            {/* Breathing Streak */}
-            <View style={[s.statCard, { marginRight: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <LungsIcon size={18} color={GREEN_MED} />
-                <Text style={[s.statLabel, { color: MUTED }]}>Breathing Streak</Text>
+              {/* Energy */}
+              <View style={[s.statCard, { marginRight: 20, backgroundColor: CARD, borderColor: BORDER_L }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <BoltIcon size={18} color={upLevel(reflection.energy).color} />
+                  <Text style={[s.statLabel, { color: MUTED }]}>Energy</Text>
+                </View>
+                <Text style={[s.statStatus, { color: upLevel(reflection.energy).color }]}>
+                  {upLevel(reflection.energy).label}
+                </Text>
+                <Text style={[s.statValue, { color: TEXT }]}>{to10(reflection.energy)}/10</Text>
+                <Sparkline color={upLevel(reflection.energy).color} />
               </View>
-              <Text style={[s.statValue, { fontSize: 22, color: TEXT, marginTop: 4 }]}>5 Days</Text>
-              <Text style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>Keep going! 🔥</Text>
-              <StreakDots />
+            </ScrollView>
+          ) : (
+            <View
+              style={[s.statCard, {
+                marginHorizontal: 20, marginTop: 12, width: undefined,
+                flexDirection: 'row', alignItems: 'center', gap: 12,
+                backgroundColor: CARD, borderColor: BORDER_L,
+              }]}
+            >
+              <Text style={{ fontSize: 28 }}>🌅</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[s.statStatus, { color: TEXT }]}>No reflection yet</Text>
+                <Text style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>
+                  Complete today's reflection from the Home screen to see your stress, mood and energy.
+                </Text>
+              </View>
             </View>
-          </ScrollView>
+          )}
         </View>
 
         {/* ── TODAY'S RECOMMENDATION ── */}
