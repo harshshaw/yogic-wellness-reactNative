@@ -320,7 +320,7 @@ const HomeScreen = () => {
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={localStyles.reflectionTitle}>Morning Reflection</Text>
+              <Text style={localStyles.reflectionTitle}>Today's Reflection</Text>
               <Text style={localStyles.reflectionSub}>
                 How are you arriving today?{'\n'}Let's personalize your day.
               </Text>
@@ -329,7 +329,7 @@ const HomeScreen = () => {
               <View style={localStyles.reflectionPlay}>
                 <PlayTriangle color="#fff" size={16} />
               </View>
-              <Text style={localStyles.reflectionPlayLabel}>Start Morning{'\n'}Reflection</Text>
+              <Text style={localStyles.reflectionPlayLabel}>Start Today's{'\n'}Reflection</Text>
             </View>
           </TouchableOpacity>
         ) : recommendation ? (
@@ -413,6 +413,31 @@ const HomeScreen = () => {
             />
           </View>
         </View>
+
+        {/* TODAY'S GOAL */}
+        <ImageBackground
+          source={images.goalHero}
+          style={styles.goalCard}
+          imageStyle={styles.goalImage}
+        >
+          <View style={isNight ? styles.goalOverlay : localStyles.goalOverlayLight} />
+          <View style={{ width: '60%' }}>
+            <Text style={[styles.goalTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
+              Today's Goal
+            </Text>
+            <Text style={[styles.goalSub, { color: isNight ? 'rgba(255,255,255,0.85)' : '#475569' }]}>
+              Keep going, you're doing great!
+            </Text>
+          </View>
+          <View style={styles.goalRow}>
+            <Text style={[styles.goalPercent, { color: colors.statYellow }]}>75%</Text>
+            <View style={[styles.progressBar, { backgroundColor: isNight ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)' }]}>
+              <View style={[styles.progressFill, { backgroundColor: colors.statYellow }]} />
+            </View>
+          </View>
+        </ImageBackground>
+
+        
  {/* NATURE THERAPY */}
  <View style={localStyles.sectionRow}>
           <View>
@@ -451,29 +476,6 @@ const HomeScreen = () => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* TODAY'S GOAL */}
-        <ImageBackground
-          source={images.goalHero}
-          style={styles.goalCard}
-          imageStyle={styles.goalImage}
-        >
-          <View style={isNight ? styles.goalOverlay : localStyles.goalOverlayLight} />
-          <View style={{ width: '60%' }}>
-            <Text style={[styles.goalTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
-              Today's Goal
-            </Text>
-            <Text style={[styles.goalSub, { color: isNight ? 'rgba(255,255,255,0.85)' : '#475569' }]}>
-              Keep going, you're doing great!
-            </Text>
-          </View>
-          <View style={styles.goalRow}>
-            <Text style={[styles.goalPercent, { color: colors.statYellow }]}>75%</Text>
-            <View style={[styles.progressBar, { backgroundColor: isNight ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)' }]}>
-              <View style={[styles.progressFill, { backgroundColor: colors.statYellow }]} />
-            </View>
-          </View>
-        </ImageBackground>
 
         
 

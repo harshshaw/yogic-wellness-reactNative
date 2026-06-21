@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../hooks/useTheme';
 import { useStreakStorage } from '../hooks/useStreakStorage';
+import { useAuth } from '../hooks/useAuth';
 import {
   ChevronLeft,
   ChevronRight,
@@ -44,6 +45,21 @@ const ProfileScreen = () => {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const { colors, mode, toggle } = useTheme();
+  const { user, logOut } = useAuth();
+
+  const displayName = user?.name || USER.name;
+  const displayEmail = user?.email || USER.email;
+  const initials = displayName
+    .split(' ')
+    .map(w => w.charAt(0))
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+  const handleSignOut = async () => {
+    await logOut();
+    navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+  };
   const isNight = mode === 'night';
   const { data } = useStreakStorage();
 
@@ -92,11 +108,11 @@ const ProfileScreen = () => {
           style={styles.profileCard}
         >
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{USER.initials}</Text>
+            <Text style={styles.avatarText}>{initials}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.profileName}>{USER.name}</Text>
-            <Text style={styles.profileEmail}>{USER.email}</Text>
+            <Text style={styles.profileName}>{displayName}</Text>
+            <Text style={styles.profileEmail}>{displayEmail}</Text>
             <Text style={styles.memberSince}>Member since {USER.memberSince}</Text>
           </View>
           <TouchableOpacity style={styles.editBtn} activeOpacity={0.8}>
@@ -203,6 +219,7 @@ const ProfileScreen = () => {
         <TouchableOpacity
           style={[styles.signOut, { borderColor: colors.borderStrong }]}
           activeOpacity={0.8}
+          onPress={handleSignOut}
         >
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>

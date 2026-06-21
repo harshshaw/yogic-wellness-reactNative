@@ -3,22 +3,28 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import BrandLogo from './BrandLogo';
+import { useAuth } from '../hooks/useAuth';
 
 type RootStackParamList = {
   Splash: undefined;
+  Auth: undefined;
   Main: undefined;
 };
 
 const SplashScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
+    // Hold the splash briefly, then route based on the restored session:
+    // signed-in users go straight to the app, others to the auth screen.
     const timer = setTimeout(() => {
-      navigation.replace("Main");
-    }, 3000); // 3 seconds
+      if (loading) return; // wait until the persisted session is resolved
+      navigation.replace(user ? 'Main' : 'Auth');
+    }, 1800);
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, user, loading]);
 
   return (
     <View style={styles.container}>

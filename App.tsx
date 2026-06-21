@@ -6,6 +6,7 @@ import AppNavigator from './components/AppNavigator';
 import { AppMusicProvider } from './hooks/useAppMusic';
 import { ThemeProvider, useTheme } from './hooks/useTheme';
 import { ReflectionProvider } from './hooks/useReflection';
+import { AuthProvider } from './hooks/useAuth';
 
 // Keeps the OS status bar (clock, wifi, battery) legible against the
 // active theme — light icons at night, dark icons during the day.
@@ -17,6 +18,7 @@ function ThemedStatusBar() {
 export default function App() {
   return (
     <ThemeProvider>
+      <AuthProvider>
       <ReflectionProvider>
       <AppMusicProvider>
         <ThemedStatusBar />
@@ -25,6 +27,7 @@ export default function App() {
         </NavigationContainer>
       </AppMusicProvider>
       </ReflectionProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
