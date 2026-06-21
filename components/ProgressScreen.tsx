@@ -7,15 +7,19 @@ import {
   StyleSheet,
 } from 'react-native';
 import Svg, { Circle, Path, Polyline, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme, type ThemeColors } from '../hooks/useTheme';
+import { useReflection } from '../hooks/useReflection';
+import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
 import {
   Sparkles,
   Flame,
-  Footprints,
-  Clock,
   Calendar,
   Pencil,
   ChevronRight,
+  Heart,
+  Sun,
+  Moon,
 } from './Icons';
 
 // ─── Stat ring ──────────────────────────────────────────────────────────
@@ -143,7 +147,11 @@ type Tab = (typeof TABS)[number];
 
 const ProgressScreen = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
+
+  const { completed, data } = useReflection();
+  const progress = data ? computeReflectionProgress(data) : null;
 
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -202,45 +210,76 @@ const ProgressScreen = () => {
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
             Today's Overview
           </Text>
-          <TouchableOpacity activeOpacity={0.7} style={styles.linkRow}>
-            <Text style={[styles.linkText, { color: colors.statPurple }]}>Edit Goals</Text>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('MorningReflection')}
+          >
+            <Text style={[styles.linkText, { color: colors.statPurple }]}>
+              {completed ? 'Edit Reflection' : 'Reflect'}
+            </Text>
             <Pencil size={14} color={colors.statPurple} />
           </TouchableOpacity>
         </View>
 
-        {/* 3 STAT CARDS */}
-        <View style={styles.statRow}>
-          <StatCard
-            colors={colors}
-            label="Calories"
-            value="520"
-            unit="/700 kcal"
-            tint={colors.statOrange}
-            tintSoft={colors.statOrangeSoft}
-            ringValue={74}
-            Icon={Flame}
-          />
-          <StatCard
-            colors={colors}
-            label="Steps"
-            value="8,243"
-            unit="/10,000 steps"
-            tint={colors.statMint}
-            tintSoft={colors.statMintSoft}
-            ringValue={82}
-            Icon={Footprints}
-          />
-          <StatCard
-            colors={colors}
-            label="Minutes"
-            value="52"
-            unit="/60 min"
-            tint={colors.statPurple}
-            tintSoft={colors.statPurpleSoft}
-            ringValue={87}
-            Icon={Clock}
-          />
-        </View>
+        {progress && data ? (
+          /* 3 STAT CARDS — derived from today's reflection */
+          <View style={styles.statRow}>
+            <StatCard
+              colors={colors}
+              label="Mood"
+              value={moodLabel(data.mood)}
+              unit="emotional state"
+              tint={colors.statPurple}
+              tintSoft={colors.statPurpleSoft}
+              ringValue={progress.mood}
+              Icon={Heart}
+            />
+            <StatCard
+              colors={colors}
+              label="Energy"
+              value={`${progress.energy}%`}
+              unit="vitality today"
+              tint={colors.statOrange}
+              tintSoft={colors.statOrangeSoft}
+              ringValue={progress.energy}
+              Icon={Sun}
+            />
+            <StatCard
+              colors={colors}
+              label="Sleep"
+              value={`${progress.sleep}%`}
+              unit="rest quality"
+              tint={colors.statMint}
+              tintSoft={colors.statMintSoft}
+              ringValue={progress.sleep}
+              Icon={Moon}
+            />
+          </View>
+        ) : (
+          /* No reflection yet — prompt to complete it */
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('MorningReflection')}
+            style={[
+              styles.emptyCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <View style={[styles.emptyIcon, { backgroundColor: colors.statPurpleSoft }]}>
+              <Sparkles size={22} color={colors.statPurple} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+                Start with today's reflection
+              </Text>
+              <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
+                Check in with your mood, energy and sleep to see your progress.
+              </Text>
+            </View>
+            <ChevronRight size={20} color={colors.statPurple} />
+          </TouchableOpacity>
+        )}
 
         {/* WEEKLY ACTIVITY */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -286,21 +325,29 @@ const ProgressScreen = () => {
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={[styles.insightTitle, { color: colors.textPrimary }]}>
-                Great consistency!
+                {progress ? progress.headline : 'Great consistency!'}
               </Text>
               <Text style={[styles.insightSub, { color: colors.textSecondary }]}>
-                You've met 4 of your 7 daily goals this week. Keep it up!
+                {progress
+                  ? progress.message
+                  : 'Complete your reflection to see personalized insights.'}
               </Text>
             </View>
             <View style={styles.insightRingCol}>
               <View style={styles.insightRing}>
-                <StatRing value={57} color={colors.statPurple} size={56} />
+                <StatRing
+                  value={progress ? progress.overall : 0}
+                  color={colors.statPurple}
+                  size={56}
+                />
                 <View style={{ position: 'absolute', alignItems: 'center' }}>
-                  <Text style={[styles.ringNum, { color: colors.statPurple }]}>4/7</Text>
+                  <Text style={[styles.ringNum, { color: colors.statPurple }]}>
+                    {progress ? `${progress.overall}%` : '—'}
+                  </Text>
                 </View>
               </View>
               <Text style={[styles.ringLabel, { color: colors.textSecondary }]}>
-                Goals met
+                Wellness
               </Text>
             </View>
           </View>
@@ -466,6 +513,22 @@ const styles = StyleSheet.create({
   statUnit: { fontSize: 10, marginTop: 2 },
   statRing: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center' },
   statRingText: { fontSize: 9, fontWeight: '700' },
+
+  // EMPTY / REFLECT PROMPT
+  emptyCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  emptyIcon: {
+    width: 44, height: 44, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  emptyTitle: { fontSize: 15, fontWeight: '700' },
+  emptySub: { fontSize: 13, marginTop: 4, lineHeight: 18 },
 
   // CARD
   card: {
