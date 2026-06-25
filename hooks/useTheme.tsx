@@ -116,17 +116,25 @@ const getTimeBasedMode = (): Mode => {
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [mode, setMode] = useState<Mode>(getTimeBasedMode);
+  // Once the user manually picks a theme, stop auto-switching by time so their
+  // choice sticks until they toggle again.
+  const [manual, setManual] = useState(false);
 
-  // Re-check every minute so the switch happens automatically at 6am/6pm.
+  // Re-check every minute so the switch happens automatically at 6am/6pm —
+  // but only while the user hasn't overridden the theme manually.
   useEffect(() => {
+    if (manual) return;
     const id = setInterval(() => setMode(getTimeBasedMode()), 60_000);
     return () => clearInterval(id);
-  }, []);
+  }, [manual]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({
       mode,
-      toggle: () => setMode(m => (m === 'day' ? 'night' : 'day')),
+      toggle: () => {
+        setManual(true);
+        setMode(m => (m === 'day' ? 'night' : 'day'));
+      },
       colors: mode === 'day' ? dayColors : nightColors,
       images: mode === 'day' ? dayImages : nightImages,
     }),

@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/karmana
+    username: ${DB_USERNAME:karmana}
+    password: ${DB_PASSWORD:karmana}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+karmana:
+  jwt:
+    secret: ${JWT_SECRET:karmana-super-secret-key-change-in-production-32chars}
+    expiration-ms: 86400000   # 24 hours
+
+logging:
+  level:
+    com.karmana: DEBUG
+    org.springframework.security: INFO
