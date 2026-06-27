@@ -1,50 +1,105 @@
-# Welcome to your Expo app 👋
+# Karmana – Wellness App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> Breathe. Rest. Grow.
 
-## Get started
+## Project Structure
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+karmana/
+├── ui/               React Native / Expo mobile app
+├── backend/          Spring Boot REST API (Java 21)
+├── terraform/        AWS infrastructure as code
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## ui/ — Mobile App (Expo)
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+cd ui
+npm install
+npx expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Framework:** React Native + Expo SDK 54
+- **Navigation:** React Navigation (native stack + bottom tabs)
+- **Theming:** Custom day/night theme with auto time-based switching
+- **Auth:** JWT via Spring Boot backend
+- **Storage:** expo-file-system for local cache
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## backend/ — Spring Boot API
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+cd backend
+JAVA_HOME=/Users/harshshaw/Library/Java/JavaVirtualMachines/jbr-21/Contents/Home \
+  mvn spring-boot:run
+```
+
+- **Framework:** Spring Boot 3.3 / Java 21
+- **Auth:** JWT (JJWT, HS384, 24h expiry)
+- **Database:** PostgreSQL via Spring Data JPA
+- **Port:** `8080` — API base: `http://localhost:8080/api`
+
+See [backend/DB_COMMANDS.md](backend/DB_COMMANDS.md) for database queries.
+See [backend/AWS_DEPLOYMENT.md](backend/AWS_DEPLOYMENT.md) for deployment guide.
+
+---
+
+## terraform/ — AWS Infrastructure
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Fill in db_password and jwt_secret in terraform.tfvars
+
+terraform init
+terraform plan
+terraform apply
+```
+
+Provisions:
+- **VPC** with public + private subnets across 2 AZs
+- **EC2** (t3.small) running the Spring Boot JAR
+- **RDS PostgreSQL** (db.t3.micro) in private subnet
+
+---
+
+## API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/register` | Public | Sign up |
+| POST | `/auth/login` | Public | Sign in → JWT |
+| GET | `/users/me/profile` | Bearer | Get onboarding profile |
+| PUT | `/users/me/profile` | Bearer | Save onboarding profile |
+| POST | `/reflections` | Bearer | Save morning reflection |
+| GET | `/reflections/today` | Bearer | Today's reflection + scores |
+| GET | `/reflections/history` | Bearer | All past reflections |
+
+---
+
+## Environment Variables
+
+### Backend
+| Variable | Description |
+|----------|-------------|
+| `DB_HOST` | Postgres host (default: localhost) |
+| `DB_USERNAME` | Postgres user |
+| `DB_PASSWORD` | Postgres password |
+| `JWT_SECRET` | JWT signing key (32+ chars) |
+
+### UI
+Update `ui/lib/apiClient.ts`:
+```ts
+// Simulator
+export const API_BASE = 'http://127.0.0.1:8080/api';
+
+// Physical device (Expo Go) — use Mac's LAN IP
+export const API_BASE = 'http://192.168.29.102:8080/api';
+
+// Production
+export const API_BASE = 'https://api.karmana.app/api';
+```

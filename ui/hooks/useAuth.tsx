@@ -14,7 +14,7 @@ type AuthContextValue = {
   /** True until the persisted session has been loaded. */
   loading: boolean;
   signUp: (name: string, email: string, password: string) => Promise<void>;
-  logIn: (email: string, password: string) => Promise<void>;
+  logIn: (email: string, password: string) => Promise<AuthResponse>;
   logOut: () => Promise<void>;
   /** Call after onboarding finishes to mark the flag without re-fetching. */
   markOnboardingComplete: () => void;
@@ -32,7 +32,7 @@ const AuthContext = createContext<AuthContextValue>({
   token: null,
   loading: true,
   signUp: async () => {},
-  logIn: async () => {},
+  logIn: async () => ({ token: '', name: '', email: '', onboardingComplete: false }),
   logOut: async () => {},
   markOnboardingComplete: () => {},
 });
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser({ name: res.name, email: res.email, onboardingComplete: res.onboardingComplete });
   };
 
-  const logIn = async (email: string, password: string) => {
+  const logIn = async (email: string, password: string): Promise<AuthResponse> => {
     const res = await apiRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       body: { email, password },
@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await saveUserBlob({ name: res.name, email: res.email });
     setToken(res.token);
     setUser({ name: res.name, email: res.email, onboardingComplete: res.onboardingComplete });
+    return res;
   };
 
   const logOut = async () => {

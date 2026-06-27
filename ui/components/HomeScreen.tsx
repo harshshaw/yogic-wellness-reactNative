@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
+import { useAuth } from '../hooks/useAuth';
 import { useReflection } from '../hooks/useReflection';
 import { useTheme } from '../hooks/useTheme';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
@@ -231,6 +232,8 @@ const HomeScreen = () => {
   const { muted, toggleMuted } = useAppMusic();
   const { mode, colors, images } = useTheme();
   const { completed, data } = useReflection();
+  const { user } = useAuth();
+  const firstName = user?.name?.split(' ')[0] ?? 'Friend';
   const isNight = mode === 'night';
 
   const dayIndex = new Date().getDay();
@@ -299,7 +302,7 @@ const HomeScreen = () => {
 
           <View style={styles.greetingBlock}>
             <Text style={[styles.greeting, { color: headerIconColor }]}>
-              Namaste, Arjun 🙏
+              Namaste, {firstName} 🙏
             </Text>
             <Text style={[styles.greetingSub, { color: headerIconColor }]}>
               Embrace the ancient wisdom,{'\n'}Transform your life.

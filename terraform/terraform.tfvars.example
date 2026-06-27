@@ -1,0 +1,8 @@
+aws_region    = "ap-south-1"
+app_name      = "karmana"
+environment   = "prod"
+db_name       = "karmana"
+db_username   = "karmana"
+db_password   = "CHANGE_ME_strong_password"
+jwt_secret    = "CHANGE_ME_32_char_secret_key_here"
+key_pair_name = "karmana-key"

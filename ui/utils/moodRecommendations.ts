@@ -1,4 +1,4 @@
-import moodRules from '../server/data/mood-rule.json';
+import moodRules from './mood-rule.json';
 
 type MoodState = keyof typeof moodRules.recommendations;
 type EnergyLevel = 'low' | 'slightly_low' | 'moderate' | 'high' | 'very_high';

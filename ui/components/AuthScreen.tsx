@@ -36,8 +36,6 @@ export default function AuthScreen() {
 
   const isSignup = mode === 'signup';
 
-  const { user } = useAuth();
-
   const goToMain = () =>
     navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
 
@@ -61,12 +59,12 @@ export default function AuthScreen() {
       setSubmitting(true);
       if (isSignup) {
         await signUp(name, email, password);
-        // New accounts always need onboarding.
         navigation.navigate('Onboarding');
       } else {
-        await logIn(email, password);
-        // Returning users skip onboarding if they already completed it.
-        if (user?.onboardingComplete) goToMain();
+        // Use the response directly — React state update is async and won't
+        // reflect in `user` until next render.
+        const res = await logIn(email, password);
+        if (res.onboardingComplete) goToMain();
         else navigation.navigate('Onboarding');
       }
     } catch (e: any) {
