@@ -19,6 +19,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { useReflection, ReflectionData } from '../hooks/useReflection';
+import { useAuth } from '../hooks/useAuth';
+import { apiRequest } from '../lib/apiClient';
 
 const PURPLE      = '#7C3AED';
 const PURPLE_SOFT = '#EDE9FE';
@@ -183,16 +185,28 @@ const ov = StyleSheet.create({
 export default function MorningReflectionScreen() {
   const navigation = useNavigation<any>();
   const { complete } = useReflection();
+  const { token } = useAuth();
 
   const [mood, setMood]     = useState<string>('calm');
   const [energy, setEnergy] = useState<ReflectionData['energy']>('moderate');
   const [sleep, setSleep]   = useState<ReflectionData['sleep']>('good');
   const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (saving) return;
+    // Update local context immediately so other screens reflect it.
     complete({ mood, energy, sleep, intention: mood });
     setSaving(true);
+    // Sync to backend — best-effort, local state is source of truth for now.
+    try {
+      await apiRequest('/reflections', {
+        method: 'POST',
+        token,
+        body: { mood, energy, sleep },
+      });
+    } catch {
+      // Silent fail — local context already updated.
+    }
     // Let the animation play, then jump to today's recommendation screen.
     // Reset the root stack so the reflection modal is removed (not left on top)
     // and the "Recommend" tab is selected.
