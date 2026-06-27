@@ -36,25 +36,13 @@ export default function AuthScreen() {
 
   const isSignup = mode === 'signup';
 
+  const { user } = useAuth();
+
   const goToMain = () =>
     navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
 
-  // New sign-ups go through onboarding; returning sign-ins go straight in.
-  const proceed = () => {
-    if (isSignup) navigation.navigate('Onboarding');
-    else goToMain();
-  };
-
-  // TODO: TEMP — bypass auth for testing. Set to false to re-enable validation.
-  const BYPASS_AUTH = true;
-
   const handleSubmit = async () => {
     setError(null);
-
-    if (BYPASS_AUTH) {
-      proceed();
-      return;
-    }
 
     if (isSignup && !name.trim()) {
       setError('Please enter your name.');
@@ -71,9 +59,16 @@ export default function AuthScreen() {
 
     try {
       setSubmitting(true);
-      if (isSignup) await signUp(name, email, password);
-      else await logIn(email, password);
-      proceed();
+      if (isSignup) {
+        await signUp(name, email, password);
+        // New accounts always need onboarding.
+        navigation.navigate('Onboarding');
+      } else {
+        await logIn(email, password);
+        // Returning users skip onboarding if they already completed it.
+        if (user?.onboardingComplete) goToMain();
+        else navigation.navigate('Onboarding');
+      }
     } catch (e: any) {
       setError(e?.message ?? 'Something went wrong. Please try again.');
     } finally {

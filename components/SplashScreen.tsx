@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 type RootStackParamList = {
   Splash: undefined;
   Auth: undefined;
+  Onboarding: undefined;
   Main: undefined;
 };
 
@@ -20,7 +21,9 @@ const SplashScreen = () => {
     // signed-in users go straight to the app, others to the auth screen.
     const timer = setTimeout(() => {
       if (loading) return; // wait until the persisted session is resolved
-      navigation.replace(user ? 'Main' : 'Auth');
+      if (!user) { navigation.replace('Auth'); return; }
+      if (!user.onboardingComplete) { navigation.replace('Onboarding'); return; }
+      navigation.replace('Main');
     }, 1800);
 
     return () => clearTimeout(timer);

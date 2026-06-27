@@ -12,6 +12,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { saveOnboarding, OnboardingData } from '../utils/onboardingStorage';
+import { useAuth } from '../hooks/useAuth';
+import { apiRequest } from '../lib/apiClient';
 
 const GREEN = '#10B981';
 const INK = '#0F172A';
@@ -42,6 +44,7 @@ const TOTAL_STEPS = 3;
 export default function OnboardingScreen() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
+  const { token, markOnboardingComplete } = useAuth();
 
   const [step, setStep] = useState(0);
 
@@ -74,7 +77,20 @@ export default function OnboardingScreen() {
       howHeard,
       completedAt: new Date().toISOString(),
     };
+
+    // Persist locally (offline fallback) and sync to backend.
     await saveOnboarding(data);
+    try {
+      await apiRequest('/users/me/profile', {
+        method: 'PUT',
+        token,
+        body: { age, gender, occupation, heightCm, weightKg, activityLevel, goals, medicalConditions, howHeard },
+      });
+      markOnboardingComplete();
+    } catch {
+      // Best-effort — local copy already saved; will sync on next profile fetch.
+    }
+
     goToMain();
   };
 

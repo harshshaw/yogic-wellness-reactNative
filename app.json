@@ -41,7 +41,7 @@
     "ios": {
       "infoPlist": {
         "UIBackgroundModes": ["fetch", "remote-notification"],
-        "NSMicrophoneUsageDescription": "Allow microphone access so you can speak to your AI companion and have it transcribed."
+        "NSMicrophoneUsageDescription": "Allow microphone access so you can speak to your AI companion and have it transcribed.",
       }
     },
     "plugins": [
