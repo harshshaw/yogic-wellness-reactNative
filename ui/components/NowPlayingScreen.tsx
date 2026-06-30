@@ -7,14 +7,17 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   StyleSheet,
+  PanResponder,
 } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Video, ResizeMode } from 'expo-av';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
+import { randomRainVideo } from '../utils/sessionMedia';
 
 const DEFAULT_VIDEO = require('../assets/background-video/portrait2.mp4');
+const SWIPE_THRESHOLD = 40;
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 const ChevronDown = ({ color }: { color: string }) => (
@@ -97,12 +100,34 @@ const NowPlayingScreen = () => {
     title?: string;
     mediaLabel?: string;
   };
-  const bgVideo = params.videoSource ?? DEFAULT_VIDEO;
+  const isRain = params.id === 'rain';
   const trackTitle = params.title ?? 'Himalayan Dawn';
 
   const { isTrackPlaying, playTrack, toggleTrack } = useAppMusic();
   const [liked, setLiked] = useState(false);
   const [immersive, setImmersive] = useState(false);
+
+  // Rain sessions cycle through a pool of rain backdrop videos: one is picked
+  // at random when the session starts, and swiping right-to-left picks another.
+  const [rainVideo, setRainVideo] = useState(() => (isRain ? randomRainVideo() : undefined));
+  useEffect(() => {
+    if (isRain && !rainVideo) setRainVideo(randomRainVideo());
+    if (!isRain && rainVideo) setRainVideo(undefined);
+  }, [isRain]);
+
+  const bgVideo = isRain ? (rainVideo ?? randomRainVideo()) : (params.videoSource ?? DEFAULT_VIDEO);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_evt, gesture) =>
+        isRain && Math.abs(gesture.dx) > SWIPE_THRESHOLD && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+      onPanResponderRelease: (_evt, gesture) => {
+        if (isRain && gesture.dx < -SWIPE_THRESHOLD) {
+          setRainVideo((prev: ReturnType<typeof require> | undefined) => randomRainVideo(prev));
+        }
+      },
+    })
+  ).current;
 
   // Track last session id so we only swap audio when the session actually changes
   const lastSessionId = useRef<string | undefined>(undefined);
@@ -126,8 +151,9 @@ const NowPlayingScreen = () => {
   // ── IMMERSIVE MODE: full-screen looping video, tap anywhere to return.
   if (immersive) {
     return (
-      <View style={styles.immersiveContainer}>
+      <View style={styles.immersiveContainer} {...panResponder.panHandlers}>
         <Video
+          key={bgVideo}
           source={bgVideo}
           style={StyleSheet.absoluteFillObject}
           resizeMode={ResizeMode.COVER}
@@ -153,7 +179,7 @@ const NowPlayingScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} {...panResponder.panHandlers}>
       {/* Background video — always visible, changes per session */}
       <Video
         source={bgVideo}
