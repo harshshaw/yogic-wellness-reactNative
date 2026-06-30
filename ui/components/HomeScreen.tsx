@@ -94,6 +94,13 @@ const ProfileIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
+const ReelsIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke={color} strokeWidth={1.8} strokeLinejoin="round" />
+    <Path d="M10 9.5v5l4.5-2.5L10 9.5z" fill={color} />
+  </Svg>
+);
+
 const HeartPulseIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
     <Path
@@ -289,6 +296,13 @@ const HomeScreen = () => {
                 ) : (
                   <SoundOnIcon color={headerIconColor} />
                 )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Reels')}
+                style={localStyles.headerBtn}
+              >
+                <ReelsIcon color={headerIconColor} />
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}

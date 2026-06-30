@@ -8,6 +8,9 @@ import {
   Pressable,
   StyleSheet,
   PanResponder,
+  Animated,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +21,55 @@ import { randomRainVideo } from '../utils/sessionMedia';
 
 const DEFAULT_VIDEO = require('../assets/background-video/portrait2.mp4');
 const SWIPE_THRESHOLD = 40;
+const CROSSFADE_MS = 500;
+
+// Stacks two <Video> layers and crossfades opacity whenever `source` changes,
+// instead of unmounting/remounting (which produced an abrupt visual cut).
+const CrossfadeVideo = ({
+  source,
+  style,
+  resizeMode,
+}: {
+  source: ReturnType<typeof require>;
+  style: StyleProp<ViewStyle>;
+  resizeMode: ResizeMode;
+}) => {
+  const [layers, setLayers] = useState(() => [
+    { id: source, source, opacity: new Animated.Value(1) },
+  ]);
+
+  useEffect(() => {
+    setLayers(prev => {
+      if (prev[prev.length - 1].source === source) return prev;
+      const opacity = new Animated.Value(0);
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: CROSSFADE_MS,
+        useNativeDriver: true,
+      }).start(() => {
+        setLayers(curr => curr.filter(l => l.source === source));
+      });
+      return [...prev, { id: source, source, opacity }];
+    });
+  }, [source]);
+
+  return (
+    <View style={style}>
+      {layers.map(l => (
+        <Animated.View key={l.id} style={[StyleSheet.absoluteFillObject, { opacity: l.opacity }]}>
+          <Video
+            source={l.source}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode={resizeMode}
+            isLooping
+            isMuted
+            shouldPlay
+          />
+        </Animated.View>
+      ))}
+    </View>
+  );
+};
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 const ChevronDown = ({ color }: { color: string }) => (
@@ -152,15 +204,7 @@ const NowPlayingScreen = () => {
   if (immersive) {
     return (
       <View style={styles.immersiveContainer} {...panResponder.panHandlers}>
-        <Video
-          key={bgVideo}
-          source={bgVideo}
-          style={StyleSheet.absoluteFillObject}
-          resizeMode={ResizeMode.COVER}
-          isLooping
-          isMuted
-          shouldPlay
-        />
+        <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
         <TouchableWithoutFeedback onPress={() => setImmersive(false)}>
           <View style={StyleSheet.absoluteFill}>
             <View style={styles.exitHint}>
@@ -181,14 +225,7 @@ const NowPlayingScreen = () => {
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       {/* Background video — always visible, changes per session */}
-      <Video
-        source={bgVideo}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-        isMuted
-        shouldPlay
-      />
+      <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
       {/* Dark overlay so white text stays readable */}
       <View style={styles.veil} />
 
