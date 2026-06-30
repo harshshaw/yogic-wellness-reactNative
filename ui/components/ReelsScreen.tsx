@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,23 +6,47 @@ import {
   Dimensions,
   StyleSheet,
   TouchableOpacity,
+  ViewToken,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Video, ResizeMode } from 'expo-av';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import reelsContent from '../utils/reels-content.json';
+import reelVideoSources from '../utils/reel-videos.generated';
 
 const { height: SCREEN_H } = Dimensions.get('window');
 
-type ReelItem = {
-  id: number;
+type QuoteItem = {
+  kind: 'quote';
+  id: string;
   category: string;
   text: string;
   source: string;
 };
 
-const content = reelsContent as ReelItem[];
+type VideoItem = {
+  kind: 'video';
+  id: string;
+  source: ReturnType<typeof require>;
+};
+
+type FeedItem = QuoteItem | VideoItem;
+
+const quotes: QuoteItem[] = (reelsContent as { id: number; category: string; text: string; source: string }[]).map(
+  q => ({ kind: 'quote', id: `quote-${q.id}`, category: q.category, text: q.text, source: q.source })
+);
+
+// Reel video clips, mixed into the feed alongside the text quote cards.
+// Sourced from utils/reel-videos.generated.ts, which is regenerated from
+// every .mp4 in assets/reel-videos/ on each `npm start` — drop a new file in
+// that folder and it shows up here automatically, no code changes needed.
+const videos: VideoItem[] = reelVideoSources.map((source, i) => ({
+  kind: 'video',
+  id: `video-${i}`,
+  source,
+}));
 
 // Alternating gradient palette — cycles by index so each scroll lands on a
 // visibly different backdrop, regardless of category.
@@ -43,7 +67,7 @@ const Close = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const ReelCard = ({ item, palette }: { item: ReelItem; palette: readonly [string, string, string] }) => (
+const QuoteCard = ({ item, palette }: { item: QuoteItem; palette: readonly [string, string, string] }) => (
   <View style={{ height: SCREEN_H, width: '100%' }}>
     <LinearGradient
       colors={palette}
@@ -59,8 +83,21 @@ const ReelCard = ({ item, palette }: { item: ReelItem; palette: readonly [string
   </View>
 );
 
+const VideoCard = ({ item, active }: { item: VideoItem; active: boolean }) => (
+  <View style={{ height: SCREEN_H, width: '100%', backgroundColor: '#000' }}>
+    <Video
+      source={item.source}
+      style={StyleSheet.absoluteFillObject}
+      resizeMode={ResizeMode.COVER}
+      isLooping
+      isMuted={false}
+      shouldPlay={active}
+    />
+  </View>
+);
+
 // Fisher-Yates shuffle so the feed order is randomized on every screen open.
-const shuffle = (items: ReelItem[]): ReelItem[] => {
+const shuffle = <T,>(items: T[]): T[] => {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -69,24 +106,42 @@ const shuffle = (items: ReelItem[]): ReelItem[] => {
   return arr;
 };
 
+const buildFeed = (): FeedItem[] => shuffle<FeedItem>([...quotes, ...videos]);
+
 const ReelsScreen = () => {
   const navigation = useNavigation<any>();
-  const [shuffled] = useState(() => shuffle(content));
+  const [feed] = useState(buildFeed);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index != null) {
+        setActiveIndex(viewableItems[0].index);
+      }
+    }
+  ).current;
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={shuffled}
-        keyExtractor={item => String(item.id)}
-        renderItem={({ item, index }) => (
-          <ReelCard item={item} palette={PALETTES[index % PALETTES.length]} />
-        )}
+        data={feed}
+        keyExtractor={item => item.id}
+        renderItem={({ item, index }) =>
+          item.kind === 'video' ? (
+            <VideoCard item={item} active={index === activeIndex} />
+          ) : (
+            <QuoteCard item={item} palette={PALETTES[index % PALETTES.length]} />
+          )
+        }
         pagingEnabled
         decelerationRate="fast"
         snapToInterval={SCREEN_H}
         snapToAlignment="start"
         showsVerticalScrollIndicator={false}
         getItemLayout={(_, index) => ({ length: SCREEN_H, offset: SCREEN_H * index, index })}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
       />
 
       <SafeAreaView style={styles.headerOverlay} pointerEvents="box-none">
@@ -123,15 +178,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  progressText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 13,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
   },
 
   cardContent: {

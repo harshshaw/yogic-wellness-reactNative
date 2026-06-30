@@ -30,13 +30,13 @@ const BACKGROUND_SOURCE = require('../assets/karmana-app-music.mp3');
 const TRACK_SOURCE = require('../assets/music-playlist/screen-recording.mp3');
 
 export const AppMusicProvider = ({ children }: { children: React.ReactNode }) => {
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [isTrackPlaying, setIsTrackPlaying] = useState(false);
 
   const bgRef = useRef<Audio.Sound | null>(null);
   const trackRef = useRef<Audio.Sound | null>(null);
 
-  const mutedRef = useRef(false);
+  const mutedRef = useRef(true);
   const trackPlayingRef = useRef(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const AppMusicProvider = ({ children }: { children: React.ReactNode }) =>
 
         const [{ sound: bg }, { sound: track }] = await Promise.all([
           Audio.Sound.createAsync(BACKGROUND_SOURCE, {
-            shouldPlay: true,
+            shouldPlay: !mutedRef.current,
             isLooping: true,
             volume: 0.1,
           }),
