@@ -3,6 +3,9 @@ import * as FileSystem from 'expo-file-system';
 // Physical device via Expo Go: must use Mac's LAN IP (not localhost/127.0.0.1)
 export const API_BASE = 'http://192.168.29.102:8080/api';
 
+// Flip to true when testing UI without a running backend
+export const MOCK_AUTH = true;
+
 const TOKEN_PATH = `${(FileSystem as any).documentDirectory}auth-token.json`;
 
 // ── token persistence ────────────────────────────────────────────────────────
@@ -40,6 +43,16 @@ type RequestOptions = {
 };
 
 export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Promise<T> {
+  if (MOCK_AUTH) {
+    if (path === '/auth/login' || path === '/auth/register') {
+      return { token: 'mock-token', name: 'Test User', email: 'test@example.com', onboardingComplete: true } as T;
+    }
+    if (path === '/users/me/profile') {
+      return { age: '25' } as T;
+    }
+    return {} as T;
+  }
+
   const { method = 'GET', body, token } = opts;
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
