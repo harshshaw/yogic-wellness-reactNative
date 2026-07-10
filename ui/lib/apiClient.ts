@@ -1,10 +1,10 @@
 import * as FileSystem from 'expo-file-system';
 
 // Physical device via Expo Go: must use Mac's LAN IP (not localhost/127.0.0.1)
-export const API_BASE = 'http://192.168.29.102:8080/api';
+export const API_BASE = 'http://192.168.29.103:8080/api';
 
 // Flip to true when testing UI without a running backend
-export const MOCK_AUTH = true;
+export const MOCK_AUTH = false;
 
 const TOKEN_PATH = `${(FileSystem as any).documentDirectory}auth-token.json`;
 

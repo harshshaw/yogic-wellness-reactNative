@@ -20,6 +20,21 @@ export type ChatMessage = {
   content: string;
 };
 
+// Personalisation context sent with each chat so the AI knows who it's talking
+// to and remembers past conversations.
+export type UserContext = {
+  name?: string;
+  profile?: {
+    age?: string;
+    gender?: string;
+    occupation?: string;
+    goals?: string[];
+    medicalConditions?: string;
+  };
+  reflection?: { mood?: string; energy?: string; sleep?: string };
+  memory?: string;
+};
+
 export type Citation = { ref: string; english: string };
 
 export type ChatResponse = {
@@ -50,12 +65,13 @@ export async function transcribeAudio(
 
 export async function sendToCompanion(
   mode: CompanionMode,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  context?: UserContext
 ): Promise<ChatResponse> {
   const res = await fetch(`${AI_API_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, messages }),
+    body: JSON.stringify({ mode, messages, context }),
   });
 
   if (!res.ok) {
@@ -65,4 +81,23 @@ export async function sendToCompanion(
 
   const json = (await res.json()) as ChatResponse;
   return json;
+}
+
+// Distils an updated memory summary from the prior summary + latest turns.
+// Called at the end of a session; the result is persisted via companionMemory.
+export async function distillMemory(
+  previousSummary: string,
+  messages: ChatMessage[]
+): Promise<string> {
+  const res = await fetch(`${AI_API_URL}/api/distill`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ previousSummary, messages }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Distill request failed (${res.status}): ${text}`);
+  }
+  const json = (await res.json()) as { summary: string };
+  return json.summary ?? '';
 }

@@ -46,9 +46,62 @@ You are the Relationship Guru — a warm, grounded companion for love, family, f
 `.trim(),
 };
 
+// Personalisation context passed by the app: who the user is, how their day is
+// going, and a distilled memory of past conversations.
+export type UserContext = {
+  name?: string;
+  profile?: {
+    age?: string;
+    gender?: string;
+    occupation?: string;
+    goals?: string[];
+    medicalConditions?: string;
+  };
+  reflection?: { mood?: string; energy?: string; sleep?: string };
+  memory?: string; // distilled "what I know about this user" summary
+};
+
+// Render the user context into a short, advisory prompt block. Kept concise so
+// it stays cheap and reads as awareness, not a data dump.
+const renderContext = (ctx?: UserContext): string => {
+  if (!ctx) return '';
+  const lines: string[] = [];
+  if (ctx.name) lines.push(`Name: ${ctx.name}.`);
+
+  const p = ctx.profile;
+  if (p) {
+    const bits: string[] = [];
+    if (p.age) bits.push(`age ${p.age}`);
+    if (p.gender) bits.push(p.gender);
+    if (p.occupation) bits.push(p.occupation);
+    if (bits.length) lines.push(`About them: ${bits.join(', ')}.`);
+    if (p.goals?.length) lines.push(`Their goals: ${p.goals.join(', ')}.`);
+    if (p.medicalConditions?.trim())
+      lines.push(`Health note (be mindful, never diagnose): ${p.medicalConditions.trim()}.`);
+  }
+
+  const r = ctx.reflection;
+  if (r && (r.mood || r.energy || r.sleep)) {
+    const bits: string[] = [];
+    if (r.mood) bits.push(`mood ${r.mood}`);
+    if (r.energy) bits.push(`energy ${r.energy}`);
+    if (r.sleep) bits.push(`slept ${r.sleep}`);
+    lines.push(`This morning they reported: ${bits.join(', ')}.`);
+  }
+
+  if (ctx.memory?.trim()) lines.push(`What you remember about them: ${ctx.memory.trim()}`);
+
+  if (lines.length === 0) return '';
+  return (
+    `\n\nAbout the person you are speaking with (use this to personalise — refer to it naturally, never recite it back as a list):\n` +
+    lines.join('\n')
+  );
+};
+
 export const buildSystemPrompt = (
   mode: Mode,
-  retrieved: { ref: string; english: string; context: string }[]
+  retrieved: { ref: string; english: string; context: string }[],
+  userContext?: UserContext
 ): string => {
   const persona = MODE_PERSONAS[mode];
   const contextBlock =
@@ -61,5 +114,5 @@ export const buildSystemPrompt = (
           )
           .join('\n\n')}\n\nLet these ideas shape your tone and perspective, but translate them entirely into your own modern, conversational words. The user should never know these were consulted.`;
 
-  return `${BASE_GUARDRAILS}\n\n${persona}${contextBlock}`;
+  return `${BASE_GUARDRAILS}\n\n${persona}${renderContext(userContext)}${contextBlock}`;
 };

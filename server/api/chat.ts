@@ -4,7 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { topK, type EmbeddedVerse } from '../lib/retrieve.js';
-import { buildSystemPrompt, type Mode } from '../lib/prompts.js';
+import { buildSystemPrompt, type Mode, type UserContext } from '../lib/prompts.js';
 
 const VALID_MODES: Mode[] = [
   'Pranayama Guru',
@@ -38,7 +38,7 @@ const loadCorpus = (mode: Mode): EmbeddedVerse[] => {
 };
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
-type RequestBody = { mode: Mode; messages: ChatMessage[] };
+type RequestBody = { mode: Mode; messages: ChatMessage[]; context?: UserContext };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS — open while developing. Lock to your app's origin before launch.
@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
 
-  const { mode, messages } = (req.body ?? {}) as RequestBody;
+  const { mode, messages, context } = (req.body ?? {}) as RequestBody;
 
   if (!VALID_MODES.includes(mode)) return res.status(400).json({ error: 'invalid mode' });
   if (!Array.isArray(messages) || messages.length === 0)
@@ -80,8 +80,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       mode === 'Gita Companion' || mode === 'Relationship Guru' ? 0.15 : 0.18;
     const relevant = retrieved.filter(r => r.score >= SCORE_FLOOR).map(r => r.verse);
 
-    // 3. Build the prompt.
-    const system = buildSystemPrompt(mode, relevant);
+    // 3. Build the prompt, personalised with the user context if provided.
+    const system = buildSystemPrompt(mode, relevant, context);
 
     // 4. Call Claude with rolling history. The Messages API takes the system
     //    prompt as a top-level field; the array holds only user/assistant turns.
