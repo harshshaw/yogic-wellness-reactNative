@@ -16,7 +16,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
-import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Volume2, VolumeX } from './Icons';
+import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Heart, Volume2, VolumeX } from './Icons';
 import { sendToCompanion, transcribeAudio, type CompanionMode } from '../lib/aiCompanion';
 import { useTheme } from '../hooks/useTheme';
 
@@ -41,6 +41,11 @@ const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: s
     open: 'You showed up. That counts. Tell me what felt hard today.',
     suggestions: ['I doubted myself', 'I avoided it', 'I want to commit', 'Celebrate a win'],
   },
+  'Relationship Guru': {
+    open: 'Every relationship is a mirror. Tell me what’s on your heart — I’ll listen without judgment.',
+    cite: 'Inspired by yogic wisdom on connection',
+    suggestions: ['We keep arguing', 'I feel unheard', 'Rebuilding trust', 'Setting boundaries'],
+  },
 };
 
 const modeIcons: Record<Mode, any> = {
@@ -48,6 +53,7 @@ const modeIcons: Record<Mode, any> = {
   'Gita Companion': Sparkles,
   'Sleep Guide': Moon,
   'Confidence Coach': Target,
+  'Relationship Guru': Heart,
 };
 
 const timeStamp = () =>

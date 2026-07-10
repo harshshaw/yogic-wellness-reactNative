@@ -1,8 +1,10 @@
 export type Verse = {
   ref: string;
   topic: string;
-  sanskrit: string;
-  transliteration: string;
+  // Sanskrit source fields — present for Gita verses, omitted for other
+  // knowledge bases (e.g. Relationship Guru).
+  sanskrit?: string;
+  transliteration?: string;
   english: string;
   context: string;
   themes: string[];

@@ -12,7 +12,8 @@ export type CompanionMode =
   | 'Pranayama Guru'
   | 'Gita Companion'
   | 'Sleep Guide'
-  | 'Confidence Coach';
+  | 'Confidence Coach'
+  | 'Relationship Guru';
 
 export type ChatMessage = {
   role: 'user' | 'assistant';
