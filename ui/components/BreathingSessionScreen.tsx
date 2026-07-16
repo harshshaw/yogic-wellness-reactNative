@@ -8,6 +8,8 @@ import {
   Easing,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAuth } from '../hooks/useAuth';
+import { recordSession } from '../lib/wellnessApi';
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { useTheme } from '../hooks/useTheme';
 import { X, Pause, Play, Check } from './Icons';
@@ -46,8 +48,26 @@ const BreathingSessionScreen = () => {
   const { colors, mode } = useTheme();
   const isNight = mode === 'night';
 
+  const { token } = useAuth();
   const title = (route.params?.title as string) ?? 'Breathing Session';
   const id = (route.params?.id as string) ?? '';
+
+  // 4 rounds of 4-7-8 ≈ 76s of practice; used for progress/minutes tracking.
+  const SESSION_SECONDS = 4 * (4 + 7 + 8);
+  // Record the completed session once, capturing the mood if chosen.
+  const recordedRef = useRef(false);
+  const finish = () => {
+    if (!recordedRef.current) {
+      recordedRef.current = true;
+      recordSession(token, {
+        type: isSleepSession ? 'sleep' : 'breathing',
+        title,
+        durationSec: SESSION_SECONDS,
+        mood: mood ?? undefined,
+      });
+    }
+    navigation.goBack();
+  };
 
   // Sleep-flavored sessions get a purple accent. Everything else gets mint.
   const isSleepSession = id === 'sleep' || /sleep|wind-?down|night/i.test(title);
@@ -295,7 +315,7 @@ const BreathingSessionScreen = () => {
                 { borderColor: colors.borderStrong, backgroundColor: 'transparent' },
               ]}
               activeOpacity={0.85}
-              onPress={() => navigation.goBack()}
+              onPress={finish}
             >
               <Text style={[styles.pillText, { color: colors.textPrimary }]}>Close</Text>
             </TouchableOpacity>
@@ -305,7 +325,7 @@ const BreathingSessionScreen = () => {
                 { backgroundColor: accent, shadowColor: accent },
               ]}
               activeOpacity={0.9}
-              onPress={() => navigation.goBack()}
+              onPress={finish}
             >
               <Text style={[styles.pillText, { color: '#FFFFFF' }]}>Save insight</Text>
             </TouchableOpacity>

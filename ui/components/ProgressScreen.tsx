@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, type ThemeColors } from '../hooks/useTheme';
 import { useReflection } from '../hooks/useReflection';
+import { useAuth } from '../hooks/useAuth';
+import { getSessionStats, type SessionStats } from '../lib/wellnessApi';
 import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
 import {
   Sparkles,
@@ -153,6 +155,11 @@ const ProgressScreen = () => {
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
 
   const { completed, data } = useReflection();
+  const { token } = useAuth();
+  const [stats, setStats] = useState<SessionStats | null>(null);
+  useEffect(() => {
+    getSessionStats(token).then(setStats);
+  }, [token]);
   const progress = data ? computeReflectionProgress(data) : null;
 
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -375,11 +382,13 @@ const ProgressScreen = () => {
           <View style={{ flex: 1, marginLeft: 14 }}>
             <Text style={[styles.streakTitle, { color: colors.textPrimary }]}>Current Streak</Text>
             <Text style={[styles.streakSub, { color: colors.textSecondary }]}>
-              You're on fire! 🔥
+              {(stats?.currentStreak ?? 0) > 0
+                ? `You're on fire! 🔥  ·  ${stats?.totalSessions ?? 0} sessions`
+                : 'Complete a session to start your streak'}
             </Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={[styles.streakNum, { color: colors.statMint }]}>12</Text>
+            <Text style={[styles.streakNum, { color: colors.statMint }]}>{stats?.currentStreak ?? 0}</Text>
             <Text style={[styles.streakUnit, { color: colors.textSecondary }]}>days</Text>
           </View>
           <ChevronRight size={20} color={colors.textSecondary} />

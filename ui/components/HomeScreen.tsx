@@ -94,6 +94,13 @@ const ProfileIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
+const JournalIcon = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path d="M4 4a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V4z" stroke={color} strokeWidth={1.8} strokeLinejoin="round" />
+    <Path d="M8 7h6M8 11h6M8 15h3" stroke={color} strokeWidth={1.8} strokeLinecap="round" />
+  </Svg>
+);
+
 const ReelsIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
     <Path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke={color} strokeWidth={1.8} strokeLinejoin="round" />
@@ -296,6 +303,13 @@ const HomeScreen = () => {
                 ) : (
                   <SoundOnIcon color={headerIconColor} />
                 )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Journal')}
+                style={localStyles.headerBtn}
+              >
+                <JournalIcon color={headerIconColor} />
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
