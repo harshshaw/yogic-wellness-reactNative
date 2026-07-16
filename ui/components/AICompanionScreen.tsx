@@ -98,6 +98,12 @@ const AICompanionScreen = () => {
         apiRequest<any>('/reflections/today', { token }).catch(() => null),
       ]);
       if (cancelled) return;
+      // TEMP DEBUG — remove once memory is confirmed working
+      console.log('[companion] memory loaded:', {
+        hasToken: !!token,
+        memoryLength: memory?.length ?? 0,
+        memoryPreview: (memory ?? '').slice(0, 80),
+      });
       memoryRef.current = memory;
       contextRef.current = {
         name: user?.name,
@@ -230,6 +236,8 @@ const AICompanionScreen = () => {
         role: (m.from === 'ai' ? 'assistant' : 'user') as 'assistant' | 'user',
         content: m.text,
       }));
+      // TEMP DEBUG — remove once memory is confirmed working
+      console.log('[companion] sending with memory length:', contextRef.current.memory?.length ?? 0);
       const reply = await sendToCompanion(mode, apiMessages, contextRef.current);
       const cite =
         reply.citations.length > 0

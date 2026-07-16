@@ -42,12 +42,6 @@ export default function AuthScreen() {
   const handleSubmit = async () => {
     setError(null);
 
-    // TESTING ONLY — bypass auth entirely and drop straight into the app.
-    if (__DEV__ && !isSignup) {
-      goToMain();
-      return;
-    }
-
     if (isSignup && !name.trim()) {
       setError('Please enter your name.');
       return;

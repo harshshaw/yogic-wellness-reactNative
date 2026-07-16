@@ -18,7 +18,10 @@ const EMBEDDING_MODEL = 'text-embedding-3-small';
 // Chat completion runs on Claude via the Anthropic API.
 const CHAT_MODEL = 'claude-opus-4-8';
 const TOP_K = 3;
-const MAX_HISTORY = 10;
+// How many recent turns of the *current* session to resend. Kept generous so
+// the AI reliably recalls things said earlier in the same conversation;
+// cross-session recall is handled separately by the distilled memory summary.
+const MAX_HISTORY = 30;
 
 // Each mode retrieves from its own knowledge base. Relationship Guru has a
 // dedicated corpus; every other mode draws on the Gita corpus.
