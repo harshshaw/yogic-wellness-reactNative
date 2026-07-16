@@ -10,6 +10,7 @@ import BreathingSessionScreen from './BreathingSessionScreen';
 import AICompanionScreen from './AICompanionScreen';
 import MorningReflectionScreen from './MorningReflectionScreen';
 import ProfileScreen from './ProfileScreen';
+import ReelsScreen from './ReelsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="Reels"
+        component={ReelsScreen}
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
     </Stack.Navigator>

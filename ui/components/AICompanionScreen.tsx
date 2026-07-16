@@ -16,8 +16,17 @@ import * as FileSystem from 'expo-file-system';
 import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
-import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Volume2, VolumeX } from './Icons';
-import { sendToCompanion, transcribeAudio, type CompanionMode } from '../lib/aiCompanion';
+import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Heart, Volume2, VolumeX } from './Icons';
+import {
+  sendToCompanion,
+  distillMemory,
+  transcribeAudio,
+  type CompanionMode,
+  type UserContext,
+} from '../lib/aiCompanion';
+import { getMemory, saveMemory, saveTurns } from '../lib/companionMemory';
+import { apiRequest } from '../lib/apiClient';
+import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 
 type Mode = CompanionMode;
@@ -41,6 +50,11 @@ const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: s
     open: 'You showed up. That counts. Tell me what felt hard today.',
     suggestions: ['I doubted myself', 'I avoided it', 'I want to commit', 'Celebrate a win'],
   },
+  'Relationship Guru': {
+    open: 'Every relationship is a mirror. Tell me what’s on your heart — I’ll listen without judgment.',
+    cite: 'Inspired by yogic wisdom on connection',
+    suggestions: ['We keep arguing', 'I feel unheard', 'Rebuilding trust', 'Setting boundaries'],
+  },
 };
 
 const modeIcons: Record<Mode, any> = {
@@ -48,6 +62,7 @@ const modeIcons: Record<Mode, any> = {
   'Gita Companion': Sparkles,
   'Sleep Guide': Moon,
   'Confidence Coach': Target,
+  'Relationship Guru': Heart,
 };
 
 const timeStamp = () =>
@@ -61,11 +76,56 @@ const AICompanionScreen = () => {
   const intro = greetingByMode[mode];
   const Icon = modeIcons[mode];
 
+  const { user, token } = useAuth();
+
   const [messages, setMessages] = useState<Msg[]>(() => [
     { from: 'ai', text: intro.open, cite: intro.cite, time: timeStamp() },
   ]);
   const [draft, setDraft] = useState('');
   const [pending, setPending] = useState(false);
+
+  // ── Personalisation context (who the user is + memory of past chats) ──
+  const contextRef = useRef<UserContext>({});
+  const memoryRef = useRef<string>('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      // Load durable memory, profile, and today's reflection in parallel.
+      const [memory, profile, reflection] = await Promise.all([
+        getMemory(token).catch(() => ''),
+        apiRequest<any>('/users/me/profile', { token }).catch(() => null),
+        apiRequest<any>('/reflections/today', { token }).catch(() => null),
+      ]);
+      if (cancelled) return;
+      // TEMP DEBUG — remove once memory is confirmed working
+      console.log('[companion] memory loaded:', {
+        hasToken: !!token,
+        memoryLength: memory?.length ?? 0,
+        memoryPreview: (memory ?? '').slice(0, 80),
+      });
+      memoryRef.current = memory;
+      contextRef.current = {
+        name: user?.name,
+        profile: profile
+          ? {
+              age: profile.age,
+              gender: profile.gender,
+              occupation: profile.occupation,
+              goals: profile.goals,
+              medicalConditions: profile.medicalConditions,
+            }
+          : undefined,
+        reflection: reflection
+          ? { mood: reflection.mood, energy: reflection.energy, sleep: reflection.sleep }
+          : undefined,
+        memory,
+      };
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, user?.name]);
 
   // ── Voice output (text-to-speech for AI replies) ──
   const [voiceOn, setVoiceOn] = useState(true);
@@ -176,7 +236,9 @@ const AICompanionScreen = () => {
         role: (m.from === 'ai' ? 'assistant' : 'user') as 'assistant' | 'user',
         content: m.text,
       }));
-      const reply = await sendToCompanion(mode, apiMessages);
+      // TEMP DEBUG — remove once memory is confirmed working
+      console.log('[companion] sending with memory length:', contextRef.current.memory?.length ?? 0);
+      const reply = await sendToCompanion(mode, apiMessages, contextRef.current);
       const cite =
         reply.citations.length > 0
           ? reply.citations.map(c => c.ref).join(' · ')
@@ -201,8 +263,38 @@ const AICompanionScreen = () => {
   const hasUser = useMemo(() => messages.some(m => m.from === 'user'), [messages]);
   const { colors } = useTheme();
 
-  // Stop any in-flight speech when the screen unmounts.
-  useEffect(() => () => { Speech.stop(); }, []);
+  // Keep the latest messages in a ref so the unmount handler isn't stale.
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+
+  // On leaving the screen: persist the session's turns, then distil an updated
+  // memory summary so the AI remembers this conversation next time.
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+
+      // Skip the opening greeting; keep only real conversation.
+      const turns = messagesRef.current
+        .filter((_, i) => i > 0)
+        .map(m => ({
+          role: (m.from === 'ai' ? 'assistant' : 'user') as 'assistant' | 'user',
+          content: m.text,
+        }));
+      const hadUserTurn = turns.some(t => t.role === 'user');
+      if (!hadUserTurn) return;
+
+      // Fire-and-forget; the JS runtime finishes these after unmount.
+      (async () => {
+        try {
+          await saveTurns(token, mode, turns);
+          const updated = await distillMemory(memoryRef.current, turns);
+          if (updated) await saveMemory(token, updated);
+        } catch {
+          // best-effort — never surface memory errors to the user
+        }
+      })();
+    };
+  }, [token, mode]);
 
   // Keep the thread pinned to the newest message.
   const scrollRef = useRef<ScrollView | null>(null);

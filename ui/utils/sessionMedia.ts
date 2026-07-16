@@ -8,6 +8,26 @@ const VIDEO_PORTRAIT = require('../assets/background-video/portrait2.mp4');
 const AUDIO_HIMALAYA = require('../assets/music-playlist/sounovamusic-himalaya-journey-449825.mp3');
 const AUDIO_DEFAULT  = require('../assets/music-playlist/screen-recording.mp3');
 
+// Pool of rain backdrop videos — one is picked at random whenever a rain
+// track starts playing, and swiping switches to another random pick.
+export const RAIN_VIDEOS: ReturnType<typeof require>[] = [
+  require('../assets/background-video/rain-background-videos/rain-ground-ripple.mp4'),
+  require('../assets/background-video/rain-background-videos/rain-island.mp4'),
+  require('../assets/background-video/rain-background-videos/rain-leaf.mp4'),
+  require('../assets/background-video/rain-background-videos/rain-street.mp4'),
+];
+
+// Returns a random rain video, optionally avoiding the one currently showing
+// so a swipe always visibly changes the backdrop.
+export function randomRainVideo(exclude?: ReturnType<typeof require>): ReturnType<typeof require> {
+  if (RAIN_VIDEOS.length === 1) return RAIN_VIDEOS[0];
+  let pick = RAIN_VIDEOS[Math.floor(Math.random() * RAIN_VIDEOS.length)];
+  while (exclude !== undefined && pick === exclude) {
+    pick = RAIN_VIDEOS[Math.floor(Math.random() * RAIN_VIDEOS.length)];
+  }
+  return pick;
+}
+
 export type SessionMedia = {
   video: ReturnType<typeof require>;
   audio: ReturnType<typeof require>;

@@ -7,14 +7,67 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   StyleSheet,
+  Animated,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Video, ResizeMode } from 'expo-av';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
+import { RAIN_VIDEOS } from '../utils/sessionMedia';
 
 const DEFAULT_VIDEO = require('../assets/background-video/portrait2.mp4');
+const CROSSFADE_MS = 500;
+
+// Stacks two <Video> layers and crossfades opacity whenever `source` changes,
+// instead of unmounting/remounting (which produced an abrupt visual cut).
+const CrossfadeVideo = ({
+  source,
+  style,
+  resizeMode,
+}: {
+  source: ReturnType<typeof require>;
+  style: StyleProp<ViewStyle>;
+  resizeMode: ResizeMode;
+}) => {
+  const [layers, setLayers] = useState(() => [
+    { id: source, source, opacity: new Animated.Value(1) },
+  ]);
+
+  useEffect(() => {
+    setLayers(prev => {
+      if (prev[prev.length - 1].source === source) return prev;
+      const opacity = new Animated.Value(0);
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: CROSSFADE_MS,
+        useNativeDriver: true,
+      }).start(() => {
+        setLayers(curr => curr.filter(l => l.source === source));
+      });
+      return [...prev, { id: source, source, opacity }];
+    });
+  }, [source]);
+
+  return (
+    <View style={style}>
+      {layers.map(l => (
+        <Animated.View key={l.id} style={[StyleSheet.absoluteFillObject, { opacity: l.opacity }]}>
+          <Video
+            source={l.source}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode={resizeMode}
+            isLooping
+            isMuted
+            shouldPlay
+          />
+        </Animated.View>
+      ))}
+    </View>
+  );
+};
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 const ChevronDown = ({ color }: { color: string }) => (
@@ -29,6 +82,31 @@ const Dots = ({ color }: { color: string }) => (
     <Circle cx="12" cy="12" r="1.6" fill={color} />
     <Circle cx="12" cy="19" r="1.6" fill={color} />
   </Svg>
+);
+
+const ChevronLeft = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path d="M15 6l-6 6 6 6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const ChevronRight = ({ color }: { color: string }) => (
+  <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+    <Path d="M9 6l6 6-6 6" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+// Minimalist prev/next buttons for stepping through the rain backdrop pool —
+// vertically centered on each edge, same translucent style as the close btn.
+const RainVideoNav = ({ onPrev, onNext }: { onPrev: () => void; onNext: () => void }) => (
+  <View style={styles.rainNavLayer} pointerEvents="box-none">
+    <TouchableOpacity style={styles.rainNavBtn} activeOpacity={0.75} onPress={onPrev} hitSlop={10}>
+      <ChevronLeft color="#FFFFFF" />
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rainNavBtn} activeOpacity={0.75} onPress={onNext} hitSlop={10}>
+      <ChevronRight color="#FFFFFF" />
+    </TouchableOpacity>
+  </View>
 );
 
 const Heart = ({ color, filled }: { color: string; filled?: boolean }) => (
@@ -97,12 +175,22 @@ const NowPlayingScreen = () => {
     title?: string;
     mediaLabel?: string;
   };
-  const bgVideo = params.videoSource ?? DEFAULT_VIDEO;
+  const isRain = params.id === 'rain';
   const trackTitle = params.title ?? 'Himalayan Dawn';
 
   const { isTrackPlaying, playTrack, toggleTrack } = useAppMusic();
   const [liked, setLiked] = useState(false);
   const [immersive, setImmersive] = useState(false);
+
+  // Rain sessions cycle through a pool of rain backdrop videos: one is picked
+  // at random when the session starts, and the prev/next buttons step through
+  // the pool in order.
+  const [rainIndex, setRainIndex] = useState(() => Math.floor(Math.random() * RAIN_VIDEOS.length));
+  const goToPrevRainVideo = () =>
+    setRainIndex(i => (i - 1 + RAIN_VIDEOS.length) % RAIN_VIDEOS.length);
+  const goToNextRainVideo = () => setRainIndex(i => (i + 1) % RAIN_VIDEOS.length);
+
+  const bgVideo = isRain ? RAIN_VIDEOS[rainIndex] : (params.videoSource ?? DEFAULT_VIDEO);
 
   // Track last session id so we only swap audio when the session actually changes
   const lastSessionId = useRef<string | undefined>(undefined);
@@ -127,14 +215,7 @@ const NowPlayingScreen = () => {
   if (immersive) {
     return (
       <View style={styles.immersiveContainer}>
-        <Video
-          source={bgVideo}
-          style={StyleSheet.absoluteFillObject}
-          resizeMode={ResizeMode.COVER}
-          isLooping
-          isMuted
-          shouldPlay
-        />
+        <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
         <TouchableWithoutFeedback onPress={() => setImmersive(false)}>
           <View style={StyleSheet.absoluteFill}>
             <View style={styles.exitHint}>
@@ -143,6 +224,7 @@ const NowPlayingScreen = () => {
             </View>
           </View>
         </TouchableWithoutFeedback>
+        {isRain && <RainVideoNav onPrev={goToPrevRainVideo} onNext={goToNextRainVideo} />}
       </View>
     );
   }
@@ -155,14 +237,7 @@ const NowPlayingScreen = () => {
   return (
     <View style={styles.container}>
       {/* Background video — always visible, changes per session */}
-      <Video
-        source={bgVideo}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-        isMuted
-        shouldPlay
-      />
+      <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
       {/* Dark overlay so white text stays readable */}
       <View style={styles.veil} />
 
@@ -261,6 +336,8 @@ const NowPlayingScreen = () => {
       </ScrollView>
       </Pressable>
 
+      {isRain && <RainVideoNav onPrev={goToPrevRainVideo} onNext={goToNextRainVideo} />}
+
       {/* Bottom dismiss hint */}
       <View style={styles.dismissHint}>
         <View style={styles.dismissBar} />
@@ -348,6 +425,24 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 19,
     backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  rainNavLayer: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+  },
+  rainNavBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
   },

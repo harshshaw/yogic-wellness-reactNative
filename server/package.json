@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "embed": "tsx scripts/embed.ts",
+    "embed:relationship": "tsx scripts/embed.ts data/relationship.json data/relationship-embeddings.json",
     "dev": "vercel dev",
     "deploy": "vercel --prod"
   },

@@ -1,0 +1,114 @@
+[
+  {
+    "ref": "REL-01",
+    "topic": "reflective listening",
+    "english": "When someone feels unheard, they don't need a solution first — they need to feel that their emotion landed. Reflect the feeling back before offering anything: 'It sounds like you felt dismissed.'",
+    "context": "Most recurring arguments are not about the topic on the surface. Naming the emotion underneath lowers defenses and lets the real conversation begin.",
+    "themes": ["listening", "feeling unheard", "arguments", "validation", "empathy"]
+  },
+  {
+    "ref": "REL-02",
+    "topic": "nonviolent communication",
+    "english": "Raise a hard thing without a fight by naming the observation, the feeling, and the need, then making a request: 'When plans change last minute, I feel anxious, because I need some predictability. Could we confirm the night before?'",
+    "context": "Blame makes people defend. Naming your own feeling and need behind a complaint invites a partner toward you instead of pushing them away.",
+    "themes": ["communication", "conflict", "requests", "expressing needs", "blame"]
+  },
+  {
+    "ref": "REL-03",
+    "topic": "attachment anxiety",
+    "english": "An anxious heart fears abandonment and reaches for reassurance; a partner who withdraws under pressure usually needs space to re-engage, not distance as rejection. Naming the pattern gently turns a power struggle into teamwork.",
+    "context": "Anxious and avoidant pairs get caught in a pursue-withdraw loop. Agreed reconnection rituals — a check-in time, a signal to pause — soothe both nervous systems.",
+    "themes": ["attachment", "anxiety", "abandonment", "push-pull", "reassurance", "withdrawal"]
+  },
+  {
+    "ref": "REL-04",
+    "topic": "repair after conflict",
+    "english": "After a fight, repair matters more than winning. If you're flooded, take twenty minutes to let your body calm. Then lead with your part — one thing you'd do differently — and reconnect with a small gesture before reopening the issue.",
+    "context": "The nervous system can't hear reason while flooded. A genuine repair attempt, even a clumsy one, restores safety faster than a perfect argument.",
+    "themes": ["conflict", "repair", "arguments", "flooding", "apology", "reconnection"]
+  },
+  {
+    "ref": "REL-05",
+    "topic": "boundaries",
+    "english": "A boundary is an act of love, not rejection. State it as your own limit and its impact — 'I can't keep taking calls after 9, I get too drained' — then hold the consequence you control, kindly and consistently.",
+    "context": "Boundaries said as accusations start fights. Said as self-respect, they protect the relationship from resentment that would otherwise build in silence.",
+    "themes": ["boundaries", "resentment", "saying no", "self-respect", "drained", "overstepped"]
+  },
+  {
+    "ref": "REL-06",
+    "topic": "rebuilding trust",
+    "english": "Trust doesn't return with a single apology. After betrayal it rebuilds slowly, through consistency, transparency, and real accountability over time. The wounded partner sets the pace; the other earns it through action, not words.",
+    "context": "Rushing to 'move on' re-injures the hurt person. Small, repeated proofs of reliability are what let safety grow back.",
+    "themes": ["trust", "betrayal", "cheating", "lying", "accountability", "healing"]
+  },
+  {
+    "ref": "REL-07",
+    "topic": "family expectations",
+    "english": "You can honor family and yourself at once. Where cultural duty and personal need collide, look for the respectful middle path — a boundary held with warmth rather than rebellion or self-erasure.",
+    "context": "In-law and parental pressure often force a false choice between guilt and resentment. Naming both the love and the limit keeps dignity on all sides.",
+    "themes": ["family", "in-laws", "parents", "expectations", "culture", "duty", "pressure"]
+  },
+  {
+    "ref": "REL-08",
+    "topic": "loneliness together",
+    "english": "Feeling lonely beside someone usually means the small daily turning-toward has eroded — the glances, the little questions, the shared nothings. Connection rebuilds through tiny rituals of attention, not one grand fix.",
+    "context": "Couples drift not through big betrayals but through a thousand missed small bids for connection. Rebuilding starts by answering those bids again.",
+    "themes": ["loneliness", "distance", "grown apart", "disconnection", "intimacy", "rituals"]
+  },
+  {
+    "ref": "REL-09",
+    "topic": "heartbreak and grief",
+    "english": "Let grief be grief. Heartbreak comes in waves and there is no schedule for it. You can love what was without clutching it — holding the memory with tenderness while letting the person be free to go.",
+    "context": "Trying to 'fix' heartbreak quickly only delays it. Non-attachment is not coldness; it is loving without gripping, which is what allows healing.",
+    "themes": ["heartbreak", "breakup", "divorce", "grief", "moving on", "loss", "letting go"]
+  },
+  {
+    "ref": "REL-10",
+    "topic": "jealousy",
+    "english": "Jealousy is usually fear wearing armor — fear of not being enough, or of loss. Speak the fear underneath instead of the accusation on top: 'I felt scared I don't matter to you,' opens a door that blame slams shut.",
+    "context": "Controlling behavior grows when jealousy is acted out instead of spoken. Naming the vulnerable fear invites reassurance rather than defensiveness.",
+    "themes": ["jealousy", "insecurity", "fear", "trust", "control", "comparison"]
+  },
+  {
+    "ref": "REL-11",
+    "topic": "appreciation",
+    "english": "What you attend to grows. Meeting a partner as they are — noticing one thing you're grateful for each day — quietly changes the whole climate of a relationship more than any big gesture.",
+    "context": "Contentment is not settling; it is choosing to see the good that is already present instead of only the gap between real and ideal.",
+    "themes": ["appreciation", "gratitude", "contentment", "acceptance", "positivity"]
+  },
+  {
+    "ref": "REL-12",
+    "topic": "kind honesty",
+    "english": "Speak your truth, but time it with care. Before a hard conversation, ask: is it true, is it kind, is it necessary? Honesty offered as a weapon wounds; the same truth offered with compassion can heal.",
+    "context": "Truthfulness and non-harm balance each other. Brutal honesty is often more about relief for the speaker than good for the listener.",
+    "themes": ["honesty", "truth", "kindness", "hard conversations", "communication", "timing"]
+  },
+  {
+    "ref": "REL-13",
+    "topic": "the mirror",
+    "english": "What irritates us most in a partner often points to our own unmet need or old wound. Before reacting, ask what the feeling is really about. The relationship becomes a mirror for your own growth.",
+    "context": "Strong triggers usually predate the current partner. Owning your part of a pattern is what makes lasting change possible.",
+    "themes": ["self-awareness", "triggers", "projection", "growth", "reactivity", "patterns"]
+  },
+  {
+    "ref": "REL-14",
+    "topic": "holding both sides",
+    "english": "In any conflict there are usually two people who both feel hurt and both feel right. Holding space for both perspectives — without taking sides against the absent partner — is how understanding replaces the urge to win.",
+    "context": "Advice that villainizes one person feels satisfying but rarely helps. Most couples are two good people caught in a bad pattern.",
+    "themes": ["conflict", "perspective", "empathy", "fairness", "misunderstanding", "compassion"]
+  },
+  {
+    "ref": "REL-15",
+    "topic": "loving without controlling",
+    "english": "Love holds; it does not grip. Supporting someone means wanting their growth even when it doesn't serve your comfort — offering freedom, not surveillance, and trusting rather than managing.",
+    "context": "Non-attachment in love means caring deeply while letting the other remain a free person. Control is fear; trust is love.",
+    "themes": ["non-attachment", "control", "freedom", "trust", "support", "independence"]
+  },
+  {
+    "ref": "REL-16",
+    "topic": "safety first",
+    "english": "If there is fear for your physical safety, that comes before any relationship advice. You deserve to be safe. Reach out to someone you trust and to local emergency or crisis support — no closeness is worth being harmed.",
+    "context": "When a user describes abuse or fear for their safety, wellbeing takes priority over reconciliation. The companion is a supportive tool, not a crisis service.",
+    "themes": ["safety", "abuse", "fear", "harm", "crisis", "protection"]
+  }
+]

@@ -8,8 +8,7 @@ output "api_url" {
   value       = "http://${module.ec2.public_ip}:8080/api"
 }
 
-output "db_endpoint" {
-  description = "RDS PostgreSQL endpoint"
-  value       = module.rds.db_endpoint
-  sensitive   = true
+output "db_host" {
+  description = "PostgreSQL runs locally on EC2"
+  value       = "localhost"
 }

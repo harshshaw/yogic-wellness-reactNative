@@ -26,22 +26,7 @@ module "networking" {
   environment = var.environment
 }
 
-# ── RDS (PostgreSQL) ──────────────────────────────────────────────────────────
-module "rds" {
-  source      = "./modules/rds"
-  app_name    = var.app_name
-  environment = var.environment
-
-  vpc_id             = module.networking.vpc_id
-  private_subnet_ids = module.networking.private_subnet_ids
-  app_sg_id          = module.ec2.app_sg_id
-
-  db_name     = var.db_name
-  db_username = var.db_username
-  db_password = var.db_password
-}
-
-# ── EC2 / App Server ──────────────────────────────────────────────────────────
+# ── EC2 / App Server (PostgreSQL runs on same instance) ───────────────────────
 module "ec2" {
   source      = "./modules/ec2"
   app_name    = var.app_name
@@ -51,7 +36,6 @@ module "ec2" {
   public_subnet_id  = module.networking.public_subnet_ids[0]
   key_pair_name     = var.key_pair_name
 
-  db_host     = module.rds.db_endpoint
   db_name     = var.db_name
   db_username = var.db_username
   db_password = var.db_password

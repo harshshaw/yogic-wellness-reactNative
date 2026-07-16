@@ -10,12 +10,18 @@ const ROOT = resolve(__dirname, '..');
 type Verse = {
   ref: string;
   topic: string;
-  sanskrit: string;
-  transliteration: string;
+  sanskrit?: string;
+  transliteration?: string;
   english: string;
   context: string;
   themes: string[];
 };
+
+// Input/output default to the Gita corpus, but any knowledge base with the
+// same schema can be embedded by passing file paths:
+//   tsx scripts/embed.ts data/relationship.json data/relationship-embeddings.json
+const INPUT_FILE = process.argv[2] ?? 'data/gita.json';
+const OUTPUT_FILE = process.argv[3] ?? 'data/gita-embeddings.json';
 
 type EmbeddedVerse = Verse & { embedding: number[] };
 
@@ -37,10 +43,10 @@ async function main() {
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  const raw = await readFile(resolve(ROOT, 'data/gita.json'), 'utf-8');
+  const raw = await readFile(resolve(ROOT, INPUT_FILE), 'utf-8');
   const verses: Verse[] = JSON.parse(raw);
 
-  console.log(`Embedding ${verses.length} verses with ${EMBEDDING_MODEL}...`);
+  console.log(`Embedding ${verses.length} entries from ${INPUT_FILE} with ${EMBEDDING_MODEL}...`);
 
   const texts = verses.map(toIndexableText);
   const response = await client.embeddings.create({
@@ -53,7 +59,7 @@ async function main() {
     embedding: response.data[i].embedding,
   }));
 
-  const outPath = resolve(ROOT, 'data/gita-embeddings.json');
+  const outPath = resolve(ROOT, OUTPUT_FILE);
   await writeFile(outPath, JSON.stringify(embedded), 'utf-8');
 
   console.log(`Wrote ${embedded.length} embeddings to ${outPath}`);

@@ -42,7 +42,7 @@ resource "aws_security_group" "app" {
 
 resource "aws_instance" "app" {
   ami                    = data.aws_ami.amazon_linux.id
-  instance_type          = "t3.small"
+  instance_type          = "t2.micro"
   subnet_id              = var.public_subnet_id
   vpc_security_group_ids = [aws_security_group.app.id]
   key_name               = var.key_pair_name
@@ -50,33 +50,50 @@ resource "aws_instance" "app" {
   user_data = <<-EOF
     #!/bin/bash
     yum update -y
-    yum install -y java-21-amazon-corretto
+    yum install -y java-21-amazon-corretto postgresql15-server
 
-    # Create app directory
+    # Init and start PostgreSQL
+    postgresql-setup --initdb
+    systemctl enable postgresql
+    systemctl start postgresql
+
+    # Create DB and user
+    sudo -u postgres psql <<SQL
+    CREATE USER ${var.db_username} WITH PASSWORD '${var.db_password}';
+    CREATE DATABASE ${var.db_name} OWNER ${var.db_username};
+    GRANT ALL PRIVILEGES ON DATABASE ${var.db_name} TO ${var.db_username};
+    SQL
+
+    # Allow local password auth
+    sed -i 's/ident/md5/g' /var/lib/pgsql/data/pg_hba.conf
+    systemctl restart postgresql
+
+    # Create app directory and env file
     mkdir -p /opt/karmana
     cat > /opt/karmana/.env <<ENV
-    DB_HOST=${var.db_host}
-    DB_USERNAME=${var.db_username}
-    DB_PASSWORD=${var.db_password}
-    JWT_SECRET=${var.jwt_secret}
-    ENV
+DB_HOST=localhost
+DB_NAME=${var.db_name}
+DB_USERNAME=${var.db_username}
+DB_PASSWORD=${var.db_password}
+JWT_SECRET=${var.jwt_secret}
+ENV
 
     # Systemd service so app restarts on reboot
     cat > /etc/systemd/system/karmana.service <<SERVICE
-    [Unit]
-    Description=Karmana Backend
-    After=network.target
+[Unit]
+Description=Karmana Backend
+After=network.target postgresql.service
 
-    [Service]
-    Type=simple
-    WorkingDirectory=/opt/karmana
-    EnvironmentFile=/opt/karmana/.env
-    ExecStart=/usr/bin/java -jar /opt/karmana/app.jar
-    Restart=on-failure
+[Service]
+Type=simple
+WorkingDirectory=/opt/karmana
+EnvironmentFile=/opt/karmana/.env
+ExecStart=/usr/bin/java -jar /opt/karmana/app.jar
+Restart=on-failure
 
-    [Install]
-    WantedBy=multi-user.target
-    SERVICE
+[Install]
+WantedBy=multi-user.target
+SERVICE
 
     systemctl daemon-reload
     systemctl enable karmana

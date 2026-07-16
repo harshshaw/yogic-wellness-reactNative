@@ -3,6 +3,8 @@
   "main": "./index.js",
   "version": "1.0.0",
   "scripts": {
+    "gen:reel-videos": "node ./scripts/generate-reel-videos.js",
+    "prestart": "npm run gen:reel-videos",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",

@@ -16,10 +16,14 @@ import {
   Chat,
   Frown,
   Heart,
+  HeartPulse,
   Mic,
+  Moon,
   SleepyFace,
-  Sparkles
+  Sparkles,
+  Target,
 } from './Icons';
+import type { CompanionMode } from '../lib/aiCompanion';
 
 type ChipMode = {
   id: string;
@@ -27,6 +31,22 @@ type ChipMode = {
   prompt: string;
   Icon: any;
 };
+
+type Persona = {
+  mode: CompanionMode;
+  label: string;
+  blurb: string;
+  Icon: any;
+};
+
+// The selectable companion "tabs" — each opens the chat in a distinct persona.
+const personas: Persona[] = [
+  { mode: 'Pranayama Guru',   label: 'Pranayama',    blurb: 'Breath & calm',       Icon: HeartPulse },
+  { mode: 'Gita Companion',   label: 'Gita',         blurb: 'Wisdom & meaning',    Icon: Sparkles },
+  { mode: 'Sleep Guide',      label: 'Sleep',        blurb: 'Wind down & rest',    Icon: Moon },
+  { mode: 'Confidence Coach', label: 'Confidence',   blurb: 'Courage & momentum',  Icon: Target },
+  { mode: 'Relationship Guru', label: 'Relationship', blurb: 'Love & connection',  Icon: Heart },
+];
 
 const AICompanionHomeScreen = () => {
   const navigation = useNavigation<any>();
@@ -102,6 +122,33 @@ const AICompanionHomeScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* COMPANION PERSONAS (tabs) */}
+        <View style={styles.personaHeader}>
+          <Text style={[styles.personaTitle, { color: colors.textPrimary }]}>
+            Choose a companion
+          </Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.personaRow}
+        >
+          {personas.map(p => (
+            <TouchableOpacity
+              key={p.mode}
+              style={[styles.personaCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+              activeOpacity={0.85}
+              onPress={() => launch(p.mode, '')}
+            >
+              <View style={[styles.personaIcon, { backgroundColor: colors.statPurpleSoft }]}>
+                <p.Icon size={20} color={colors.statPurple} />
+              </View>
+              <Text style={[styles.personaLabel, { color: colors.textPrimary }]}>{p.label}</Text>
+              <Text style={[styles.personaBlurb, { color: colors.textSecondary }]}>{p.blurb}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* MIC BUTTON */}
         <View style={styles.micArea}>
@@ -223,6 +270,29 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   chipLabel: { fontSize: 14, fontWeight: '600' },
+
+  // PERSONAS
+  personaHeader: { paddingHorizontal: 20, marginTop: 30 },
+  personaTitle: { fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
+  personaRow: {
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    gap: 12,
+  },
+  personaCard: {
+    width: 120,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+    alignItems: 'flex-start',
+  },
+  personaIcon: {
+    width: 40, height: 40, borderRadius: 20,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 12,
+  },
+  personaLabel: { fontSize: 14, fontWeight: '700' },
+  personaBlurb: { fontSize: 12, marginTop: 3 },
 
   // MIC
   micArea: { alignItems: 'center', marginTop: 40 },

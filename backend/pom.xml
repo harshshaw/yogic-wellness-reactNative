@@ -101,6 +101,23 @@
 
   <build>
     <plugins>
+      <!-- maven-compiler-plugin 3.12+ no longer picks up Lombok from the
+           classpath automatically; it must be declared as an annotation
+           processor path or @Getter/@Builder/@RequiredArgsConstructor silently
+           don't generate and every builder()/constructor call fails. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

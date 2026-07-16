@@ -182,6 +182,11 @@ const DEFAULT_HERO = {
   heroDesc: 'Helps you release stress and\nrelax deeply.',
 };
 
+// ─── PER-TRACK AUDIO SOURCES (keyed by soundscape item title) ──────────────
+const soundscapeSources: Record<string, ReturnType<typeof require>> = {
+  'Light Rain': require('../assets/music-playlist/rain-sound.mp4'),
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 export default function SleepScreen() {
   const navigation = useNavigation<any>();
@@ -203,8 +208,12 @@ export default function SleepScreen() {
   const playSuggestion = (title: string, sub: string) => {
     playedSuggestionRef.current = { title, sub };
     setFeedbackGiven(false);
-    playTrack();
-    navigation.navigate('NowPlaying');
+    playTrack(soundscapeSources[title]);
+    navigation.navigate('NowPlaying', {
+      id: title === 'Light Rain' ? 'rain' : undefined,
+      title,
+      mediaLabel: sub,
+    });
   };
 
   // When opened from Home's "Nature Therapy" with an autoPlay param, start the
@@ -421,7 +430,7 @@ export default function SleepScreen() {
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>{p.duration}</Text>
                 </View>
-                <TouchableOpacity style={s.popPlay} onPress={playAndOpen}>
+                <TouchableOpacity style={s.popPlay} onPress={() => playSuggestion(p.title, p.sub)}>
                   <Play size={14} color="#fff" />
                 </TouchableOpacity>
               </View>

@@ -111,6 +111,11 @@ const CoverArt = ({
   </View>
 );
 
+// ─── PER-TRACK AUDIO SOURCES ────────────────────────────────────────────
+const trackSources: Record<string, ReturnType<typeof require>> = {
+  rain: require('../assets/music-playlist/rain-sound.mp4'),
+};
+
 const symbolForTitle = (s: string) => {
   if (/sleep|night|nidra|dream|moon/i.test(s)) return '☾';
   if (/om|mantra|chant|shanti/i.test(s)) return 'ॐ';
@@ -215,7 +220,10 @@ const MusicScreen = () => {
               key={t.id}
               style={styles.carouselCard}
               activeOpacity={0.88}
-              onPress={() => { playTrack(); navigation.navigate('NowPlaying'); }}
+              onPress={() => {
+                playTrack(trackSources[t.id]);
+                navigation.navigate('NowPlaying', { id: t.id, title: t.title, mediaLabel: t.subtitle });
+              }}
             >
               <CoverArt size={150} gradient={t.gradient} symbol={symbolForTitle(t.title)} />
               <Text style={[styles.carouselTitle, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -236,7 +244,10 @@ const MusicScreen = () => {
               key={t.id}
               style={styles.gridCard}
               activeOpacity={0.88}
-              onPress={() => { playTrack(); navigation.navigate('NowPlaying'); }}
+              onPress={() => {
+                playTrack(trackSources[t.id]);
+                navigation.navigate('NowPlaying', { id: t.id, title: t.title, mediaLabel: t.subtitle });
+              }}
             >
               <CoverArt size={148} gradient={t.gradient} symbol={symbolForTitle(t.title)} />
               <Text style={[styles.gridTitle, { color: colors.textPrimary }]} numberOfLines={1}>

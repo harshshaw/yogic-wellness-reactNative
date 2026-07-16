@@ -8,8 +8,15 @@ import {
   Easing,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { useTheme } from '../hooks/useTheme';
 import { X, Pause, Play, Check } from './Icons';
+
+// Placeholder until a real breathing tutorial clip is recorded.
+const TUTORIAL_VIDEO = require('../assets/background-video/portrait2.mp4');
+
+// Screens shown in order before the breathing rings start.
+type Stage = 'disclaimer' | 'tutorial' | 'session';
 
 type Phase = 'inhale' | 'hold' | 'exhale';
 const phases: { name: Phase; label: string; secs: number; sanskrit: string }[] = [
@@ -47,6 +54,7 @@ const BreathingSessionScreen = () => {
   const accent = isSleepSession ? colors.statPurple : colors.statMint;
   const accentSoft = isSleepSession ? colors.statPurpleSoft : colors.statMintSoft;
 
+  const [stage, setStage] = useState<Stage>('disclaimer');
   const [running, setRunning] = useState(true);
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(phases[0].secs);
@@ -57,8 +65,60 @@ const BreathingSessionScreen = () => {
   const scale = useRef(new Animated.Value(1)).current;
   const aura = useRef(new Animated.Value(0.35)).current;
 
+  // ─── DISCLAIMER fade in → hold → fade out ───────────────────────────
+  const disclaimerOpacity = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    if (!running || done) return;
+    if (stage !== 'disclaimer') return;
+    const anim = Animated.sequence([
+      Animated.timing(disclaimerOpacity, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.delay(4000),
+      Animated.timing(disclaimerOpacity, {
+        toValue: 0,
+        duration: 900,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]);
+    anim.start(({ finished }) => finished && setStage('tutorial'));
+    return () => anim.stop();
+  }, [stage, disclaimerOpacity]);
+
+  // ─── TUTORIAL video fade in on start, fade out at end ───────────────
+  const tutorialOpacity = useRef(new Animated.Value(0)).current;
+  const tutorialEnding = useRef(false);
+  useEffect(() => {
+    if (stage !== 'tutorial') return;
+    tutorialEnding.current = false;
+    Animated.timing(tutorialOpacity, {
+      toValue: 1,
+      duration: 900,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [stage, tutorialOpacity]);
+
+  const endTutorial = () => {
+    if (tutorialEnding.current) return;
+    tutorialEnding.current = true;
+    Animated.timing(tutorialOpacity, {
+      toValue: 0,
+      duration: 900,
+      easing: Easing.in(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => setStage('session'));
+  };
+
+  const onTutorialStatus = (status: AVPlaybackStatus) => {
+    if (status.isLoaded && status.didJustFinish) endTutorial();
+  };
+
+  useEffect(() => {
+    if (stage !== 'session' || !running || done) return;
     const phase = phases[phaseIdx];
     const toScale = phase.name === 'inhale' ? 1.45 : phase.name === 'exhale' ? 1 : undefined;
     const toAura = phase.name === 'inhale' ? 0.85 : phase.name === 'exhale' ? 0.25 : undefined;
@@ -81,10 +141,10 @@ const BreathingSessionScreen = () => {
           }),
       ].filter(Boolean) as Animated.CompositeAnimation[]
     ).start();
-  }, [phaseIdx, running, done, scale, aura]);
+  }, [stage, phaseIdx, running, done, scale, aura]);
 
   useEffect(() => {
-    if (!running || done) return;
+    if (stage !== 'session' || !running || done) return;
     if (secondsLeft <= 0) {
       const next = (phaseIdx + 1) % phases.length;
       if (next === 0) {
@@ -101,7 +161,70 @@ const BreathingSessionScreen = () => {
     }
     const t = setTimeout(() => setSecondsLeft(s => s - 1), 1000);
     return () => clearTimeout(t);
-  }, [secondsLeft, running, done, phaseIdx, round]);
+  }, [stage, secondsLeft, running, done, phaseIdx, round]);
+
+  // ─── DISCLAIMER SCREEN ──────────────────────────────────────────────
+  if (stage === 'disclaimer') {
+    return (
+      <View style={[styles.screen, { backgroundColor: colors.bg }]}>
+        <TouchableOpacity
+          style={[
+            styles.iconBtn,
+            styles.stageClose,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+          activeOpacity={0.7}
+          onPress={() => navigation.goBack()}
+        >
+          <X size={18} color={colors.textPrimary} />
+        </TouchableOpacity>
+        <Animated.View style={[styles.disclaimerWrap, { opacity: disclaimerOpacity }]}>
+          <Text style={[styles.overline, { color: accent }]}>BEFORE WE BEGIN</Text>
+          <Text style={[styles.h1, { color: colors.textPrimary, marginTop: 10 }]}>
+            A gentle note
+          </Text>
+          <Text style={[styles.body, { color: colors.textSecondary, marginTop: 14 }]}>
+            Breathing practices are for relaxation and general wellness — they are
+            not medical advice. If you feel dizzy, light-headed, or uncomfortable
+            at any point, stop and breathe normally. If you are pregnant or have a
+            heart or respiratory condition, please consult your doctor first.
+          </Text>
+        </Animated.View>
+      </View>
+    );
+  }
+
+  // ─── TUTORIAL VIDEO ─────────────────────────────────────────────────
+  if (stage === 'tutorial') {
+    return (
+      <View style={[styles.screen, { backgroundColor: '#000' }]}>
+        <Animated.View style={[StyleSheet.absoluteFillObject, { opacity: tutorialOpacity }]}>
+          <Video
+            source={TUTORIAL_VIDEO}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay
+            onPlaybackStatusUpdate={onTutorialStatus}
+          />
+          <View style={styles.tutorialOverlay}>
+            <Text style={[styles.overline, { color: '#FFFFFF' }]}>HOW IT WORKS</Text>
+            <Text style={styles.tutorialTitle}>{title}</Text>
+            <Text style={styles.tutorialSub}>
+              Follow the circle — expand as you inhale, rest as you hold, soften
+              as you exhale.
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.skipBtn}
+            activeOpacity={0.85}
+            onPress={endTutorial}
+          >
+            <Text style={styles.skipText}>Skip tutorial</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  }
 
   // ─── COMPLETE SCREEN ────────────────────────────────────────────────
   if (done) {
@@ -393,6 +516,57 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   pillText: { fontSize: 15, fontWeight: '700' },
+
+  // DISCLAIMER
+  stageClose: {
+    position: 'absolute',
+    top: 56,
+    left: 20,
+    zIndex: 2,
+  },
+  disclaimerWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+
+  // TUTORIAL
+  tutorialOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 32,
+    paddingBottom: 120,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  tutorialTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 8,
+    letterSpacing: -0.3,
+    textAlign: 'center',
+  },
+  tutorialSub: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
+    textAlign: 'center',
+    lineHeight: 21,
+    marginTop: 10,
+    maxWidth: 300,
+  },
+  skipBtn: {
+    position: 'absolute',
+    bottom: 44,
+    alignSelf: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    borderRadius: 999,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.6)',
+  },
+  skipText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
 
   // COMPLETE
   overline: { fontSize: 11, fontWeight: '700', letterSpacing: 2.4 },
