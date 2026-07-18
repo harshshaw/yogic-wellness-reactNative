@@ -523,7 +523,11 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity activeOpacity={0.85} style={localStyles.focusCardLight}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={localStyles.focusCardLight}
+          onPress={() => navigation.navigate('Meditation')}
+        >
           <View style={[localStyles.focusIconCircle, { backgroundColor: colors.statMintSoft }]}>
             <SunIcon color={colors.statMint} />
           </View>

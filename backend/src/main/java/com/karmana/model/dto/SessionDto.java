@@ -13,6 +13,7 @@ public class SessionDto {
     public static class Request {
         @NotBlank private String type;      // breathing | meditation | sleep | music | reflection
         private String title;
+        private String technique;           // meditation only: focused-attention | body-scan | loving-kindness | mindfulness
         private Integer durationSec;
         private String mood;
     }

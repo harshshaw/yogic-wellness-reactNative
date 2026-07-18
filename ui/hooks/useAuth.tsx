@@ -115,7 +115,7 @@ export const useAuth = () => useContext(AuthContext);
 
 // ── tiny user-blob helpers (name + email cache alongside the token) ───────────
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 const USER_PATH = `${(FileSystem as any).documentDirectory}auth-user.json`;
 
 async function saveUserBlob(u: { name: string; email: string }) {

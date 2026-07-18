@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export type DayRecord = {
   date: string;       // YYYY-MM-DD

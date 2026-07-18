@@ -29,6 +29,9 @@ public class SessionCompletion {
 
     private String title;
 
+    /** For meditation sessions: focused-attention | body-scan | loving-kindness | mindfulness. */
+    private String technique;
+
     /** Duration actually practised, in seconds. */
     @Builder.Default
     private Integer durationSec = 0;

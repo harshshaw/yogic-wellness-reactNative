@@ -29,6 +29,7 @@ public class SessionService {
                 .user(user)
                 .type(req.getType())
                 .title(req.getTitle())
+                .technique(req.getTechnique())
                 .durationSec(req.getDurationSec() == null ? 0 : req.getDurationSec())
                 .mood(req.getMood())
                 .completedDate(LocalDate.now())

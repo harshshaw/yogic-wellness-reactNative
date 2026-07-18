@@ -10,6 +10,8 @@ import BreathingSessionScreen from './BreathingSessionScreen';
 import AICompanionScreen from './AICompanionScreen';
 import MorningReflectionScreen from './MorningReflectionScreen';
 import JournalScreen from './JournalScreen';
+import MeditationScreen from './MeditationScreen';
+import MeditationSessionScreen from './MeditationSessionScreen';
 import ProfileScreen from './ProfileScreen';
 import ReelsScreen from './ReelsScreen';
 
@@ -54,6 +56,16 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Journal"
         component={JournalScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="Meditation"
+        component={MeditationScreen}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="MeditationSession"
+        component={MeditationSessionScreen}
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen

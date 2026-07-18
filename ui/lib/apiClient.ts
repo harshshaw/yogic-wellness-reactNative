@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 // Physical device via Expo Go: must use Mac's LAN IP (not localhost/127.0.0.1)
 export const API_BASE = 'http://192.168.29.103:8080/api';

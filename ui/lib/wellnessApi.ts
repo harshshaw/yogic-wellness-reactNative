@@ -33,6 +33,7 @@ export async function subscribe(
 export type SessionRecord = {
   type: 'breathing' | 'meditation' | 'sleep' | 'music' | 'reflection';
   title?: string;
+  technique?: string; // meditation: focused-attention | body-scan | loving-kindness | mindfulness
   durationSec?: number;
   mood?: string;
 };
