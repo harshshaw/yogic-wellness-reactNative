@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../hooks/useTheme';
 import { Check, Sparkles } from './Icons';
 import BrandLogo from './BrandLogo';
+import { useAuth } from '../hooks/useAuth';
+import { getSubscription, subscribe } from '../lib/wellnessApi';
 
 type Plan = {
   id: string;
@@ -59,9 +62,38 @@ const FEATURES: string[] = [
 
 export default function SubscriptionScreen() {
   const { colors } = useTheme();
+  const { token } = useAuth();
   const [selected, setSelected] = useState<string>('yearly');
+  const [currentPlan, setCurrentPlan] = useState<string>('FREE'); // active plan from backend
+  const [busy, setBusy] = useState(false);
 
   const selectedPlan = PLANS.find(p => p.id === selected) ?? PLANS[1];
+
+  // Load the user's current plan and preselect it if they're already premium.
+  useEffect(() => {
+    getSubscription(token)
+      .then(sub => {
+        setCurrentPlan(sub.plan);
+        if (sub.premium && sub.plan) setSelected(sub.plan.toLowerCase());
+      })
+      .catch(() => {});
+  }, [token]);
+
+  const handleSubscribe = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      // NOTE: real billing/IAP goes here; on success we persist the plan.
+      const sub = await subscribe(token, selected);
+      setCurrentPlan(sub.plan);
+    } catch {
+      // keep the screen usable if the call fails
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const isCurrent = (planId: string) => currentPlan.toLowerCase() === planId.toLowerCase();
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
@@ -203,15 +235,19 @@ export default function SubscriptionScreen() {
       >
         <TouchableOpacity
           activeOpacity={0.9}
-          style={[styles.cta, { backgroundColor: colors.accent }]}
-          onPress={() => {
-            // TODO: hook up to in-app purchase / billing flow
-          }}
+          style={[styles.cta, { backgroundColor: colors.accent }, busy && { opacity: 0.6 }]}
+          onPress={handleSubscribe}
+          disabled={busy || isCurrent(selected)}
         >
-          <Text style={styles.ctaText}>
-            Start {selectedPlan.name} — {selectedPlan.price}
-            {selectedPlan.period === 'once' ? '' : selectedPlan.period}
-          </Text>
+          {busy ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.ctaText}>
+              {isCurrent(selected)
+                ? `${selectedPlan.name} — active`
+                : `Start ${selectedPlan.name} — ${selectedPlan.price}${selectedPlan.period === 'once' ? '' : selectedPlan.period}`}
+            </Text>
+          )}
         </TouchableOpacity>
         <Text style={[styles.restore, { color: colors.textSecondary }]}>
           Restore purchases

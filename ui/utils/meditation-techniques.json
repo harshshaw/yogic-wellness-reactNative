@@ -1,0 +1,56 @@
+{
+  "techniques": [
+    {
+      "id": "focused-attention",
+      "name": "Focused Attention",
+      "shortName": "Focus",
+      "tagline": "Anchor your attention, gently return when it wanders",
+      "why": "Sustained-attention practice measurably reduces mind-wandering and strengthens the brain networks involved in attentional control.",
+      "citation": "Lutz, Slagter, Dunne & Davidson (2008), Trends in Cognitive Sciences — attentional control mechanisms in focused-attention meditation.",
+      "sessions": [
+        { "id": "fa-5",  "title": "Breath Anchor",     "durationMin": 5,  "instruction": "Rest attention on the breath. Each time the mind wanders, gently escort it back — no judgment, just return." },
+        { "id": "fa-10", "title": "Steady Attention",  "durationMin": 10, "instruction": "Rest attention on the breath. Each time the mind wanders, gently escort it back — no judgment, just return." },
+        { "id": "fa-15", "title": "Deep Focus",         "durationMin": 15, "instruction": "Rest attention on the breath. Each time the mind wanders, gently escort it back — no judgment, just return." }
+      ]
+    },
+    {
+      "id": "body-scan",
+      "name": "Body Scan",
+      "shortName": "Body Scan",
+      "tagline": "A slow sweep of attention through the body",
+      "why": "Body scan practice is well-supported for reducing somatic anxiety and easing sleep onset, and is a core module of clinically validated MBSR programs.",
+      "citation": "Kabat-Zinn (1990); meta-analysis in Gotink et al. (2015), PLOS ONE — MBSR/MBCT outcomes across 209 studies.",
+      "sessions": [
+        { "id": "bs-8",  "title": "Quick Body Scan",   "durationMin": 8,  "instruction": "Starting at your feet, slowly move your attention upward through the body. Simply notice each area — no need to change anything." },
+        { "id": "bs-15", "title": "Full Body Scan",    "durationMin": 15, "instruction": "Starting at your feet, slowly move your attention upward through the body. Simply notice each area — no need to change anything." },
+        { "id": "bs-20", "title": "Sleep Body Scan",    "durationMin": 20, "instruction": "Starting at your feet, slowly move your attention upward through the body, releasing tension as you go. Let this ease you toward sleep." }
+      ]
+    },
+    {
+      "id": "loving-kindness",
+      "name": "Loving-Kindness",
+      "shortName": "Metta",
+      "tagline": "Direct warmth toward yourself and others",
+      "why": "Loving-kindness (metta) meditation reliably increases positive emotion and social connection, and has been shown to reduce implicit bias toward others.",
+      "citation": "Fredrickson, Cohn, Coffey, Pek & Finkel (2008), Journal of Personality and Social Psychology — broaden-and-build effects of loving-kindness meditation.",
+      "sessions": [
+        { "id": "lk-8",  "title": "Kindness for Yourself",   "durationMin": 8,  "instruction": "Silently offer yourself: 'May I be safe. May I be at ease. May I be well.' Let the phrases settle before repeating." },
+        { "id": "lk-12", "title": "Kindness for a Loved One", "durationMin": 12, "instruction": "Picture someone you care about. Silently offer: 'May you be safe. May you be at ease. May you be well.'" },
+        { "id": "lk-15", "title": "Kindness for a Hard Relationship", "durationMin": 15, "instruction": "Bring to mind someone you have friction with. Gently offer the same phrases — you are not condoning, only softening your own heart." }
+      ]
+    },
+    {
+      "id": "mindfulness",
+      "name": "Open Mindfulness",
+      "shortName": "Mindfulness",
+      "tagline": "Notice thoughts and feelings without judgment",
+      "why": "Standard MBSR-style open-awareness practice has strong RCT evidence for reducing anxiety, depression, and chronic pain.",
+      "citation": "Goyal et al. (2014), JAMA Internal Medicine — meta-analysis of 47 RCTs on mindfulness meditation programs.",
+      "sessions": [
+        { "id": "om-5",  "title": "Arriving",           "durationMin": 5,  "instruction": "Let thoughts and feelings arise and pass, like clouds. You don't need to follow them or push them away — just notice." },
+        { "id": "om-10", "title": "Open Awareness",     "durationMin": 10, "instruction": "Let thoughts and feelings arise and pass, like clouds. You don't need to follow them or push them away — just notice." },
+        { "id": "om-20", "title": "Deep Stillness",      "durationMin": 20, "instruction": "Let thoughts and feelings arise and pass, like clouds. You don't need to follow them or push them away — just notice." }
+      ]
+    }
+  ]
+}

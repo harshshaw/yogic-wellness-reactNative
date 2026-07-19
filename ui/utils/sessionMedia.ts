@@ -17,6 +17,15 @@ export const RAIN_VIDEOS: ReturnType<typeof require>[] = [
   require('../assets/background-video/rain-background-videos/rain-street.mp4'),
 ];
 
+// Pool of immersive backdrop videos for the meditation player's full-screen
+// mode. Navigable with prev/next, same as the rain pool. Add more files here.
+export const MEDITATION_VIDEOS: ReturnType<typeof require>[] = [
+  require('../assets/background-video/meditation-videos/galaxyVideo.mp4'),
+  require('../assets/background-video/meditation-videos/sky_mountians.mp4'),
+  require('../assets/background-video/meditation-videos/redGalaxy.mp4'),
+  require('../assets/background-video/meditation-videos/movingGalaxy.mp4'),
+];
+
 // Returns a random rain video, optionally avoiding the one currently showing
 // so a swipe always visibly changes the backdrop.
 export function randomRainVideo(exclude?: ReturnType<typeof require>): ReturnType<typeof require> {

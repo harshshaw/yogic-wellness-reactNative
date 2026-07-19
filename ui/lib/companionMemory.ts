@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { apiRequest } from './apiClient';
 import type { ChatMessage } from './aiCompanion';
 
