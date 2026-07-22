@@ -14,10 +14,12 @@ com/karmana/model/entity/SessionCompletion.class
 com/karmana/model/dto/ReflectionDto$Response.class
 com/karmana/model/dto/SessionDto$DayActivity.class
 com/karmana/model/dto/AuthRequest$Register.class
+com/karmana/model/entity/JournalEntry$JournalEntryBuilder.class
 com/karmana/model/entity/SessionCompletion$SessionCompletionBuilder.class
 com/karmana/model/dto/SessionDto$Request.class
 com/karmana/model/entity/UserProfile.class
 com/karmana/repository/MorningReflectionRepository.class
+com/karmana/controller/JournalController.class
 com/karmana/model/dto/SessionDto$Stats$StatsBuilder.class
 com/karmana/KarmanaApplication.class
 com/karmana/model/dto/CompanionDto$MemoryResponse.class
@@ -27,10 +29,15 @@ com/karmana/model/entity/User.class
 com/karmana/model/dto/CompanionDto$MemoryResponse$MemoryResponseBuilder.class
 com/karmana/model/entity/Subscription$Plan.class
 com/karmana/service/SubscriptionService$1.class
+com/karmana/model/entity/JournalEntry.class
 com/karmana/model/entity/Subscription.class
+com/karmana/repository/JournalEntryRepository.class
+com/karmana/model/dto/JournalDto$Request.class
 com/karmana/model/entity/Subscription$Status.class
+com/karmana/service/JournalService.class
 com/karmana/model/dto/CompanionDto$Turn.class
 com/karmana/model/dto/CompanionDto$TurnsRequest.class
+com/karmana/model/dto/JournalDto$Response$ResponseBuilder.class
 com/karmana/controller/ReflectionController.class
 com/karmana/model/dto/SubscriptionDto$Response.class
 com/karmana/service/SessionService.class
@@ -45,6 +52,7 @@ com/karmana/service/UserProfileService.class
 com/karmana/service/ReflectionService.class
 com/karmana/model/dto/SessionDto.class
 com/karmana/model/dto/AuthRequest.class
+com/karmana/model/dto/JournalDto$Response.class
 com/karmana/model/dto/SessionDto$Stats.class
 com/karmana/repository/SessionCompletionRepository.class
 com/karmana/model/entity/User$Role.class
@@ -57,6 +65,7 @@ com/karmana/model/entity/CompanionMessage.class
 com/karmana/model/dto/ReflectionDto$Response$ResponseBuilder.class
 com/karmana/model/entity/CompanionMemory.class
 com/karmana/model/dto/ProgressDto.class
+com/karmana/model/dto/JournalDto.class
 com/karmana/security/JwtAuthFilter.class
 com/karmana/model/dto/ProgressDto$ProgressDtoBuilder.class
 com/karmana/model/dto/CompanionDto.class
