@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Play, Leaf, Target, Heart, Moon, Info, Check
 import techniquesData from '../utils/meditation-techniques.json';
 import { FOUNDATIONS } from '../utils/foundations';
 import { loadCompleted } from '../lib/foundationsProgress';
+import { randomTrack, formatMin, type MeditationTrack } from '../utils/meditationMusic';
 
 type Session = { id: string; title: string; durationMin: number; instruction: string };
 type Technique = {
@@ -39,11 +40,24 @@ const MeditationScreen = () => {
   // Foundations course progress — reloaded each time the screen refocuses so a
   // just-completed module unlocks the next one.
   const [completed, setCompleted] = useState<string[]>([]);
+  // Randomised "morning mindfulness" suggestion — a fresh track each visit.
+  const [suggestion, setSuggestion] = useState<MeditationTrack>(() => randomTrack());
   useFocusEffect(
     React.useCallback(() => {
       loadCompleted().then(setCompleted);
+      setSuggestion(prev => randomTrack(prev?.id));
     }, [])
   );
+
+  const openTrack = (track: MeditationTrack) =>
+    navigation.navigate('MeditationSession', {
+      techniqueId: 'meditation-music',
+      techniqueName: 'Meditation Music',
+      title: track.title,
+      durationSec: track.durationSec,
+      audio: track.audio,
+      startImmersive: true, // meditation music always plays over a background video
+    });
   // A module is unlocked if it's first, or the previous one is completed.
   const isUnlocked = (index: number) =>
     index === 0 || completed.includes(FOUNDATIONS[index - 1].id);
@@ -90,6 +104,22 @@ const MeditationScreen = () => {
             Four techniques backed by peer-reviewed research.
           </Text>
         </View>
+
+        {/* MORNING MINDFULNESS — randomised suggestion */}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={styles.suggestCard}
+          onPress={() => openTrack(suggestion)}
+        >
+          <View style={styles.suggestText}>
+            <Text style={styles.suggestKicker}>SUGGESTED FOR YOU</Text>
+            <Text style={styles.suggestTitle}>{suggestion.title}</Text>
+            <Text style={styles.suggestMeta}>{formatMin(suggestion.durationSec)} · Meditation music</Text>
+          </View>
+          <View style={styles.suggestPlay}>
+            <Play size={20} color="#FFFFFF" />
+          </View>
+        </TouchableOpacity>
 
         {/* FOUNDATIONS COURSE */}
         <View style={[styles.courseCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -226,6 +256,20 @@ const styles = StyleSheet.create({
   overline: { fontSize: 11, fontWeight: '700', letterSpacing: 2.5 },
   title: { fontSize: 34, fontWeight: '700', letterSpacing: -0.8, marginTop: 8 },
   subtitle: { fontSize: 15, marginTop: 4 },
+
+  suggestCard: {
+    marginHorizontal: 20, marginBottom: 18, borderRadius: 20, padding: 18,
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: '#7C3AED',
+  },
+  suggestText: { flex: 1 },
+  suggestKicker: { fontSize: 10, fontWeight: '700', letterSpacing: 1.6, color: 'rgba(255,255,255,0.75)' },
+  suggestTitle: { fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginTop: 4, letterSpacing: -0.3 },
+  suggestMeta: { fontSize: 12.5, color: 'rgba(255,255,255,0.85)', marginTop: 3 },
+  suggestPlay: {
+    width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
 
   courseCard: { marginHorizontal: 20, marginBottom: 8, borderRadius: 20, borderWidth: 1, padding: 16 },
   courseHead: { marginBottom: 8 },

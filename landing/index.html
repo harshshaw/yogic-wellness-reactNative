@@ -307,6 +307,19 @@
       section.block { padding: 68px 0; }
       .hero { padding: 130px 0 60px; }
     }
+    /* quote band */
+    .quote-band {
+      padding: 84px 0; text-align: center;
+      background:
+        radial-gradient(700px 300px at 50% 0%, rgba(124,58,237,.10), transparent 70%),
+        radial-gradient(600px 300px at 50% 100%, rgba(236,72,153,.08), transparent 70%);
+    }
+    .quote-line {
+      font-size: clamp(1.7rem, 3.6vw, 2.7rem); font-weight: 500; line-height: 1.25;
+      letter-spacing: -.01em; color: var(--ink); max-width: 20ch; margin: 0 auto;
+    }
+    .quote-accent { color: var(--purple); font-style: italic; }
+
     /* early-access modal */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 200; display: none;
@@ -412,6 +425,16 @@
       <div><div class="n">∞</div><div class="l">Memory that grows with you</div></div>
     </div>
   </div>
+
+  <!-- QUOTE BAND -->
+  <section class="quote-band">
+    <div class="wrap reveal">
+      <p class="quote-line serif">
+        Sleep deeper. Wake up lighter.<br />
+        <span class="quote-accent">Find calm when life feels overwhelming.</span>
+      </p>
+    </div>
+  </section>
 
   <!-- FEATURES -->
   <section class="block" id="features">
