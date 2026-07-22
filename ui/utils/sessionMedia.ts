@@ -15,6 +15,7 @@ export const RAIN_VIDEOS: ReturnType<typeof require>[] = [
   require('../assets/background-video/rain-background-videos/rain-island.mp4'),
   require('../assets/background-video/rain-background-videos/rain-leaf.mp4'),
   require('../assets/background-video/rain-background-videos/rain-street.mp4'),
+  require('../assets/background-video/rain-background-videos/rain-on-window.mp4'),
 ];
 
 // Pool of immersive backdrop videos for the meditation player's full-screen

@@ -58,8 +58,11 @@ const MeditationSessionScreen = () => {
 
   // Immersive full-screen background video (navigable pool). All clips are kept
   // preloaded and we crossfade opacity between them, so switching is instant.
-  const [immersive, setImmersive] = useState(false);
-  const [videoIndex, setVideoIndex] = useState(0);
+  // Music tracks open straight into the video backdrop; a random clip each time.
+  const [immersive, setImmersive] = useState(!!route.params?.startImmersive);
+  const [videoIndex, setVideoIndex] = useState(() =>
+    Math.floor(Math.random() * Math.max(1, MEDITATION_VIDEOS.length))
+  );
   const hasVideo = MEDITATION_VIDEOS.length > 0;
   const prevVideo = () => setVideoIndex(i => (i - 1 + MEDITATION_VIDEOS.length) % MEDITATION_VIDEOS.length);
   const nextVideo = () => setVideoIndex(i => (i + 1) % MEDITATION_VIDEOS.length);

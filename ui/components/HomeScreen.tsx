@@ -12,6 +12,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { useAuth } from '../hooks/useAuth';
 import { useReflection } from '../hooks/useReflection';
+import { pickForReflection, formatMin } from '../utils/meditationMusic';
 import { useTheme } from '../hooks/useTheme';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
 import restData from '../utils/rest-screen-plan.json';
@@ -255,18 +256,17 @@ const HomeScreen = () => {
   const affirmation = DAILY_AFFIRMATIONS[dayIndex % DAILY_AFFIRMATIONS.length];
   const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
 
-  // derive a recommendation from reflection data
+  // derive a meditation recommendation from reflection data (from the
+  // meditation-foundation-audios library)
   const recommendation = (() => {
     if (!data) return null;
-    const lowEnergy = data.energy === 'low' || data.energy === 'slightly_low';
-    const highEnergy = data.energy === 'high' || data.energy === 'very_high';
-    const poorSleep = data.sleep === 'poor' || data.sleep === 'average';
-    const calmMood = ['calm', 'neutral', 'happy'].includes(data.mood);
-    if (lowEnergy || poorSleep || ['stressed', 'anxious', 'overwhelmed', 'sad'].includes(data.mood))
-      return { name: 'Nadi Shodhana', meta: '6 min · Alternate Nostril · Gentle', hint: 'Calms the nervous system and restores balance after a rough night or low energy morning.' };
-    if (highEnergy && calmMood)
-      return { name: 'Kapalbhati', meta: '5 min · Breath of Fire · Energising', hint: 'Channel your high energy with focused breath to sharpen concentration.' };
-    return { name: 'Box Breathing', meta: '5 min · 4-4-4-4 · Balancing', hint: 'Steadies mood and centers your mind for the day ahead.' };
+    const { track, hint } = pickForReflection(data.mood, data.energy, data.sleep);
+    return {
+      name: track.title,
+      meta: `${formatMin(track.durationSec)} · Meditation`,
+      hint,
+      track,
+    };
   })();
 
   return (
@@ -379,7 +379,14 @@ const HomeScreen = () => {
               <TouchableOpacity
                 style={localStyles.recPlay}
                 activeOpacity={0.85}
-                onPress={() => navigation.navigate('BreathingSession', { id: 'nadi', title: recommendation.name })}
+                onPress={() => navigation.navigate('MeditationSession', {
+                  techniqueId: 'meditation-music',
+                  techniqueName: 'Meditation Music',
+                  title: recommendation.name,
+                  durationSec: recommendation.track.durationSec,
+                  audio: recommendation.track.audio,
+                  startImmersive: true,
+                })}
               >
                 <PlayTriangle color="#fff" size={16} />
               </TouchableOpacity>
