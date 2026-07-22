@@ -17,7 +17,7 @@ import {
   Heart, Target,
 } from './Icons';
 import restData from '../utils/rest-screen-plan.json';
-import { MEDITATION_MUSIC, formatMin } from '../utils/meditationMusic';
+import { MEDITATION_MUSIC, MEDITATION_FOCUS, formatMin } from '../utils/meditationMusic';
 import FeedbackCelebration from './FeedbackCelebration';
 
 const { width: W } = Dimensions.get('window');
@@ -485,6 +485,50 @@ export default function SleepScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
                   <Text style={[s.popSub, { color: MUTED }]}>Meditation music</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+          })}
+        </ScrollView>
+
+        {/* ── MANTRA & FOCUS ── */}
+        <View style={s.sectionRow}>
+          <View>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Mantra &amp; Focus</Text>
+            <Text style={[s.sectionSub, { color: MUTED }]}>So Hum &amp; mantra chants to anchor the mind</Text>
+          </View>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+          {MEDITATION_FOCUS.map((t, i) => {
+            const openTrack = () =>
+              navigation.navigate('MeditationSession', {
+                techniqueId: 'meditation-music',
+                techniqueName: 'Mantra & Focus',
+                title: t.title,
+                durationSec: t.durationSec,
+                audio: t.audio,
+                startImmersive: true, // play over a meditation background video
+              });
+            return (
+            <TouchableOpacity
+              key={t.id}
+              activeOpacity={0.88}
+              style={s.popCard}
+              onPress={openTrack}
+            >
+              <View style={[s.popBg, { backgroundColor: THERAPY_COLORS[i % THERAPY_COLORS.length] }]}>
+                <View style={s.popDurationBadge}>
+                  <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
+                </View>
+                <TouchableOpacity style={s.popPlay} onPress={openTrack}>
+                  <Play size={14} color="#fff" />
+                </TouchableOpacity>
+              </View>
+              <View style={s.popInfo}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
+                  <Text style={[s.popSub, { color: MUTED }]}>Mantra &amp; focus</Text>
                 </View>
               </View>
             </TouchableOpacity>
