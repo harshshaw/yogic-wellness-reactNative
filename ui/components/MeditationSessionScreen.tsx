@@ -9,6 +9,7 @@ import { recordSession } from '../lib/wellnessApi';
 import { markCompleted } from '../lib/foundationsProgress';
 import { MEDITATION_VIDEOS } from '../utils/sessionMedia';
 import { X, Pause, Play, Check, Info, ChevronLeft, ChevronRight } from './Icons';
+import type { MediaSource } from '../lib/media';
 
 const ExpandIcon = ({ color }: { color: string }) => (
   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -44,7 +45,7 @@ const MeditationSessionScreen = () => {
 
   // Guided-audio params (Foundations course). When present, real narration
   // plays and drives the countdown; otherwise it's a silent guided timer.
-  const audioSource = route.params?.audio as ReturnType<typeof require> | undefined;
+  const audioSource = route.params?.audio as MediaSource | undefined;
   const moduleId = route.params?.moduleId as string | undefined;
   const durationSecParam = route.params?.durationSec as number | undefined;
   const hasAudio = !!audioSource;

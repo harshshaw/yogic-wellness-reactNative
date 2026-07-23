@@ -17,8 +17,9 @@ import { Video, ResizeMode } from 'expo-av';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { RAIN_VIDEOS } from '../utils/sessionMedia';
+import { media, type MediaSource } from '../lib/media';
 
-const DEFAULT_VIDEO = require('../assets/background-video/portrait2.mp4');
+const DEFAULT_VIDEO = media('background-video/portrait2.mp4');
 const CROSSFADE_MS = 500;
 
 // Stacks two <Video> layers and crossfades opacity whenever `source` changes,
@@ -28,28 +29,30 @@ const CrossfadeVideo = ({
   style,
   resizeMode,
 }: {
-  source: ReturnType<typeof require>;
+  source: MediaSource;
   style: StyleProp<ViewStyle>;
   resizeMode: ResizeMode;
 }) => {
+  // Compare by uri, not object identity: media() builds a fresh object on every
+  // call, so `===` would never match and each render would stack a new layer.
   const [layers, setLayers] = useState(() => [
-    { id: source, source, opacity: new Animated.Value(1) },
+    { id: source.uri, source, opacity: new Animated.Value(1) },
   ]);
 
   useEffect(() => {
     setLayers(prev => {
-      if (prev[prev.length - 1].source === source) return prev;
+      if (prev[prev.length - 1].source.uri === source.uri) return prev;
       const opacity = new Animated.Value(0);
       Animated.timing(opacity, {
         toValue: 1,
         duration: CROSSFADE_MS,
         useNativeDriver: true,
       }).start(() => {
-        setLayers(curr => curr.filter(l => l.source === source));
+        setLayers(curr => curr.filter(l => l.source.uri === source.uri));
       });
-      return [...prev, { id: source, source, opacity }];
+      return [...prev, { id: source.uri, source, opacity }];
     });
-  }, [source]);
+  }, [source.uri]);
 
   return (
     <View style={style}>
@@ -170,8 +173,8 @@ const NowPlayingScreen = () => {
   const route = useRoute();
   const params = (route.params ?? {}) as {
     id?: string;
-    videoSource?: ReturnType<typeof require>;
-    audioSource?: ReturnType<typeof require>;
+    videoSource?: MediaSource;
+    audioSource?: MediaSource;
     title?: string;
     mediaLabel?: string;
   };

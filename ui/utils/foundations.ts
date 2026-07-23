@@ -1,3 +1,4 @@
+import { media, type MediaSource } from '../lib/media';
 // The "Foundations" course — four sequential guided-audio modules that teach
 // the basics of meditation. Real narration lives in assets/meditation-audio/.
 
@@ -7,7 +8,7 @@ export type FoundationModule = {
   title: string;
   subtitle: string;
   durationSec: number;   // actual audio length, keeps the timer in sync
-  audio: ReturnType<typeof require>;
+  audio: MediaSource;
 };
 
 export const FOUNDATIONS: FoundationModule[] = [
@@ -17,7 +18,7 @@ export const FOUNDATIONS: FoundationModule[] = [
     title: 'Getting Started',
     subtitle: 'How to sit, hands, eyes, and what meditation really is',
     durationSec: 167,
-    audio: require('../assets/meditation-audio/gettingStartedFoundation.mp3'),
+    audio: media('meditation-audio/gettingStartedFoundation.mp3'),
   },
   {
     id: 'breath-awareness',
@@ -25,7 +26,7 @@ export const FOUNDATIONS: FoundationModule[] = [
     title: 'Breath Awareness',
     subtitle: 'Feel your natural breath, without controlling it',
     durationSec: 80,
-    audio: require('../assets/meditation-audio/breatheAwareness.mp3'),
+    audio: media('meditation-audio/breatheAwareness.mp3'),
   },
   {
     id: 'body-relaxation',
@@ -33,7 +34,7 @@ export const FOUNDATIONS: FoundationModule[] = [
     title: 'Body Relaxation',
     subtitle: 'Soften the face, jaw, shoulders and body',
     durationSec: 82,
-    audio: require('../assets/meditation-audio/bodyRelaxation.mp3'),
+    audio: media('meditation-audio/bodyRelaxation.mp3'),
   },
   {
     id: 'basic-body-scan',
@@ -41,7 +42,7 @@ export const FOUNDATIONS: FoundationModule[] = [
     title: 'Basic Body Scan',
     subtitle: 'Move attention slowly from head to feet',
     durationSec: 77,
-    audio: require('../assets/meditation-audio/bodyScan.mp3'),
+    audio: media('meditation-audio/bodyScan.mp3'),
   },
   {
     id: 'level-1',
@@ -49,6 +50,6 @@ export const FOUNDATIONS: FoundationModule[] = [
     title: 'Level 1 Meditation',
     subtitle: 'Your first full guided meditation',
     durationSec: 546,
-    audio: require('../assets/meditation-audio/mediation-1.mp3'),
+    audio: media('meditation-audio/mediation-1.mp3'),
   },
 ];

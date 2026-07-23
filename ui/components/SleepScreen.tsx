@@ -19,6 +19,7 @@ import {
 import restData from '../utils/rest-screen-plan.json';
 import { MEDITATION_MUSIC, MEDITATION_FOCUS, formatMin } from '../utils/meditationMusic';
 import FeedbackCelebration from './FeedbackCelebration';
+import { media, type MediaSource } from '../lib/media';
 
 const { width: W } = Dimensions.get('window');
 
@@ -184,8 +185,8 @@ const DEFAULT_HERO = {
 };
 
 // ─── PER-TRACK AUDIO SOURCES (keyed by soundscape item title) ──────────────
-const soundscapeSources: Record<string, ReturnType<typeof require>> = {
-  'Light Rain': require('../assets/music-playlist/rain-sound.mp4'),
+const soundscapeSources: Record<string, MediaSource> = {
+  'Light Rain': media('music-playlist/rain-sound.mp4'),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

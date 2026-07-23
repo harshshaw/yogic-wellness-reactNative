@@ -7,12 +7,13 @@ import React, {
   useState,
 } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
+import { media, type MediaSource } from '../lib/media';
 
 type AudioContextValue = {
   muted: boolean;
   toggleMuted: () => void;
   isTrackPlaying: boolean;
-  playTrack: (source?: ReturnType<typeof require>) => void;
+  playTrack: (source?: MediaSource) => void;
   pauseTrack: () => void;
   toggleTrack: () => void;
 };
@@ -26,8 +27,8 @@ const AudioContext = createContext<AudioContextValue>({
   toggleTrack: () => {},
 });
 
-const BACKGROUND_SOURCE = require('../assets/karmana-app-music.mp3');
-const TRACK_SOURCE = require('../assets/music-playlist/screen-recording.mp3');
+const BACKGROUND_SOURCE = media('karmana-app-music.mp3');
+const TRACK_SOURCE = media('music-playlist/screen-recording.mp3');
 
 export const AppMusicProvider = ({ children }: { children: React.ReactNode }) => {
   const [muted, setMuted] = useState(true);
@@ -124,7 +125,7 @@ export const AppMusicProvider = ({ children }: { children: React.ReactNode }) =>
     })();
   }, [muted]);
 
-  const playTrack = async (source?: ReturnType<typeof require>) => {
+  const playTrack = async (source?: MediaSource) => {
     const bg = bgRef.current;
     if (bg) await bg.pauseAsync().catch(() => {});
 
