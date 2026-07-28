@@ -614,7 +614,7 @@ export default function PranayamaScreen() {
                   key={i}
                   style={[s.promptChip, { borderColor: BORDER, backgroundColor: CARD }]}
                   activeOpacity={0.75}
-                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
+                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion', prompt: p.replace('\n', ' ') })}
                 >
                   <Text style={[s.promptText, { color: TEXT }]}>{p}</Text>
                 </TouchableOpacity>
@@ -623,7 +623,7 @@ export default function PranayamaScreen() {
             <TouchableOpacity
               style={[s.micBtn, { backgroundColor: GREEN }]}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
+              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion' })}
             >
               <MicIcon size={22} color="#fff" />
             </TouchableOpacity>

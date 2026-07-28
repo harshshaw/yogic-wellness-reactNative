@@ -16,7 +16,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
-import { Sparkles, X, Mic, Send, HeartPulse, Moon, Target, Heart, Volume2, VolumeX } from './Icons';
+import { Sparkles, X, Mic, Send, Moon, Target, Heart, Volume2, VolumeX } from './Icons';
 import {
   sendToCompanion,
   distillMemory,
@@ -33,10 +33,6 @@ type Mode = CompanionMode;
 type Msg = { from: 'ai' | 'user'; text: string; cite?: string; time: string };
 
 const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: string[] }> = {
-  'Pranayama Guru': {
-    open: 'Take one slow breath with me. In through the nose, out through the mouth. What feels tight right now?',
-    suggestions: ['I’m anxious', 'I need energy', 'Help me focus', 'Start a 4-7-8'],
-  },
   'Gita Companion': {
     open: 'A doubt is a door. Tell me what you are carrying — I’ll offer a quiet reflection.',
     cite: 'Inspired by the Bhagavad Gita',
@@ -58,7 +54,6 @@ const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: s
 };
 
 const modeIcons: Record<Mode, any> = {
-  'Pranayama Guru': HeartPulse,
   'Gita Companion': Sparkles,
   'Sleep Guide': Moon,
   'Confidence Coach': Target,
@@ -71,7 +66,7 @@ const timeStamp = () =>
 const AICompanionScreen = () => {
   const navigation = useNavigation();
   const route = useRoute<any>();
-  const mode = ((route.params?.mode as Mode) ?? 'Pranayama Guru') as Mode;
+  const mode = ((route.params?.mode as Mode) ?? 'Gita Companion') as Mode;
 
   const intro = greetingByMode[mode];
   const Icon = modeIcons[mode];

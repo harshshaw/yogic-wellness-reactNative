@@ -55,7 +55,7 @@ const BreatheScreen = () => {
           <TouchableOpacity
             style={[styles.sparkleBtn, { borderColor: colors.borderStrong }]}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
+            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion' })}
           >
             <Sparkles size={20} color={colors.statMint} />
           </TouchableOpacity>
@@ -89,7 +89,7 @@ const BreatheScreen = () => {
             <Text style={[styles.heroBadgeText, { color: colors.statMint }]}>AI COMPANION</Text>
           </View>
           <Text style={[styles.heroTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
-            Pranayama Guru
+            AI Companion
           </Text>
           <Text style={[styles.heroSub, { color: isNight ? 'rgba(255,255,255,0.88)' : '#0F172A' }]}>
             A calm coach for your breath. Personalized in the moment, never preachy.

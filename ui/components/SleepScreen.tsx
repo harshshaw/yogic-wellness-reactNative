@@ -20,6 +20,7 @@ import restData from '../utils/rest-screen-plan.json';
 import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, formatMin } from '../utils/meditationMusic';
 import FeedbackCelebration from './FeedbackCelebration';
 import { media, type MediaSource } from '../lib/media';
+import { shouldAskFeedback } from '../utils/restFeedback';
 
 const { width: W } = Dimensions.get('window');
 
@@ -233,10 +234,14 @@ export default function SleepScreen() {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      if (playedSuggestionRef.current && !feedbackGiven) {
-        setFeedbackItem(playedSuggestionRef.current);
+      const item = playedSuggestionRef.current;
+      if (!item || feedbackGiven) return;
+      // Ask for feedback at most once per day, on a random play — not every time.
+      shouldAskFeedback().then(ask => {
+        if (!ask) return;
+        setFeedbackItem(item);
         setFeedbackVisible(true);
-      }
+      });
     });
     return unsubscribe;
   }, [navigation, feedbackGiven]);
@@ -465,7 +470,7 @@ export default function SleepScreen() {
                 title: t.title,
                 durationSec: t.durationSec,
                 audio: t.audio,
-                startImmersive: true, // play over a meditation background video
+                startImmersive: false, // open the plain timer first; user taps the expand icon for the background video
               });
             return (
             <TouchableOpacity
@@ -509,7 +514,7 @@ export default function SleepScreen() {
                 title: t.title,
                 durationSec: t.durationSec,
                 audio: t.audio,
-                startImmersive: true, // play over a meditation background video
+                startImmersive: false, // open the plain timer first; user taps the expand icon for the background video
               });
             return (
             <TouchableOpacity
@@ -553,7 +558,7 @@ export default function SleepScreen() {
                 title: t.title,
                 durationSec: t.durationSec,
                 audio: t.audio,
-                startImmersive: true, // play over a meditation background video
+                startImmersive: false, // open the plain timer first; user taps the expand icon for the background video
               });
             return (
             <TouchableOpacity
