@@ -1,0 +1,13 @@
+# Cloud Build uploads this directory as the build context. Keep it to source —
+# the Dockerfile rebuilds the jar itself, so shipping target/ just slows uploads.
+.gcloudignore
+.git/
+.gitignore
+target/
+*.md
+.env
+.env.*
+.idea/
+*.iml
+.vscode/
+.DS_Store

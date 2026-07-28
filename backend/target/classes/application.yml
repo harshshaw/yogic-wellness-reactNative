@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/karmana
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/karmana}
     username: ${DB_USERNAME:karmana}
     password: ${DB_PASSWORD:karmana}
     driver-class-name: org.postgresql.Driver
@@ -14,7 +14,8 @@ spring:
         format_sql: true
 
 server:
-  port: 8080
+  # Cloud Run injects PORT and requires the container to listen on it.
+  port: ${PORT:8080}
   servlet:
     context-path: /api
 

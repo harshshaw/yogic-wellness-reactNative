@@ -1,7 +1,12 @@
 import * as FileSystem from 'expo-file-system/legacy';
 
-// Physical device via Expo Go: must use Mac's LAN IP (not localhost/127.0.0.1)
-export const API_BASE = 'http://192.168.29.103:8080/api';
+// Cloud Run (europe-west1). HTTPS is required on real devices — iOS App Transport
+// Security blocks cleartext HTTP, so the old LAN address only ever worked in dev.
+export const API_BASE = 'https://karmana-backend-894590249756.europe-west1.run.app/api';
+
+// Local dev against a backend on your Mac: swap in your LAN IP (not localhost —
+// Expo Go on a physical device can't reach the host's loopback).
+// export const API_BASE = 'http://192.168.29.103:8080/api';
 
 // Flip to true when testing UI without a running backend
 export const MOCK_AUTH = false;

@@ -16,7 +16,6 @@ import {
   Chat,
   Frown,
   Heart,
-  HeartPulse,
   Mic,
   Moon,
   SleepyFace,
@@ -41,7 +40,6 @@ type Persona = {
 
 // The selectable companion "tabs" — each opens the chat in a distinct persona.
 const personas: Persona[] = [
-  { mode: 'Pranayama Guru',   label: 'Pranayama',    blurb: 'Breath & calm',       Icon: HeartPulse },
   { mode: 'Gita Companion',   label: 'Gita',         blurb: 'Wisdom & meaning',    Icon: Sparkles },
   { mode: 'Sleep Guide',      label: 'Sleep',        blurb: 'Wind down & rest',    Icon: Moon },
   { mode: 'Confidence Coach', label: 'Confidence',   blurb: 'Courage & momentum',  Icon: Target },
@@ -113,7 +111,7 @@ const AICompanionHomeScreen = () => {
               key={c.id}
               style={[styles.chip, { backgroundColor: colors.card, borderColor: colors.border }]}
               activeOpacity={0.85}
-              onPress={() => launch('Pranayama Guru', c.prompt)}
+              onPress={() => launch('Gita Companion', c.prompt)}
             >
               <View style={[styles.chipIcon, { backgroundColor: colors.statPurpleSoft }]}>
                 <c.Icon size={16} color={colors.statPurple} />
@@ -156,7 +154,7 @@ const AICompanionHomeScreen = () => {
             <TouchableOpacity
               style={[styles.micBtn, { backgroundColor: colors.statPurple }]}
               activeOpacity={0.85}
-              onPress={() => launch('Pranayama Guru', '')}
+              onPress={() => launch('Gita Companion', '')}
             >
               <Mic size={28} color="#FFFFFF" />
             </TouchableOpacity>

@@ -20,6 +20,7 @@
   <properties>
     <java.version>21</java.version>
     <jjwt.version>0.12.6</jjwt.version>
+    <cloudsql.version>1.20.1</cloudsql.version>
     <!-- Override Spring Boot's managed 1.18.32; newer Lombok avoids the
          javac TypeTag :: UNKNOWN error on current JDKs. -->
     <lombok.version>1.18.46</lombok.version>
@@ -52,6 +53,15 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Cloud SQL — lets the JDBC URL reach the instance over Cloud Run's
+         unix socket without opening a public IP on the database. -->
+    <dependency>
+      <groupId>com.google.cloud.sql</groupId>
+      <artifactId>postgres-socket-factory</artifactId>
+      <version>${cloudsql.version}</version>
       <scope>runtime</scope>
     </dependency>
 

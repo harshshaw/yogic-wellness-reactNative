@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
 import { useAppMusic } from '../hooks/useAppMusic';
+import { media, type MediaSource } from '../lib/media';
 
 // ─── ICONS ──────────────────────────────────────────────────────────────
 const Search = ({ color }: { color: string }) => (
@@ -112,8 +113,8 @@ const CoverArt = ({
 );
 
 // ─── PER-TRACK AUDIO SOURCES ────────────────────────────────────────────
-const trackSources: Record<string, ReturnType<typeof require>> = {
-  rain: require('../assets/music-playlist/rain-sound.mp4'),
+const trackSources: Record<string, MediaSource> = {
+  rain: media('music-playlist/rain-sound.mp4'),
 };
 
 const symbolForTitle = (s: string) => {

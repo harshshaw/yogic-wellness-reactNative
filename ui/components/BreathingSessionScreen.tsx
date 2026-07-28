@@ -13,9 +13,10 @@ import { recordSession } from '../lib/wellnessApi';
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { useTheme } from '../hooks/useTheme';
 import { X, Pause, Play, Check } from './Icons';
+import { media } from '../lib/media';
 
 // Placeholder until a real breathing tutorial clip is recorded.
-const TUTORIAL_VIDEO = require('../assets/background-video/portrait2.mp4');
+const TUTORIAL_VIDEO = media('background-video/portrait2.mp4');
 
 // Screens shown in order before the breathing rings start.
 type Stage = 'disclaimer' | 'tutorial' | 'session';

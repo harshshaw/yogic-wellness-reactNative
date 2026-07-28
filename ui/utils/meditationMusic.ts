@@ -1,3 +1,4 @@
+import { media, type MediaSource } from '../lib/media';
 // Ambient meditation-music tracks (instrumental, no narration). Used on the
 // Rest screen and as randomised "morning mindfulness" suggestions.
 
@@ -5,40 +6,62 @@ export type MeditationTrack = {
   id: string;
   title: string;
   durationSec: number;
-  audio: ReturnType<typeof require>;
+  audio: MediaSource;
 };
 
 export const MEDITATION_MUSIC: MeditationTrack[] = [
   { id: 'deep-stillness', title: 'Deep Stillness', durationSec: 290,
-    audio: require('../assets/meditation-foundation-audios/leberch-deep-meditation-375362.mp3') },
+    audio: media('meditation-foundation-audios/leberch-deep-meditation-375362.mp3') },
   { id: 'gentle-calm', title: 'Gentle Calm', durationSec: 174,
-    audio: require('../assets/meditation-foundation-audios/leberch-meditation-509071.mp3') },
+    audio: media('meditation-foundation-audios/leberch-meditation-509071.mp3') },
   { id: 'inner-quiet', title: 'Inner Quiet', durationSec: 328,
-    audio: require('../assets/meditation-foundation-audios/leberch-meditation-510292.mp3') },
+    audio: media('meditation-foundation-audios/leberch-meditation-510292.mp3') },
   { id: 'ambient-drift', title: 'Ambient Drift', durationSec: 306,
-    audio: require('../assets/meditation-foundation-audios/leberch-meditation-ambient-375361.mp3') },
+    audio: media('meditation-foundation-audios/leberch-meditation-ambient-375361.mp3') },
   { id: 'flowing-mind', title: 'Flowing Mind', durationSec: 324,
-    audio: require('../assets/meditation-foundation-audios/leberch-meditation-meditation-music-523576.mp3') },
+    audio: media('meditation-foundation-audios/leberch-meditation-meditation-music-523576.mp3') },
   { id: 'deep-journey', title: 'Deep Journey', durationSec: 549,
-    audio: require('../assets/meditation-foundation-audios/nastelbom-meditation-463389.mp3') },
+    audio: media('meditation-foundation-audios/nastelbom-meditation-463389.mp3') },
   { id: 'quiet-phase', title: 'Quiet Phase', durationSec: 276,
-    audio: require('../assets/meditation-foundation-audios/quietphase-meditation-meditation-482096.mp3') },
+    audio: media('meditation-foundation-audios/quietphase-meditation-meditation-482096.mp3') },
   { id: 'mountain-spirit', title: 'Mountain Spirit', durationSec: 326,
-    audio: require('../assets/meditation-foundation-audios/the_mountain-spiritual-meditation-444137.mp3') },
+    audio: media('meditation-foundation-audios/the_mountain-spiritual-meditation-444137.mp3') },
   { id: 'sacred-space', title: 'Sacred Space', durationSec: 522,
-    audio: require('../assets/meditation-foundation-audios/verclub_music-meditation-music-550885.mp3') },
+    audio: media('meditation-foundation-audios/verclub_music-meditation-music-550885.mp3') },
 ];
 
-// Mantra & focus tracks (So Hum / mantra chanting) for the Rest screen.
+// Focus & Awareness — guided So Hum, mantra, concentration and breath counting.
 export const MEDITATION_FOCUS: MeditationTrack[] = [
   { id: 'so-hum-1', title: 'So Hum I', durationSec: 110,
-    audio: require('../assets/meditation-focus-audios/so-hum1.mp3') },
+    audio: media('meditation-focus-audios/so-hum1.mp3') },
   { id: 'so-hum-2', title: 'So Hum II', durationSec: 102,
-    audio: require('../assets/meditation-focus-audios/so-hum2.mp3') },
+    audio: media('meditation-focus-audios/so-hum2.mp3') },
   { id: 'so-hum-3', title: 'So Hum III', durationSec: 101,
-    audio: require('../assets/meditation-focus-audios/so-hum3.mp3') },
-  { id: 'mantra-1', title: 'Mantra', durationSec: 99,
-    audio: require('../assets/meditation-focus-audios/mantra1.mp3') },
+    audio: media('meditation-focus-audios/so-hum3.mp3') },
+  { id: 'mantra-1', title: 'Mantra: Om', durationSec: 99,
+    audio: media('meditation-focus-audios/mantra1.mp3') },
+  { id: 'mantra-2', title: 'Mantra: A Word of Your Own', durationSec: 150,
+    audio: media('meditation-focus-audios/mantra2-focus.mp3') },
+  { id: 'mantra-3', title: 'Mantra: Om Shanti', durationSec: 91,
+    audio: media('meditation-focus-audios/mantra3Shanti-focus.mp3') },
+  { id: 'concentration-1', title: 'Concentration I', durationSec: 99,
+    audio: media('meditation-focus-audios/Concentration1Focus.mp3') },
+  { id: 'concentration-2', title: 'Concentration II', durationSec: 107,
+    audio: media('meditation-focus-audios/Concentration2Focus.mp3') },
+  { id: 'breath-count-1', title: 'Breath Counting I', durationSec: 99,
+    audio: media('meditation-focus-audios/BreatheCount1-focus.mp3') },
+  { id: 'breath-count-2', title: 'Breath Counting II', durationSec: 96,
+    audio: media('meditation-focus-audios/BreatheCount2-focus.mp3') },
+];
+
+// Mindfulness — observing thoughts, noting.
+export const MEDITATION_MINDFULNESS: MeditationTrack[] = [
+  { id: 'thoughts-as-clouds', title: 'Thoughts as Clouds', durationSec: 120,
+    audio: media('Mindfullness/ThoughtsAsCloud-Mindfullness.mp3') },
+  { id: 'not-your-thoughts', title: 'You Are Not Your Thoughts', durationSec: 115,
+    audio: media('Mindfullness/YouarenotyourThought-Mindfullness.mp3') },
+  { id: 'naming-whats-here', title: "Naming What's Here", durationSec: 110,
+    audio: media('Mindfullness/NamingWhatshere-Mindfullness.mp3') },
 ];
 
 /** A random track, optionally avoiding one already showing. */

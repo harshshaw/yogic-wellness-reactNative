@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import reelsContent from '../utils/reels-content.json';
 import reelVideoSources from '../utils/reel-videos.generated';
+import type { MediaSource } from '../lib/media';
 
 const { height: SCREEN_H } = Dimensions.get('window');
 
@@ -30,7 +31,7 @@ type QuoteItem = {
 type VideoItem = {
   kind: 'video';
   id: string;
-  source: ReturnType<typeof require>;
+  source: MediaSource;
 };
 
 type FeedItem = QuoteItem | VideoItem;

@@ -9,7 +9,6 @@ export const AI_API_URL =
   'https://karmana.vercel.app';
 
 export type CompanionMode =
-  | 'Pranayama Guru'
   | 'Gita Companion'
   | 'Sleep Guide'
   | 'Confidence Coach'
