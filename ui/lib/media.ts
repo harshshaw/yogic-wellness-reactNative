@@ -5,7 +5,10 @@
 // Trade-off: these need a network connection on first play. Anything that must
 // work offline has to be bundled or cached on device — see CACHING below.
 
-const MEDIA_BASE = 'https://storage.googleapis.com/karmana-media-prod/assets';
+// Served through Google Cloud CDN (edge-cached) rather than the bucket origin.
+// media.karmana.ie -> HTTPS LB + Cloud CDN -> backend bucket (karmana-media-prod).
+// Origin fallback (direct bucket): https://storage.googleapis.com/karmana-media-prod/assets
+const MEDIA_BASE = 'https://media.karmana.ie/assets';
 
 /** What expo-av / expo-video accept in a `source` prop for remote files. */
 export type MediaSource = { uri: string };
