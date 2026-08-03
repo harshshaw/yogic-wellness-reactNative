@@ -233,11 +233,12 @@ const MeditationSessionScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* center timer */}
-        <View style={styles.immCenter} pointerEvents="none">
-          <Text style={styles.immCountdown}>{mm}:{ss}</Text>
-          {!!instruction && <Text style={styles.immInstruction}>{instruction}</Text>}
-        </View>
+        {/* center — timer hidden in full-screen; keep just any guidance text */}
+        {!!instruction && (
+          <View style={styles.immCenter} pointerEvents="none">
+            <Text style={styles.immInstruction}>{instruction}</Text>
+          </View>
+        )}
 
         {/* bottom controls */}
         <View style={styles.immControls}>

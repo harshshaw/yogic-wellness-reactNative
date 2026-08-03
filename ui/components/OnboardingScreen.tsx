@@ -47,6 +47,7 @@ export default function OnboardingScreen() {
   const { token, markOnboardingComplete } = useAuth();
 
   const [step, setStep] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
@@ -94,11 +95,40 @@ export default function OnboardingScreen() {
     goToMain();
   };
 
+  // Every detail is required before moving on (medical conditions stays optional
+  // — we don't force users to disclose sensitive health information).
+  const validateStep = (s: number): string | null => {
+    if (s === 0) {
+      if (!age.trim()) return 'Please enter your age.';
+      if (!/^\d{1,3}$/.test(age.trim()) || Number(age) < 1 || Number(age) > 120)
+        return 'Please enter a valid age.';
+      if (!gender) return 'Please select your gender.';
+      if (!occupation.trim()) return 'Please enter your occupation.';
+    }
+    if (s === 1) {
+      if (!heightCm.trim()) return 'Please enter your height.';
+      if (!weightKg.trim()) return 'Please enter your weight.';
+      if (!activityLevel) return 'Please select your activity level.';
+      if (goals.length === 0) return 'Please choose at least one goal.';
+    }
+    if (s === 2) {
+      if (!howHeard) return 'Please tell us how you heard about Karmana.';
+    }
+    return null;
+  };
+
   const next = () => {
+    const err = validateStep(step);
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError(null);
     if (step < TOTAL_STEPS - 1) setStep(step + 1);
     else finish();
   };
   const back = () => {
+    setError(null);
     if (step > 0) setStep(step - 1);
     else navigation.goBack();
   };
@@ -207,6 +237,8 @@ export default function OnboardingScreen() {
           )}
         </ScrollView>
 
+        {error && <Text style={styles.error}>{error}</Text>}
+
         {/* Footer */}
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
           <TouchableOpacity style={styles.backBtn} activeOpacity={0.7} onPress={back}>
@@ -308,6 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
   },
   multiline: { minHeight: 80, textAlignVertical: 'top' },
+  error: { color: '#EF4444', fontSize: 13, fontWeight: '600', paddingHorizontal: 28, paddingBottom: 8 },
   chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chip: {
     borderWidth: 1,

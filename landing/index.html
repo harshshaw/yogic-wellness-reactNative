@@ -363,7 +363,7 @@
     .field input:focus, .field textarea:focus { border-color: var(--purple); }
     .field textarea { resize: vertical; min-height: 74px; }
     .modal .submit { width: 100%; margin-top: 6px; }
-    .modal .hp { position: absolute; left: -9999px; }
+    .hp { position: absolute; left: -9999px; }
     .modal-success { text-align: center; padding: 12px 0 4px; }
     .modal-success .tick {
       width: 60px; height: 60px; border-radius: 50%; background: var(--mint); color: #fff;
@@ -378,6 +378,30 @@
     .price-reveal .pm-price { font-family: 'Fraunces', serif; font-size: 3.2rem; font-weight: 600; letter-spacing: -.02em; color: var(--ink); margin: 6px 0 2px; }
     .price-reveal .pm-price small { font-size: 1.05rem; color: var(--muted); font-family: 'Inter'; font-weight: 500; }
     .price-reveal .pm-note { color: var(--muted); font-size: .95rem; margin: 6px 0 22px; }
+
+    /* pricing lead-capture card */
+    .lead-card { max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px 38px; text-align: center; }
+    .lead-card .lead-title { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 600; letter-spacing: -.01em; }
+    .lead-card .lead-sub { color: var(--muted); font-size: 1.05rem; margin: 12px auto 26px; max-width: 46ch; line-height: 1.55; }
+    .lead-card form { text-align: left; }
+    .lead-card .btn { width: 100%; margin-top: 6px; }
+    .lead-done .tick { width: 56px; height: 56px; border-radius: 50%; background: var(--mint); color: #fff;
+      display: grid; place-items: center; font-size: 1.6rem; margin: 0 auto 16px; }
+    .lead-done .lead-thanks { color: var(--muted); font-size: 1rem; margin-bottom: 20px; }
+
+    /* prices modal — three plans */
+    .modal-prices { max-width: 460px; }
+    .plan-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+    .plan-row { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .plan-row.best { border-color: var(--blue); background: var(--blue-soft); }
+    .plan-row .pl-name { font-weight: 700; font-size: 1.02rem; display: flex; align-items: center; gap: 8px; }
+    .plan-row .pl-note { color: var(--muted); font-size: .82rem; margin-top: 3px; }
+    .plan-row .pl-price { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+    .plan-row .pl-price small { font-size: .82rem; color: var(--muted); font-family: 'Inter'; font-weight: 500; }
+    .plan-badge { font-size: .58rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: #fff; background: var(--blue); padding: 3px 8px; border-radius: 999px; }
   </style>
 </head>
 <body>
@@ -576,44 +600,36 @@
         <h2 class="h2 serif">Invest in yourself</h2>
         <p class="sub">Less than a single yoga class a month. Start free — upgrade when you're ready.</p>
       </div>
-      <div class="price-grid">
-        <div class="price reveal">
-          <div class="pname">Free</div>
-          <div class="plocked"><span class="lock">🔒</span> Price hidden</div>
-          <div class="pnote">Feel the shift in a single week — no card, no catch. Tap to see just how much "free" really unlocks.</div>
-          <ul>
-            <li>Daily morning reflection</li>
-            <li>Starter breathwork &amp; soundscapes</li>
-            <li>Wisdom Reels feed</li>
-            <li>A taste of the AI companion</li>
-          </ul>
-          <button type="button" class="btn btn-ghost" onclick="openPrice('free')">Click to know price</button>
+      <div class="lead-card reveal">
+        <h3 class="lead-title">Calm, for less than a single yoga class</h3>
+        <p class="lead-sub">Unlock everything Karmana offers — all 5 AI companions, the full soundscape &amp; session library, sleep, night wisdom and your personalised memory. Drop your details and we'll open up all three plans, plus your early-access invite.</p>
+
+        <!-- Netlify Forms: submissions appear in your Netlify dashboard (Forms tab). -->
+        <div id="lcForm">
+          <form name="pricing-interest" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return submitLead(event)">
+            <input type="hidden" name="form-name" value="pricing-interest" />
+            <p class="hp"><label>Don't fill this out: <input name="bot-field" /></label></p>
+            <div class="field">
+              <label for="lc-name">Name</label>
+              <input id="lc-name" type="text" name="name" placeholder="Your name" required />
+            </div>
+            <div class="field">
+              <label for="lc-email">Email</label>
+              <input id="lc-email" type="email" name="email" placeholder="you@example.com" required />
+            </div>
+            <div class="field">
+              <label for="lc-phone">Phone</label>
+              <input id="lc-phone" type="tel" name="phone" placeholder="+353 …" required />
+            </div>
+            <button type="submit" class="btn btn-primary submit">Unlock my plans →</button>
+            <p class="form-err" id="lcErr">Something went wrong. Please email support@karmana.ie instead.</p>
+          </form>
         </div>
-        <div class="price best reveal">
-          <div class="best-badge">Most popular</div>
-          <div class="pname">Monthly</div>
-          <div class="plocked"><span class="lock">🔒</span> Price hidden</div>
-          <div class="pnote">Every feature Karmana has — for less than a single yoga class. Tap to reveal your monthly price.</div>
-          <ul>
-            <li>All 5 AI companion personas</li>
-            <li>Personalised memory</li>
-            <li>Full soundscape &amp; session library</li>
-            <li>Sleep, rest &amp; night wisdom</li>
-            <li>Voice conversations</li>
-          </ul>
-          <button type="button" class="btn btn-primary" onclick="openPrice('monthly')">Click to know price</button>
-        </div>
-        <div class="price reveal">
-          <div class="pname">Yearly</div>
-          <div class="plocked"><span class="lock">🔒</span> Price hidden</div>
-          <div class="pnote">Commit to a calmer year and pay the least you ever will. Tap to see how much you save.</div>
-          <ul>
-            <li>Everything in Monthly</li>
-            <li>Save ~17% vs monthly</li>
-            <li>Priority new features</li>
-            <li>Cancel anytime</li>
-          </ul>
-          <button type="button" class="btn btn-ghost" onclick="openPrice('yearly')">Click to know price</button>
+
+        <div id="lcDone" class="lead-done" style="display:none;">
+          <div class="tick">✓</div>
+          <p class="lead-thanks" id="lcThanks">You're all set — your plans are ready to view.</p>
+          <button type="button" class="btn btn-primary submit" onclick="openPrices()">Explore prices →</button>
         </div>
       </div>
     </div>
@@ -709,44 +725,38 @@
     </div>
   </div>
 
-  <!-- PRICING modal: collect details, then reveal the price -->
-  <div class="modal-overlay" id="priceModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
-      <button class="close-x" type="button" aria-label="Close" onclick="closePrice()">✕</button>
+  <!-- PRICES modal: the three plans, shown after the lead is captured -->
+  <div class="modal-overlay" id="pricesModal">
+    <div class="modal modal-prices" role="dialog" aria-modal="true" aria-labelledby="prTitle">
+      <button class="close-x" type="button" aria-label="Close" onclick="closePrices()">✕</button>
+      <h3 id="prTitle" class="serif">Choose your plan</h3>
+      <p class="msub">Simple pricing — start free, upgrade when you're ready, cancel anytime.</p>
 
-      <div id="pmForm">
-        <h3 id="pmTitle" class="serif">See your <span id="pmPlanLabel">plan</span> price</h3>
-        <p class="msub">Tell us where to send it and we'll reveal your price right away — plus your early-access invite.</p>
-
-        <!-- Netlify Forms: submissions appear in your Netlify dashboard (Forms tab). -->
-        <form name="pricing-interest" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return submitPrice(event)">
-          <input type="hidden" name="form-name" value="pricing-interest" />
-          <input type="hidden" name="plan" id="pm-plan" value="" />
-          <p class="hp"><label>Don't fill this out: <input name="bot-field" /></label></p>
-
-          <div class="field">
-            <label for="pm-name">Name</label>
-            <input id="pm-name" type="text" name="name" placeholder="Your name" required />
+      <div class="plan-list">
+        <div class="plan-row">
+          <div>
+            <div class="pl-name">Free</div>
+            <div class="pl-note">7-day full trial — no card needed</div>
           </div>
-          <div class="field">
-            <label for="pm-email">Email</label>
-            <input id="pm-email" type="email" name="email" placeholder="you@example.com" required />
+          <div class="pl-price">Free</div>
+        </div>
+        <div class="plan-row best">
+          <div>
+            <div class="pl-name">Monthly <span class="plan-badge">Popular</span></div>
+            <div class="pl-note">The full Karmana experience</div>
           </div>
-          <div class="field">
-            <label for="pm-phone">Phone</label>
-            <input id="pm-phone" type="tel" name="phone" placeholder="+353 …" required />
+          <div class="pl-price">$15<small>/mo</small></div>
+        </div>
+        <div class="plan-row">
+          <div>
+            <div class="pl-name">Yearly</div>
+            <div class="pl-note">2 months free — best value</div>
           </div>
-          <button type="submit" class="btn btn-primary submit">Reveal my price →</button>
-          <p class="form-err" id="pmErr">Something went wrong. Please email support@karmana.ie instead.</p>
-        </form>
+          <div class="pl-price">$150<small>/yr</small></div>
+        </div>
       </div>
 
-      <div id="pmReveal" class="price-reveal" style="display:none;">
-        <div class="pm-plan" id="pmRevealPlan">Monthly</div>
-        <div class="pm-price" id="pmRevealPrice">$15<small>/month</small></div>
-        <p class="pm-note" id="pmRevealNote">The full Karmana experience.</p>
-        <a href="#get" class="btn btn-primary submit" onclick="closePrice()">Get early access →</a>
-      </div>
+      <a href="#get" class="btn btn-primary submit" style="margin-top:22px;" onclick="closePrices()">Get early access →</a>
     </div>
   </div>
 
@@ -785,37 +795,17 @@
       return false;
     }
 
-    // ── Pricing reveal modal ──
-    const PRICES = {
-      free:    { label: 'Free',    price: 'Free', priceSmall: ' for 7 days', note: 'No card, no catch — start today and feel the shift within a week.' },
-      monthly: { label: 'Monthly', price: '$15',  priceSmall: '/month',      note: 'The full Karmana experience — every feature, every companion.' },
-      yearly:  { label: 'Yearly',  price: '$150',  priceSmall: '/year',       note: '2 months free vs monthly — our best value, billed yearly.' },
-    };
-    const priceModal = document.getElementById('priceModal');
-    function openPrice(plan) {
-      const p = PRICES[plan] || PRICES.monthly;
-      document.getElementById('pm-plan').value = plan;
-      document.getElementById('pmPlanLabel').textContent = p.label.toLowerCase();
-      // ensure form view (not the reveal) is showing
-      document.getElementById('pmForm').style.display = '';
-      document.getElementById('pmReveal').style.display = 'none';
-      document.getElementById('pmErr').style.display = 'none';
-      priceModal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closePrice() {
-      priceModal.classList.remove('open');
-      document.body.style.overflow = '';
-      document.getElementById('pmForm').style.display = '';
-      document.getElementById('pmReveal').style.display = 'none';
-    }
-    priceModal.addEventListener('click', e => { if (e.target === priceModal) closePrice(); });
-    addEventListener('keydown', e => { if (e.key === 'Escape') closePrice(); });
+    // ── Pricing: inline lead capture → prices modal ──
+    const pricesModal = document.getElementById('pricesModal');
+    function openPrices() { pricesModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closePrices() { pricesModal.classList.remove('open'); document.body.style.overflow = ''; }
+    pricesModal.addEventListener('click', e => { if (e.target === pricesModal) closePrices(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') closePrices(); });
 
-    async function submitPrice(e) {
+    async function submitLead(e) {
       e.preventDefault();
       const form = e.target;
-      const err = document.getElementById('pmErr');
+      const err = document.getElementById('lcErr');
       err.style.display = 'none';
       try {
         await fetch('/', {
@@ -823,13 +813,12 @@
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(new FormData(form)).toString(),
         });
-        const plan = document.getElementById('pm-plan').value;
-        const p = PRICES[plan] || PRICES.monthly;
-        document.getElementById('pmRevealPlan').textContent = p.label;
-        document.getElementById('pmRevealPrice').innerHTML = p.price + '<small>' + p.priceSmall + '</small>';
-        document.getElementById('pmRevealNote').textContent = p.note;
-        document.getElementById('pmForm').style.display = 'none';
-        document.getElementById('pmReveal').style.display = '';
+        const name = (document.getElementById('lc-name').value || '').trim().split(' ')[0];
+        document.getElementById('lcThanks').textContent = name
+          ? `Thanks, ${name} — your plans are ready to view.`
+          : "You're all set — your plans are ready to view.";
+        document.getElementById('lcForm').style.display = 'none';
+        document.getElementById('lcDone').style.display = '';
       } catch {
         err.style.display = 'block';
       }
