@@ -347,7 +347,7 @@ const HomeScreen = () => {
           >
             <View style={localStyles.reflectionIconWrap}>
               <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
-                <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#3D74D6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
@@ -368,7 +368,7 @@ const HomeScreen = () => {
             <View style={localStyles.recTop}>
               <View style={localStyles.recIconWrap}>
                 <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-                  <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke="#3D74D6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </Svg>
               </View>
               <View style={{ flex: 1 }}>
@@ -509,7 +509,7 @@ const HomeScreen = () => {
                 {item.sub}
               </Text>
               <View style={localStyles.naturePlay}>
-                <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '700' }}>▶ Play</Text>
+                <Text style={{ fontSize: 11, color: '#5B8DEF', fontWeight: '700' }}>▶ Play</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -656,7 +656,7 @@ const localStyles = StyleSheet.create({
   reflectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#7C3AED',
+    color: '#3D74D6',
   },
   reflectionSub: {
     fontSize: 13,
@@ -668,13 +668,13 @@ const localStyles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#3D74D6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   reflectionPlayLabel: {
     fontSize: 11,
-    color: '#7C3AED',
+    color: '#3D74D6',
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 15,
@@ -693,12 +693,12 @@ const localStyles = StyleSheet.create({
     backgroundColor: 'rgba(124,58,237,0.15)',
     alignItems: 'center', justifyContent: 'center',
   },
-  recLabel: { fontSize: 11, fontWeight: '700', color: '#7C3AED', letterSpacing: 1, textTransform: 'uppercase' },
+  recLabel: { fontSize: 11, fontWeight: '700', color: '#3D74D6', letterSpacing: 1, textTransform: 'uppercase' },
   recName: { fontSize: 17, fontWeight: '800', color: '#0F172A', marginTop: 2 },
   recMeta: { fontSize: 13, color: '#6B7280', marginTop: 2 },
   recPlay: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: '#7C3AED', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#3D74D6', alignItems: 'center', justifyContent: 'center',
   },
   recHint: { fontSize: 13, color: '#4C1D95', marginTop: 12, lineHeight: 18 },
 
@@ -746,7 +746,7 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 18, marginTop: 22, marginBottom: 8,
     borderRadius: 20, borderWidth: 1, padding: 20, alignItems: 'center',
   },
-  affirmTop: { fontSize: 12, fontWeight: '700', color: '#8B5CF6', letterSpacing: 0.5, marginBottom: 10 },
+  affirmTop: { fontSize: 12, fontWeight: '700', color: '#5B8DEF', letterSpacing: 0.5, marginBottom: 10 },
   affirmText: { fontSize: 16, fontWeight: '700', textAlign: 'center', lineHeight: 24, fontStyle: 'italic' },
 });
 

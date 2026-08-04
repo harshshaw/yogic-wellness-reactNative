@@ -61,6 +61,12 @@ const REST_CARD_IMAGES: Record<string, any> = {
   'thoughts-as-clouds': require('../assets/images/rest-cards/thoughts-as-clouds.png'),
   'not-your-thoughts':  require('../assets/images/rest-cards/not-your-thoughts.png'),
   'naming-whats-here':  require('../assets/images/rest-cards/naming-whats-here.png'),
+  // Therapy — Emotional Reset
+  'anxiety-before-sleep': require('../assets/images/rest-cards/anxiety-before-sleep.png'),
+  'stress-recovery':      require('../assets/images/rest-cards/stress-recovery.png'),
+  'loneliness':           require('../assets/images/rest-cards/loneliness.png'),
+  'heartbreak':           require('../assets/images/rest-cards/heartbreak.png'),
+  'confidence-repair':    require('../assets/images/rest-cards/confidence-repair.png'),
   // Wisdom & Stories
   'steve-jobs-success':    require('../assets/images/rest-cards/steveJobsSuccessThumbnail.jpg'),
   'stoic-marcus-aurelius': require('../assets/images/rest-cards/marcus-aurelius.jpg'),
@@ -157,8 +163,9 @@ const SOUNDSCAPE_COLORS: Record<number, { color: string; soft: string; bg: strin
   3: { color: '#F59E0B', soft: 'rgba(245,158,11,0.18)',  bg: '#3d2a00' },
   4: { color: '#8B5CF6', soft: 'rgba(139,92,246,0.18)',  bg: '#1a1a3e' },
 };
-const THERAPY_COLORS = ['#F472B6', '#F59E0B', '#6366F1', '#EF4444', '#10B981'];
-const WISDOM_COLORS  = ['#F59E0B', '#6366F1', '#10B981', '#8B5CF6', '#F472B6'];
+// Blue-family accents (subtle variation) to match the Calm Blue palette.
+const THERAPY_COLORS = ['#5B8DEF', '#4667C7', '#2E8CC0', '#6D8FE0', '#3D74D6'];
+const WISDOM_COLORS  = ['#4667C7', '#5B8DEF', '#2E8CC0', '#3D74D6', '#6D8FE0'];
 
 // ─── PER-TRACK AUDIO SOURCES (keyed by soundscape item title) ──────────────
 const soundscapeSources: Record<string, MediaSource> = {
@@ -266,8 +273,8 @@ export default function SleepScreen() {
   const BORDER      = isNight ? 'rgba(255,255,255,0.08)' : '#F1F5F9';
   const TEXT        = isNight ? '#E8E9F3' : '#0F172A';
   const MUTED       = isNight ? '#8B92B0' : '#6B7280';
-  const PURPLE      = '#8B5CF6';
-  const PURPLE_SOFT = isNight ? 'rgba(139,92,246,0.18)' : '#EDE9FE';
+  const PURPLE      = isNight ? '#6EA8FF' : '#5B8DEF';
+  const PURPLE_SOFT = isNight ? 'rgba(110,168,255,0.18)' : '#E7F0FF';
 
   return (
     <View style={[s.root, { backgroundColor: BG }]}>
@@ -303,48 +310,48 @@ export default function SleepScreen() {
           </View>
         </ImageBackground>
 
-        {/* ── POPULAR SOUNDSCAPE TRACKS ── */}
+        {/* ── WISDOM & STORIES ── */}
         <View style={s.sectionRow}>
-          <Text style={[s.sectionTitle, { color: TEXT }]}>Popular Right Now</Text>
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text style={[s.linkText, { color: PURPLE }]}>View all</Text>
-          </TouchableOpacity>
+          <View>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Wisdom &amp; Stories</Text>
+            <Text style={[s.sectionSub, { color: MUTED }]}>Reflective narrations to rest into</Text>
+          </View>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
-          {[
-            ...soundscapesSection.categories![0].items.slice(0, 2).map((item, i) => ({
-              title: item, sub: soundscapesSection.categories![0].name,
-              duration: `${20 + i * 10} min`, color: SOUNDSCAPE_COLORS[1].bg,
-            })),
-            ...soundscapesSection.categories![1].items.slice(0, 2).map((item, i) => ({
-              title: item, sub: soundscapesSection.categories![1].name,
-              duration: `${25 + i * 5} min`, color: SOUNDSCAPE_COLORS[2].bg,
-            })),
-            ...soundscapesSection.categories![2].items.slice(0, 1).map((item) => ({
-              title: item, sub: soundscapesSection.categories![2].name,
-              duration: '20 min', color: SOUNDSCAPE_COLORS[3].bg,
-            })),
-          ].map((p, i) => (
-            <TouchableOpacity key={i} activeOpacity={0.88} style={s.popCard}>
-              <CardArt imageKey={p.title} color={p.color}>
-                <View style={s.popDurationBadge}>
-                  <Text style={s.popDuration}>{p.duration}</Text>
+          {WISDOM_STORIES.map((t, i) => {
+            const openTrack = () =>
+              navigation.navigate('MeditationSession', {
+                techniqueId: 'meditation-music',
+                techniqueName: 'Wisdom & Stories',
+                title: t.title,
+                durationSec: t.durationSec,
+                audio: t.audio,
+                startImmersive: false, // plain timer first; expand icon for the background video
+              });
+            return (
+              <TouchableOpacity
+                key={t.id}
+                activeOpacity={0.88}
+                style={s.popCard}
+                onPress={openTrack}
+              >
+                <CardArt imageKey={t.id} color={THERAPY_COLORS[i % THERAPY_COLORS.length]}>
+                  <View style={s.popDurationBadge}>
+                    <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
+                  </View>
+                  <TouchableOpacity style={s.popPlay} onPress={openTrack}>
+                    <Play size={14} color="#fff" />
+                  </TouchableOpacity>
+                </CardArt>
+                <View style={s.popInfo}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
+                    <Text style={[s.popSub, { color: MUTED }]}>Wisdom &amp; stories</Text>
+                  </View>
                 </View>
-                <TouchableOpacity style={s.popPlay} onPress={() => playSuggestion(p.title, p.sub)}>
-                  <Play size={14} color="#fff" />
-                </TouchableOpacity>
-              </CardArt>
-              <View style={s.popInfo}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{p.title}</Text>
-                  <Text style={[s.popSub, { color: MUTED }]}>{p.sub}</Text>
-                </View>
-                <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                  <Heart size={16} color={MUTED} />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* ── NATURE (full-screen video + sound, no timer) ── */}
@@ -538,57 +545,11 @@ export default function SleepScreen() {
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
-          {therapySection.categories!.map((cat, i) => {
-            const accent = THERAPY_COLORS[i % THERAPY_COLORS.length];
-            const track = THERAPY_EMOTIONAL_RESET[i];
-            const openTrack = () =>
-              track
-                ? navigation.navigate('MeditationSession', {
-                    techniqueId: 'meditation-music',
-                    techniqueName: 'Emotional Reset',
-                    title: track.title,
-                    durationSec: track.durationSec,
-                    audio: track.audio,
-                    startImmersive: false, // plain timer first; expand icon for the background video
-                  })
-                : playAndOpen();
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                activeOpacity={0.88}
-                style={[s.therapyCard, { backgroundColor: isNight ? '#1A2040' : CARD, borderColor: BORDER }]}
-                onPress={openTrack}
-              >
-                <View style={[s.therapyIcon, { backgroundColor: `${accent}22` }]}>
-                  <TherapyIcon size={20} color={accent} />
-                </View>
-                <Text style={[s.therapyTitle, { color: TEXT }]}>{cat.name}</Text>
-                {cat.items.length > 0 && (
-                  <Text style={[s.therapySub, { color: MUTED }]} numberOfLines={2}>
-                    {cat.items[0]}
-                  </Text>
-                )}
-                <View style={[s.therapyPlayBtn, { backgroundColor: accent }]}>
-                  <Play size={12} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        {/* ── WISDOM & STORIES ── */}
-        <View style={s.sectionRow}>
-          <View>
-            <Text style={[s.sectionTitle, { color: TEXT }]}>Wisdom &amp; Stories</Text>
-            <Text style={[s.sectionSub, { color: MUTED }]}>Reflective narrations to rest into</Text>
-          </View>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
-          {WISDOM_STORIES.map((t, i) => {
+          {THERAPY_EMOTIONAL_RESET.map((t, i) => {
             const openTrack = () =>
               navigation.navigate('MeditationSession', {
                 techniqueId: 'meditation-music',
-                techniqueName: 'Wisdom & Stories',
+                techniqueName: 'Emotional Reset',
                 title: t.title,
                 durationSec: t.durationSec,
                 audio: t.audio,
@@ -612,12 +573,56 @@ export default function SleepScreen() {
                 <View style={s.popInfo}>
                   <View style={{ flex: 1 }}>
                     <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
-                    <Text style={[s.popSub, { color: MUTED }]}>Wisdom &amp; stories</Text>
+                    <Text style={[s.popSub, { color: MUTED }]}>Emotional reset</Text>
                   </View>
                 </View>
               </TouchableOpacity>
             );
           })}
+        </ScrollView>
+
+        {/* ── POPULAR SOUNDSCAPE TRACKS ── */}
+        <View style={s.sectionRow}>
+          <Text style={[s.sectionTitle, { color: TEXT }]}>Popular Right Now</Text>
+          <TouchableOpacity activeOpacity={0.7}>
+            <Text style={[s.linkText, { color: PURPLE }]}>View all</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+          {[
+            ...soundscapesSection.categories![0].items.slice(0, 2).map((item, i) => ({
+              title: item, sub: soundscapesSection.categories![0].name,
+              duration: `${20 + i * 10} min`, color: SOUNDSCAPE_COLORS[1].bg,
+            })),
+            ...soundscapesSection.categories![1].items.slice(0, 2).map((item, i) => ({
+              title: item, sub: soundscapesSection.categories![1].name,
+              duration: `${25 + i * 5} min`, color: SOUNDSCAPE_COLORS[2].bg,
+            })),
+            ...soundscapesSection.categories![2].items.slice(0, 1).map((item) => ({
+              title: item, sub: soundscapesSection.categories![2].name,
+              duration: '20 min', color: SOUNDSCAPE_COLORS[3].bg,
+            })),
+          ].map((p, i) => (
+            <TouchableOpacity key={i} activeOpacity={0.88} style={s.popCard}>
+              <CardArt imageKey={p.title} color={p.color}>
+                <View style={s.popDurationBadge}>
+                  <Text style={s.popDuration}>{p.duration}</Text>
+                </View>
+                <TouchableOpacity style={s.popPlay} onPress={() => playSuggestion(p.title, p.sub)}>
+                  <Play size={14} color="#fff" />
+                </TouchableOpacity>
+              </CardArt>
+              <View style={s.popInfo}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{p.title}</Text>
+                  <Text style={[s.popSub, { color: MUTED }]}>{p.sub}</Text>
+                </View>
+                <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Heart size={16} color={MUTED} />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
 
         {/* ── WIND DOWN PLAN ── */}
@@ -641,7 +646,7 @@ export default function SleepScreen() {
             {[
               { label: 'Relaxing\nMusic',  Icon: MusicIcon, color: PURPLE,    pick: windDownPicks.music,   technique: 'Relaxing Music' },
               { label: 'Calm\nTherapy',    Icon: Wind,      color: PURPLE,    pick: windDownPicks.therapy, technique: 'Emotional Reset' },
-              { label: 'Positive\nStory',  Icon: BookIcon,  color: '#10B981', pick: windDownPicks.story,   technique: 'Wisdom & Stories' },
+              { label: 'Positive\nStory',  Icon: BookIcon,  color: '#3D74D6', pick: windDownPicks.story,   technique: 'Wisdom & Stories' },
             ].map((step, i, arr) => (
               <React.Fragment key={step.label}>
                 <TouchableOpacity

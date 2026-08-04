@@ -53,7 +53,7 @@ const AICompanionHomeScreen = () => {
   const isNight = mode === 'night';
 
   const heroGradient: readonly [string, string, string] = isNight
-    ? ['#2A2150', '#1F1A40', '#15123A']
+    ? ['#1B2A4A', '#152140', '#0E1730']
     : ['#F3E8FF', '#EDE9FE', '#E0E7FF'];
     
 
