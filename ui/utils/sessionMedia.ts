@@ -28,6 +28,20 @@ export const MEDITATION_VIDEOS: MediaSource[] = [
   media('background-video/meditation-videos/movingGalaxy.mp4'),
 ];
 
+// Long, self-contained nature videos (each already carries its own audio).
+// Played full-screen with sound and no timer — see NatureVideoScreen.
+export type NatureVideo = { id: string; title: string; sub: string; source: MediaSource };
+export const NATURE_VIDEOS: NatureVideo[] = [
+  { id: 'himalayan-wind',  title: 'Himalayan Wind',        sub: 'High mountain air',
+    source: media('Nature-videos/Himalayan%20Wind_prob3.mp4') },
+  { id: 'ocean-waves',     title: 'Ocean Waves',           sub: 'Rolling surf',
+    source: media('Nature-videos/Ocean%20Waves_prob3.mp4') },
+  { id: 'redwood-forest',  title: 'Redwood Forest at Dusk', sub: 'Tall trees, fading light',
+    source: media('Nature-videos/Redwood%20Forest%20at%20Dusk_prob3.mp4') },
+  { id: 'tibetan-bowls',   title: 'Tibetan Bowls',         sub: 'Resonant singing bowls',
+    source: media('Nature-videos/Tibetan%20Bowls_prob3.mp4') },
+];
+
 // Returns a random rain video, optionally avoiding the one currently showing
 // so a swipe always visibly changes the backdrop.
 export function randomRainVideo(exclude?: MediaSource): MediaSource {

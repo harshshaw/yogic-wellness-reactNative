@@ -21,8 +21,69 @@ import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, formatMin }
 import FeedbackCelebration from './FeedbackCelebration';
 import { media, type MediaSource } from '../lib/media';
 import { shouldAskFeedback } from '../utils/restFeedback';
+import { NATURE_VIDEOS } from '../utils/sessionMedia';
 
 const { width: W } = Dimensions.get('window');
+
+// Dark nature tones for the full-screen video cards (no thumbnail art).
+const NATURE_COLORS = ['#22463a', '#123a44', '#3a2f1a', '#243a5a'];
+
+// Card artwork keyed by soundscape title / meditation-music track id. Cards
+// without an entry fall back to their solid colour.
+const REST_CARD_IMAGES: Record<string, any> = {
+  'Light Rain':       require('../assets/images/rest-cards/light-rain.png'),
+  'Thunder Storm':    require('../assets/images/rest-cards/thunder-storm.png'),
+  'Forest':           require('../assets/images/rest-cards/forest.png'),
+  'Waterfall':        require('../assets/images/rest-cards/waterfall.png'),
+  'Temple Ambience':  require('../assets/images/rest-cards/temple-ambience.png'),
+  'deep-stillness':   require('../assets/images/rest-cards/deep-stillness.png'),
+  'gentle-calm':      require('../assets/images/rest-cards/gentle-calm.png'),
+  'inner-quiet':      require('../assets/images/rest-cards/inner-quiet.png'),
+  'ambient-drift':    require('../assets/images/rest-cards/ambient-drift.png'),
+  'flowing-mind':     require('../assets/images/rest-cards/flowing-mind.png'),
+  // Meditation Music (remaining) + Mantra & Focus
+  'deep-journey':     require('../assets/images/rest-cards/deep-journey.png'),
+  'quiet-phase':      require('../assets/images/rest-cards/quiet-phase.png'),
+  'mountain-spirit':  require('../assets/images/rest-cards/mountain-spirit.png'),
+  'sacred-space':     require('../assets/images/rest-cards/sacred-space.png'),
+  'so-hum-1':         require('../assets/images/rest-cards/so-hum-1.png'),
+  'so-hum-2':         require('../assets/images/rest-cards/so-hum-2.png'),
+  'so-hum-3':         require('../assets/images/rest-cards/so-hum-3.png'),
+  'mantra-1':         require('../assets/images/rest-cards/mantra-1.png'),
+  'mantra-2':         require('../assets/images/rest-cards/mantra-2.png'),
+  'mantra-3':         require('../assets/images/rest-cards/mantra-3.png'),
+  // Concentration + Breath Counting (Mantra & Focus) and Mindfulness
+  'concentration-1':  require('../assets/images/rest-cards/concentration-1.png'),
+  'concentration-2':  require('../assets/images/rest-cards/concentration-2.png'),
+  'breath-count-1':   require('../assets/images/rest-cards/breath-count-1.png'),
+  'breath-count-2':   require('../assets/images/rest-cards/breath-count-2.png'),
+  'thoughts-as-clouds': require('../assets/images/rest-cards/thoughts-as-clouds.png'),
+  'not-your-thoughts':  require('../assets/images/rest-cards/not-your-thoughts.png'),
+  'naming-whats-here':  require('../assets/images/rest-cards/naming-whats-here.png'),
+};
+
+// The artwork area at the top of a "popular" card — a photo when we have one
+// for this track, otherwise the original solid colour. Children (duration badge
+// + play button) render on top either way.
+const CardArt = ({
+  imageKey,
+  color,
+  children,
+}: {
+  imageKey?: string;
+  color: string;
+  children: React.ReactNode;
+}) => {
+  const img = imageKey ? REST_CARD_IMAGES[imageKey] : undefined;
+  if (img) {
+    return (
+      <ImageBackground source={img} style={s.popBg} imageStyle={{ borderRadius: 14 }}>
+        {children}
+      </ImageBackground>
+    );
+  }
+  return <View style={[s.popBg, { backgroundColor: color }]}>{children}</View>;
+};
 
 // ── inline icons ───────────────────────────────────────────────────────────────
 const BrainIcon = ({ size = 22, color = '#fff' }) => (
@@ -433,14 +494,14 @@ export default function SleepScreen() {
             })),
           ].map((p, i) => (
             <TouchableOpacity key={i} activeOpacity={0.88} style={s.popCard}>
-              <View style={[s.popBg, { backgroundColor: p.color }]}>
+              <CardArt imageKey={p.title} color={p.color}>
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>{p.duration}</Text>
                 </View>
                 <TouchableOpacity style={s.popPlay} onPress={() => playSuggestion(p.title, p.sub)}>
                   <Play size={14} color="#fff" />
                 </TouchableOpacity>
-              </View>
+              </CardArt>
               <View style={s.popInfo}>
                 <View style={{ flex: 1 }}>
                   <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{p.title}</Text>
@@ -449,6 +510,39 @@ export default function SleepScreen() {
                 <TouchableOpacity hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                   <Heart size={16} color={MUTED} />
                 </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* ── NATURE (full-screen video + sound, no timer) ── */}
+        <View style={s.sectionRow}>
+          <View>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Nature</Text>
+            <Text style={[s.sectionSub, { color: MUTED }]}>Long visual escapes — full screen, with sound</Text>
+          </View>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+          {NATURE_VIDEOS.map((v, i) => (
+            <TouchableOpacity
+              key={v.id}
+              activeOpacity={0.88}
+              style={s.popCard}
+              onPress={() => navigation.navigate('NatureVideo', { index: i })}
+            >
+              <View style={[s.popBg, { backgroundColor: NATURE_COLORS[i % NATURE_COLORS.length] }]}>
+                <View style={s.popDurationBadge}>
+                  <Text style={s.popDuration}>Video</Text>
+                </View>
+                <View style={s.popPlay}>
+                  <Play size={14} color="#fff" />
+                </View>
+              </View>
+              <View style={s.popInfo}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{v.title}</Text>
+                  <Text style={[s.popSub, { color: MUTED }]}>{v.sub}</Text>
+                </View>
               </View>
             </TouchableOpacity>
           ))}
@@ -479,14 +573,14 @@ export default function SleepScreen() {
               style={s.popCard}
               onPress={openTrack}
             >
-              <View style={[s.popBg, { backgroundColor: WISDOM_COLORS[i % WISDOM_COLORS.length] }]}>
+              <CardArt imageKey={t.id} color={WISDOM_COLORS[i % WISDOM_COLORS.length]}>
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
                 </View>
                 <TouchableOpacity style={s.popPlay} onPress={openTrack}>
                   <Play size={14} color="#fff" />
                 </TouchableOpacity>
-              </View>
+              </CardArt>
               <View style={s.popInfo}>
                 <View style={{ flex: 1 }}>
                   <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
@@ -523,14 +617,14 @@ export default function SleepScreen() {
               style={s.popCard}
               onPress={openTrack}
             >
-              <View style={[s.popBg, { backgroundColor: THERAPY_COLORS[i % THERAPY_COLORS.length] }]}>
+              <CardArt imageKey={t.id} color={THERAPY_COLORS[i % THERAPY_COLORS.length]}>
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
                 </View>
                 <TouchableOpacity style={s.popPlay} onPress={openTrack}>
                   <Play size={14} color="#fff" />
                 </TouchableOpacity>
-              </View>
+              </CardArt>
               <View style={s.popInfo}>
                 <View style={{ flex: 1 }}>
                   <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
@@ -567,14 +661,14 @@ export default function SleepScreen() {
               style={s.popCard}
               onPress={openTrack}
             >
-              <View style={[s.popBg, { backgroundColor: WISDOM_COLORS[(i + 2) % WISDOM_COLORS.length] }]}>
+              <CardArt imageKey={t.id} color={WISDOM_COLORS[(i + 2) % WISDOM_COLORS.length]}>
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
                 </View>
                 <TouchableOpacity style={s.popPlay} onPress={openTrack}>
                   <Play size={14} color="#fff" />
                 </TouchableOpacity>
-              </View>
+              </CardArt>
               <View style={s.popInfo}>
                 <View style={{ flex: 1 }}>
                   <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
