@@ -84,9 +84,32 @@ export const WISDOM_STORIES: MeditationTrack[] = [
     audio: media('audios/successStories/steveJobs-success.mp3') },
   { id: 'stoic-marcus-aurelius', title: 'Stoic Wisdom: Marcus Aurelius', durationSec: 184,
     audio: media('audios/stoicWisdom/stoicWisdom-Marcus%20Aurelius.mp3') },
+  { id: 'life-wisdom-detachment', title: 'Life Wisdom: Detachment from Outcomes', durationSec: 177,
+    audio: media('audios/lifeWisdom/life%20Widsom-%20detachment%20from%20outcomes.mp3') },
   { id: 'confidence-before-sleep', title: 'Confidence Before Sleep', durationSec: 151,
     audio: media('audios/confidenceBeforeSleep/confidence-before-sleep.mp3') },
 ];
+
+// A single flat pool of every guided/spoken audio track — used for the
+// "Recommended for you" hero and the Wind Down plan's random picks.
+export const ALL_REST_AUDIO: MeditationTrack[] = [
+  ...MEDITATION_MUSIC,
+  ...MEDITATION_FOCUS,
+  ...MEDITATION_MINDFULNESS,
+  ...THERAPY_EMOTIONAL_RESET,
+  ...WISDOM_STORIES,
+];
+
+/** A random track from the whole library (optionally excluding one id). */
+export function randomRestTrack(excludeId?: string): MeditationTrack {
+  const pool = excludeId ? ALL_REST_AUDIO.filter(t => t.id !== excludeId) : ALL_REST_AUDIO;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/** A random track from a given list (safe if the list is empty → undefined). */
+export function randomFrom(list: MeditationTrack[]): MeditationTrack | undefined {
+  return list.length ? list[Math.floor(Math.random() * list.length)] : undefined;
+}
 
 /** A random track, optionally avoiding one already showing. */
 export function randomTrack(excludeId?: string): MeditationTrack {

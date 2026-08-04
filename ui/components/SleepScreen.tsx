@@ -18,7 +18,7 @@ import {
   Heart, Target,
 } from './Icons';
 import restData from '../utils/rest-screen-plan.json';
-import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, THERAPY_EMOTIONAL_RESET, WISDOM_STORIES, formatMin } from '../utils/meditationMusic';
+import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, THERAPY_EMOTIONAL_RESET, WISDOM_STORIES, randomRestTrack, randomFrom, formatMin, type MeditationTrack } from '../utils/meditationMusic';
 import FeedbackCelebration from './FeedbackCelebration';
 import { media, type MediaSource } from '../lib/media';
 import { shouldAskFeedback } from '../utils/restFeedback';
@@ -61,6 +61,11 @@ const REST_CARD_IMAGES: Record<string, any> = {
   'thoughts-as-clouds': require('../assets/images/rest-cards/thoughts-as-clouds.png'),
   'not-your-thoughts':  require('../assets/images/rest-cards/not-your-thoughts.png'),
   'naming-whats-here':  require('../assets/images/rest-cards/naming-whats-here.png'),
+  // Wisdom & Stories
+  'steve-jobs-success':    require('../assets/images/rest-cards/steveJobsSuccessThumbnail.jpg'),
+  'stoic-marcus-aurelius': require('../assets/images/rest-cards/marcus-aurelius.jpg'),
+  'life-wisdom-detachment': require('../assets/images/rest-cards/wisdom.jpg'),
+  'confidence-before-sleep': require('../assets/images/rest-cards/confiedencebeforesleep.jpg'),
 };
 
 // The artwork area at the top of a "popular" card — a photo when we have one
@@ -143,7 +148,6 @@ const getGreeting = () => {
 
 // ── Pull data from JSON ────────────────────────────────────────────────────────
 const soundscapesSection = restData.sections.find((s) => s.id === 1)!;
-const nightWisdomSection = restData.sections.find((s) => s.id === 2)!;
 const therapySection     = restData.sections.find((s) => s.id === 3)!;
 
 // Color palette per soundscape category id
@@ -155,97 +159,6 @@ const SOUNDSCAPE_COLORS: Record<number, { color: string; soft: string; bg: strin
 };
 const THERAPY_COLORS = ['#F472B6', '#F59E0B', '#6366F1', '#EF4444', '#10B981'];
 const WISDOM_COLORS  = ['#F59E0B', '#6366F1', '#10B981', '#8B5CF6', '#F472B6'];
-
-// ── Mood → hero + suggested content ───────────────────────────────────────────
-type MoodSuggestion = {
-  pill: string;
-  heroTitle: string;
-  heroMeta: string;
-  heroDesc: string;
-  suggestedItems: { title: string; sub: string; color: string; duration: string }[];
-};
-
-const MOOD_SUGGESTIONS: Record<string, MoodSuggestion> = {
-  overthinking: {
-    pill: 'For Overthinking',
-    heroTitle: 'Calm the Racing Mind',
-    heroMeta: '15 min  •  Guided Audio',
-    heroDesc: 'Release racing thoughts and find stillness.',
-    suggestedItems: [
-      { title: 'Overthinking Tonight',    sub: 'Anxiety Before Sleep',  color: '#4C1D95', duration: '10 min' },
-      { title: 'Letting Go of Control',   sub: 'Anxiety Before Sleep',  color: '#1e3a5f', duration: '8 min'  },
-      { title: 'Rain on Window',          sub: 'Rain Collection',       color: '#1e3a5f', duration: '30 min' },
-      { title: 'Marcus Aurelius',         sub: 'Stoic Wisdom',          color: '#2a1a3e', duration: '12 min' },
-    ],
-  },
-  tired: {
-    pill: 'For Tiredness',
-    heroTitle: 'Deep Rest Mode',
-    heroMeta: '30 min  •  Sound Bath',
-    heroDesc: 'Let go and sink into deep, restful sleep.',
-    suggestedItems: [
-      { title: 'White Noise',             sub: 'Color Noise',           color: '#1a1a3e', duration: '60 min' },
-      { title: 'Brown Noise',             sub: 'Color Noise',           color: '#2a1506', duration: '60 min' },
-      { title: 'Stress Recovery',         sub: 'Therapy',               color: '#1a3328', duration: '12 min' },
-      { title: 'Small Wins Today',        sub: 'Gratitude Journey',     color: '#1a2a3e', duration: '5 min'  },
-    ],
-  },
-  calm: {
-    pill: 'Stay Calm',
-    heroTitle: 'Deepen Your Peace',
-    heroMeta: '20 min  •  Indian Spiritual',
-    heroDesc: 'Immerse in sacred sounds that nourish the soul.',
-    suggestedItems: [
-      { title: 'Temple Ambience',         sub: 'Indian Spiritual',      color: '#3d2a00', duration: '20 min' },
-      { title: 'Himalayan Dawn',          sub: 'Indian Spiritual',      color: '#2a1a0a', duration: '25 min' },
-      { title: 'Inner Peace',             sub: 'Life Wisdom',           color: '#1a3328', duration: '10 min' },
-      { title: 'Gratitude Reflection',    sub: 'Gratitude Journey',     color: '#2a1a3e', duration: '5 min'  },
-    ],
-  },
-  emotional: {
-    pill: 'Emotional Support',
-    heroTitle: 'You Are Not Alone',
-    heroMeta: '15 min  •  Healing Audio',
-    heroDesc: 'Gentle support to process and release emotions.',
-    suggestedItems: [
-      { title: 'Heart Break',             sub: 'Therapy',               color: '#4C1D1D', duration: '15 min' },
-      { title: 'Confidence Repair',       sub: 'Therapy',               color: '#1a1a3e', duration: '12 min' },
-      { title: 'You Are Making Progress', sub: 'Confidence Before Sleep',color: '#1a2a1a', duration: '5 min'  },
-      { title: 'Tibetan Bowls',           sub: 'Indian Spiritual',      color: '#3d2a00', duration: '20 min' },
-    ],
-  },
-  'low-energy': {
-    pill: 'For Low Energy',
-    heroTitle: 'Recharge Your Spirit',
-    heroMeta: '12 min  •  Recovery',
-    heroDesc: 'Gentle energy restoration for body and mind.',
-    suggestedItems: [
-      { title: 'Stress Recovery',         sub: 'Therapy',               color: '#1a3328', duration: '12 min' },
-      { title: 'Ocean Waves',             sub: 'Nature',                color: '#1e3a5f', duration: '30 min' },
-      { title: 'J.K. Rowling\'s Rejections', sub: 'Success Stories',   color: '#2a1a3e', duration: '8 min'  },
-      { title: 'Tomorrow is a New Day',   sub: 'Confidence Before Sleep',color: '#1a2a1a', duration: '5 min' },
-    ],
-  },
-  focus: {
-    pill: 'Sharpen Focus',
-    heroTitle: 'Enter the Zone',
-    heroMeta: '25 min  •  Focus Sounds',
-    heroDesc: 'Binaural beats and ambient tones for deep focus.',
-    suggestedItems: [
-      { title: 'Pink Noise',              sub: 'Color Noise',           color: '#2a1a3e', duration: '60 min' },
-      { title: 'Soft Tanpura',            sub: 'Indian Spiritual',      color: '#3d2a00', duration: '20 min' },
-      { title: 'Seneca',                  sub: 'Stoic Wisdom',          color: '#1a1a3e', duration: '10 min' },
-      { title: 'Detachment from Outcomes',sub: 'Life Wisdom',           color: '#1a3328', duration: '8 min'  },
-    ],
-  },
-};
-
-const DEFAULT_HERO = {
-  pill: 'Recommended for you',
-  heroTitle: 'Calm the Mind',
-  heroMeta: '12 min  •  Guided Audio',
-  heroDesc: 'Helps you release stress and\nrelax deeply.',
-};
 
 // ─── PER-TRACK AUDIO SOURCES (keyed by soundscape item title) ──────────────
 const soundscapeSources: Record<string, MediaSource> = {
@@ -280,6 +193,27 @@ export default function SleepScreen() {
       mediaLabel: sub,
     });
   };
+
+  // Open the guided-audio player for a specific track (plain timer first; the
+  // expand icon brings in the background video) — same behaviour as the cards.
+  const openTrack = (track: MeditationTrack, techniqueName: string) =>
+    navigation.navigate('MeditationSession', {
+      techniqueId: 'meditation-music',
+      techniqueName,
+      title: track.title,
+      durationSec: track.durationSec,
+      audio: track.audio,
+      startImmersive: false,
+    });
+
+  // Random picks, chosen once per screen mount: one "Recommended for you" track
+  // and one per Wind Down category.
+  const [recommended] = useState<MeditationTrack>(() => randomRestTrack());
+  const [windDownPicks] = useState(() => ({
+    music:   randomFrom(MEDITATION_MUSIC),
+    therapy: randomFrom(THERAPY_EMOTIONAL_RESET),
+    story:   randomFrom(WISDOM_STORIES),
+  }));
 
   // When opened from Home's "Nature Therapy" with an autoPlay param, start the
   // chosen soundscape and open the player, then clear the param so it doesn't
@@ -325,19 +259,7 @@ export default function SleepScreen() {
   };
 
   const isNight = mode === 'night';
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-
-  const moods = [
-    { key: 'overthinking', label: 'Overthinking', Icon: BrainIcon, color: '#8B5CF6' },
-    { key: 'tired',        label: 'Tired',         Icon: Moon,      color: '#6366F1' },
-    { key: 'calm',         label: 'Need Calm',     Icon: Leaf,      color: '#10B981' },
-    { key: 'emotional',    label: 'Emotional',     Icon: Heart,     color: '#F472B6' },
-    { key: 'low-energy',   label: 'Low Energy',    Icon: BoltIcon,  color: '#F59E0B' },
-    { key: 'focus',        label: 'Need Focus',    Icon: Target,    color: '#3B82F6' },
-  ];
-
-  const hero = selectedMood ? MOOD_SUGGESTIONS[selectedMood] : DEFAULT_HERO;
-  const suggestedItems = selectedMood ? MOOD_SUGGESTIONS[selectedMood].suggestedItems : null;
+  const [selectedMood] = useState<string | null>(null);
 
   const BG          = isNight ? '#0B1024' : '#F8F9FF';
   const CARD        = isNight ? '#161B33' : '#FFFFFF';
@@ -359,30 +281,6 @@ export default function SleepScreen() {
           </View>
         </View>
 
-        {/* ── MOOD CHECK ── */}
-        <Text style={[s.sectionTitle, { color: TEXT, paddingHorizontal: 20, marginBottom: 14 }]}>
-          How are you feeling right now?
-        </Text>
-        <View style={s.moodGrid}>
-          {moods.map((m) => {
-            const active = selectedMood === m.key;
-            return (
-              <TouchableOpacity
-                key={m.key}
-                activeOpacity={0.8}
-                onPress={() => setSelectedMood(active ? null : m.key)}
-                style={[
-                  s.moodChip,
-                  { backgroundColor: active ? m.color : CARD, borderColor: active ? m.color : BORDER },
-                ]}
-              >
-                <m.Icon size={20} color={active ? '#fff' : m.color} />
-                <Text style={[s.moodLabel, { color: active ? '#fff' : TEXT }]}>{m.label}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
         {/* ── HERO CARD ── */}
         <ImageBackground
           source={images.sleepHero}
@@ -393,84 +291,17 @@ export default function SleepScreen() {
           <View style={s.heroContent}>
             <View style={s.recPill}>
               <Sparkles size={13} color={PURPLE} />
-              <Text style={[s.recPillText, { color: '#fff' }]}>{hero.pill}</Text>
+              <Text style={[s.recPillText, { color: '#fff' }]}>Recommended for you</Text>
             </View>
-            <Text style={s.heroTitle}>{hero.heroTitle}</Text>
-            <Text style={s.heroMeta}>{hero.heroMeta}</Text>
-            <Text style={s.heroDesc}>{hero.heroDesc}</Text>
-            <TouchableOpacity style={s.heroBtn} activeOpacity={0.88} onPress={playAndOpen}>
+            <Text style={s.heroTitle}>{recommended.title}</Text>
+            <Text style={s.heroMeta}>{formatMin(recommended.durationSec)}  •  Guided Audio</Text>
+            <Text style={s.heroDesc}>A moment of calm,{'\n'}picked just for you.</Text>
+            <TouchableOpacity style={s.heroBtn} activeOpacity={0.88} onPress={() => openTrack(recommended, 'Recommended')}>
               <Play size={13} color="#fff" />
               <Text style={s.heroBtnText}>Play Now</Text>
             </TouchableOpacity>
           </View>
         </ImageBackground>
-
-        {/* ── MOOD SUGGESTIONS (shown when mood is selected) ── */}
-        {suggestedItems && (
-          <View style={{ marginBottom: 28 }}>
-            <View style={s.sectionRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={[s.sectionTitle, { color: TEXT }]}>Suggested for You</Text>
-                <Text style={[s.sectionSub, { color: MUTED }]}>Based on how you're feeling</Text>
-              </View>
-              <TouchableOpacity activeOpacity={0.7}>
-                <Text style={[s.linkText, { color: PURPLE }]}>View all</Text>
-              </TouchableOpacity>
-            </View>
-            {suggestedItems.map((item, i) => (
-              <TouchableOpacity
-                key={i}
-                activeOpacity={0.85}
-                style={[s.suggestRow, { backgroundColor: CARD, borderColor: BORDER }]}
-                onPress={() => playSuggestion(item.title, item.sub)}
-              >
-                <View style={[s.suggestArt, { backgroundColor: item.color }]}>
-                  <MusicIcon size={16} color="#fff" />
-                </View>
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={[s.suggestTitle, { color: TEXT }]} numberOfLines={1}>{item.title}</Text>
-                  <Text style={[s.suggestSub, { color: MUTED }]}>{item.sub}  ·  {item.duration}</Text>
-                </View>
-                <TouchableOpacity style={[s.suggestPlay, { backgroundColor: PURPLE }]} onPress={() => playSuggestion(item.title, item.sub)}>
-                  <Play size={13} color="#fff" />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        {/* ── SOUNDSCAPES ── */}
-        <View style={s.sectionRow}>
-          <View>
-            <Text style={[s.sectionTitle, { color: TEXT }]}>{soundscapesSection.name}</Text>
-            <Text style={[s.sectionSub, { color: MUTED }]}>Sleep sounds & ambient music</Text>
-          </View>
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text style={[s.linkText, { color: PURPLE }]}>View all</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
-          {soundscapesSection.categories!.map((cat) => {
-            const palette = SOUNDSCAPE_COLORS[cat.id] ?? SOUNDSCAPE_COLORS[1];
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                activeOpacity={0.85}
-                style={[s.catCard, { backgroundColor: isNight ? '#1A2040' : CARD, borderColor: BORDER }]}
-              >
-                <View style={[s.catIcon, { backgroundColor: palette.soft }]}>
-                  <MusicIcon size={22} color={palette.color} />
-                </View>
-                <Text style={[s.catTitle, { color: TEXT }]}>{cat.name}</Text>
-                <Text style={[s.catSub, { color: MUTED }]}>{cat.items.slice(0, 2).join('\n')}</Text>
-                <TouchableOpacity style={s.catFooter} activeOpacity={0.7}>
-                  <Text style={[s.catCount, { color: palette.color }]}>{cat.items.length} tracks</Text>
-                  <ChevronRight size={13} color={palette.color} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
 
         {/* ── POPULAR SOUNDSCAPE TRACKS ── */}
         <View style={s.sectionRow}>
@@ -789,49 +620,6 @@ export default function SleepScreen() {
           })}
         </ScrollView>
 
-        {/* ── NIGHT WISDOM ── */}
-        <View style={s.sectionRow}>
-          <View>
-            <Text style={[s.sectionTitle, { color: TEXT }]}>{nightWisdomSection.name}</Text>
-            <Text style={[s.sectionSub, { color: MUTED }]}>{nightWisdomSection.altName}</Text>
-          </View>
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text style={[s.linkText, { color: PURPLE }]}>View all</Text>
-          </TouchableOpacity>
-        </View>
-        {nightWisdomSection.categories!.map((cat, i) => {
-          const accent = WISDOM_COLORS[i % WISDOM_COLORS.length];
-          return (
-            <TouchableOpacity
-              key={cat.id}
-              activeOpacity={0.85}
-              style={[s.wisdomRow, { backgroundColor: CARD, borderColor: BORDER }]}
-              onPress={playAndOpen}
-            >
-              <View style={[s.wisdomIcon, { backgroundColor: `${accent}22` }]}>
-                {i === 0 ? <StarIcon size={18} color={accent} /> :
-                 i === 1 ? <ZenIcon size={18} color={accent} /> :
-                 i === 2 ? <LightbulbIcon size={18} color={accent} /> :
-                 i === 3 ? <TherapyIcon size={18} color={accent} /> :
-                           <Heart size={18} color={accent} />}
-              </View>
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={[s.wisdomTitle, { color: TEXT }]}>{cat.name}</Text>
-                {cat.items.length > 0 && (
-                  <Text style={[s.wisdomSub, { color: MUTED }]} numberOfLines={1}>
-                    {cat.items.slice(0, 2).join('  ·  ')}
-                    {cat.items.length > 2 ? ` +${cat.items.length - 2} more` : ''}
-                  </Text>
-                )}
-                {('format' in cat) && (
-                  <Text style={[s.wisdomFormat, { color: accent }]}>{(cat as any).format}</Text>
-                )}
-              </View>
-              <ChevronRight size={16} color={MUTED} />
-            </TouchableOpacity>
-          );
-        })}
-
         {/* ── WIND DOWN PLAN ── */}
         <View style={[s.planCard, { backgroundColor: CARD, borderColor: BORDER }]}>
           <View style={s.planHeader}>
@@ -840,28 +628,48 @@ export default function SleepScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[s.planTitle, { color: TEXT }]}>Wind Down Plan</Text>
-              <Text style={[s.planMeta, { color: MUTED }]}>3 steps  •  32 min</Text>
+              <Text style={[s.planMeta, { color: MUTED }]}>
+                3 steps  •  {formatMin(
+                  (windDownPicks.music?.durationSec ?? 0) +
+                  (windDownPicks.therapy?.durationSec ?? 0) +
+                  (windDownPicks.story?.durationSec ?? 0)
+                )}
+              </Text>
             </View>
           </View>
           <View style={s.planSteps}>
             {[
-              { label: 'Relaxing\nMusic', mins: '10 min', Icon: MusicIcon,  color: PURPLE },
-              { label: 'Calm\nTherapy',  mins: '12 min', Icon: Wind,       color: PURPLE },
-              { label: 'Positive\nStory',mins: '10 min', Icon: BookIcon,   color: '#10B981' },
+              { label: 'Relaxing\nMusic',  Icon: MusicIcon, color: PURPLE,    pick: windDownPicks.music,   technique: 'Relaxing Music' },
+              { label: 'Calm\nTherapy',    Icon: Wind,      color: PURPLE,    pick: windDownPicks.therapy, technique: 'Emotional Reset' },
+              { label: 'Positive\nStory',  Icon: BookIcon,  color: '#10B981', pick: windDownPicks.story,   technique: 'Wisdom & Stories' },
             ].map((step, i, arr) => (
               <React.Fragment key={step.label}>
-                <View style={s.planStep}>
+                <TouchableOpacity
+                  style={s.planStep}
+                  activeOpacity={0.8}
+                  disabled={!step.pick}
+                  onPress={() => step.pick && openTrack(step.pick, step.technique)}
+                >
                   <View style={[s.planStepIcon, { backgroundColor: PURPLE_SOFT }]}>
                     <step.Icon size={18} color={step.color} />
                   </View>
                   <Text style={[s.planStepLabel, { color: TEXT }]}>{step.label}</Text>
-                  <Text style={[s.planStepMins, { color: MUTED }]}>{step.mins}</Text>
-                </View>
+                  <Text style={[s.planStepMins, { color: MUTED }]}>
+                    {step.pick ? formatMin(step.pick.durationSec) : '—'}
+                  </Text>
+                </TouchableOpacity>
                 {i < arr.length - 1 && <View style={[s.planDash, { borderColor: BORDER }]} />}
               </React.Fragment>
             ))}
           </View>
-          <TouchableOpacity style={[s.planBtn, { backgroundColor: PURPLE }]} activeOpacity={0.88} onPress={playAndOpen}>
+          <TouchableOpacity
+            style={[s.planBtn, { backgroundColor: PURPLE }]}
+            activeOpacity={0.88}
+            onPress={() => {
+              const first = windDownPicks.music ?? windDownPicks.therapy ?? windDownPicks.story;
+              if (first) openTrack(first, 'Wind Down Plan');
+            }}
+          >
             <Text style={s.planBtnText}>Start Plan</Text>
           </TouchableOpacity>
         </View>

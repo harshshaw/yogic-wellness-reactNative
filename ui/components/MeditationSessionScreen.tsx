@@ -7,7 +7,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 import { recordSession } from '../lib/wellnessApi';
 import { markCompleted } from '../lib/foundationsProgress';
-import { MEDITATION_VIDEOS } from '../utils/sessionMedia';
+import { pickMeditationVideos } from '../utils/sessionMedia';
 import { X, Pause, Play, Check, Info, ChevronLeft, ChevronRight } from './Icons';
 import type { MediaSource } from '../lib/media';
 
@@ -61,15 +61,18 @@ const MeditationSessionScreen = () => {
   // preloaded and we crossfade opacity between them, so switching is instant.
   // Music tracks open straight into the video backdrop; a random clip each time.
   const [immersive, setImmersive] = useState(!!route.params?.startImmersive);
+  // A fresh random subset of background clips each session (kept stable while
+  // mounted) so we don't overload the decoder with the whole library.
+  const [videoPool] = useState(() => pickMeditationVideos(5));
   const [videoIndex, setVideoIndex] = useState(() =>
-    Math.floor(Math.random() * Math.max(1, MEDITATION_VIDEOS.length))
+    Math.floor(Math.random() * Math.max(1, videoPool.length))
   );
-  const hasVideo = MEDITATION_VIDEOS.length > 0;
-  const prevVideo = () => setVideoIndex(i => (i - 1 + MEDITATION_VIDEOS.length) % MEDITATION_VIDEOS.length);
-  const nextVideo = () => setVideoIndex(i => (i + 1) % MEDITATION_VIDEOS.length);
+  const hasVideo = videoPool.length > 0;
+  const prevVideo = () => setVideoIndex(i => (i - 1 + videoPool.length) % videoPool.length);
+  const nextVideo = () => setVideoIndex(i => (i + 1) % videoPool.length);
 
   const videoOpacities = useRef(
-    MEDITATION_VIDEOS.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))
+    videoPool.map((_, i) => new Animated.Value(i === videoIndex ? 1 : 0))
   ).current;
   useEffect(() => {
     Animated.parallel(
@@ -197,7 +200,7 @@ const MeditationSessionScreen = () => {
       <View style={styles.immersive}>
         {/* All clips stay mounted + playing; we crossfade opacity so switching
             is instant with no reload flash. */}
-        {MEDITATION_VIDEOS.map((src, i) => (
+        {videoPool.map((src, i) => (
           <Animated.View
             key={i}
             style={[StyleSheet.absoluteFillObject, { opacity: videoOpacities[i] }]}

@@ -26,7 +26,33 @@ export const MEDITATION_VIDEOS: MediaSource[] = [
   media('background-video/meditation-videos/sky_mountians.mp4'),
   media('background-video/meditation-videos/redGalaxy.mp4'),
   media('background-video/meditation-videos/movingGalaxy.mp4'),
+  media('background-video/meditation-videos/134208-758855400.mp4'),
+  media('background-video/meditation-videos/173085-848555574.mp4'),
+  media('background-video/meditation-videos/175977-854481148.mp4'),
+  media('background-video/meditation-videos/177608-857728962.mp4'),
+  media('background-video/meditation-videos/177849-858853161.mp4'),
+  media('background-video/meditation-videos/183969-872226597.mp4'),
+  media('background-video/meditation-videos/198939-909336004.mp4'),
+  media('background-video/meditation-videos/209264.mp4'),
+  media('background-video/meditation-videos/217028.mp4'),
+  media('background-video/meditation-videos/283431.mp4'),
+  media('background-video/meditation-videos/319751_medium.mp4'),
+  media('background-video/meditation-videos/359535.mp4'),
+  media('background-video/meditation-videos/367164.mp4'),
 ];
+
+// Mobile devices can only decode a few videos at once, and the immersive player
+// keeps its whole pool mounted for instant cross-fades. So each session mounts a
+// small RANDOM subset of the library rather than all of them — different clips
+// each time, without overloading the decoder.
+export function pickMeditationVideos(count = 5): MediaSource[] {
+  const shuffled = [...MEDITATION_VIDEOS];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
 
 // Long, self-contained nature videos (each already carries its own audio).
 // Played full-screen with sound and no timer — see NatureVideoScreen.
