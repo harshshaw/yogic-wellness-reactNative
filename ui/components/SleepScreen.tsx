@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
+  Image,
   Dimensions,
 } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
@@ -17,7 +18,7 @@ import {
   Heart, Target,
 } from './Icons';
 import restData from '../utils/rest-screen-plan.json';
-import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, formatMin } from '../utils/meditationMusic';
+import { MEDITATION_MUSIC, MEDITATION_FOCUS, MEDITATION_MINDFULNESS, THERAPY_EMOTIONAL_RESET, WISDOM_STORIES, formatMin } from '../utils/meditationMusic';
 import FeedbackCelebration from './FeedbackCelebration';
 import { media, type MediaSource } from '../lib/media';
 import { shouldAskFeedback } from '../utils/restFeedback';
@@ -25,8 +26,8 @@ import { NATURE_VIDEOS } from '../utils/sessionMedia';
 
 const { width: W } = Dimensions.get('window');
 
-// Dark nature tones for the full-screen video cards (no thumbnail art).
-const NATURE_COLORS = ['#22463a', '#123a44', '#3a2f1a', '#243a5a'];
+// Sprite sheet: 4 portrait panels side-by-side, one per NATURE_VIDEOS entry in order.
+const NATURE_THUMB = require('../assets/images/longvideos-thumbnail.png');
 
 // Card artwork keyed by soundscape title / meditation-music track id. Cards
 // without an entry fall back to their solid colour.
@@ -530,7 +531,22 @@ export default function SleepScreen() {
               style={s.popCard}
               onPress={() => navigation.navigate('NatureVideo', { index: i })}
             >
-              <View style={[s.popBg, { backgroundColor: NATURE_COLORS[i % NATURE_COLORS.length] }]}>
+              <View style={s.popBg}>
+                <View style={StyleSheet.absoluteFill}>
+                  <Image
+                    source={NATURE_THUMB}
+                    style={{
+                      width: POP_W * 4,
+                      // Sprite is 1536×1024 → height = width * (1024/1536)
+                      height: POP_W * 4 * (1024 / 1536),
+                      position: 'absolute',
+                      left: -i * POP_W,
+                      // Center vertically in the 140px card
+                      top: -(POP_W * 4 * (1024 / 1536) - 140) / 2,
+                    }}
+                    resizeMode="stretch"
+                  />
+                </View>
                 <View style={s.popDurationBadge}>
                   <Text style={s.popDuration}>Video</Text>
                 </View>
@@ -693,12 +709,24 @@ export default function SleepScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
           {therapySection.categories!.map((cat, i) => {
             const accent = THERAPY_COLORS[i % THERAPY_COLORS.length];
+            const track = THERAPY_EMOTIONAL_RESET[i];
+            const openTrack = () =>
+              track
+                ? navigation.navigate('MeditationSession', {
+                    techniqueId: 'meditation-music',
+                    techniqueName: 'Emotional Reset',
+                    title: track.title,
+                    durationSec: track.durationSec,
+                    audio: track.audio,
+                    startImmersive: false, // plain timer first; expand icon for the background video
+                  })
+                : playAndOpen();
             return (
               <TouchableOpacity
                 key={cat.id}
                 activeOpacity={0.88}
                 style={[s.therapyCard, { backgroundColor: isNight ? '#1A2040' : CARD, borderColor: BORDER }]}
-                onPress={playAndOpen}
+                onPress={openTrack}
               >
                 <View style={[s.therapyIcon, { backgroundColor: `${accent}22` }]}>
                   <TherapyIcon size={20} color={accent} />
@@ -711,6 +739,50 @@ export default function SleepScreen() {
                 )}
                 <View style={[s.therapyPlayBtn, { backgroundColor: accent }]}>
                   <Play size={12} color="#fff" />
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        {/* ── WISDOM & STORIES ── */}
+        <View style={s.sectionRow}>
+          <View>
+            <Text style={[s.sectionTitle, { color: TEXT }]}>Wisdom &amp; Stories</Text>
+            <Text style={[s.sectionSub, { color: MUTED }]}>Reflective narrations to rest into</Text>
+          </View>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+          {WISDOM_STORIES.map((t, i) => {
+            const openTrack = () =>
+              navigation.navigate('MeditationSession', {
+                techniqueId: 'meditation-music',
+                techniqueName: 'Wisdom & Stories',
+                title: t.title,
+                durationSec: t.durationSec,
+                audio: t.audio,
+                startImmersive: false, // plain timer first; expand icon for the background video
+              });
+            return (
+              <TouchableOpacity
+                key={t.id}
+                activeOpacity={0.88}
+                style={s.popCard}
+                onPress={openTrack}
+              >
+                <CardArt imageKey={t.id} color={THERAPY_COLORS[i % THERAPY_COLORS.length]}>
+                  <View style={s.popDurationBadge}>
+                    <Text style={s.popDuration}>{formatMin(t.durationSec)}</Text>
+                  </View>
+                  <TouchableOpacity style={s.popPlay} onPress={openTrack}>
+                    <Play size={14} color="#fff" />
+                  </TouchableOpacity>
+                </CardArt>
+                <View style={s.popInfo}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[s.popTitle, { color: TEXT }]} numberOfLines={1}>{t.title}</Text>
+                    <Text style={[s.popSub, { color: MUTED }]}>Wisdom &amp; stories</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             );

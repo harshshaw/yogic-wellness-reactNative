@@ -64,6 +64,30 @@ export const MEDITATION_MINDFULNESS: MeditationTrack[] = [
     audio: media('Mindfullness/NamingWhatshere-Mindfullness.mp3') },
 ];
 
+// Emotional Reset — short guided therapy sessions for hard feelings.
+export const THERAPY_EMOTIONAL_RESET: MeditationTrack[] = [
+  { id: 'anxiety-before-sleep', title: 'Anxiety Before Sleep', durationSec: 110,
+    audio: media('Therapy-Emotional-Reset/anxiety-before-sleep.mp3') },
+  { id: 'stress-recovery', title: 'Stress Recovery', durationSec: 111,
+    audio: media('Therapy-Emotional-Reset/stressRecovery.mp3') },
+  { id: 'loneliness', title: 'Loneliness', durationSec: 111,
+    audio: media('Therapy-Emotional-Reset/loneliness.mp3') },
+  { id: 'heartbreak', title: 'Heartbreak', durationSec: 111,
+    audio: media('Therapy-Emotional-Reset/HeartBreak.mp3') },
+  { id: 'confidence-repair', title: 'Confidence Repair', durationSec: 113,
+    audio: media('Therapy-Emotional-Reset/confidenceRepair.mp3') },
+];
+
+// Wisdom & Stories — longer reflective narrations to rest into.
+export const WISDOM_STORIES: MeditationTrack[] = [
+  { id: 'steve-jobs-success', title: 'Steve Jobs: Turning Setbacks Around', durationSec: 202,
+    audio: media('audios/successStories/steveJobs-success.mp3') },
+  { id: 'stoic-marcus-aurelius', title: 'Stoic Wisdom: Marcus Aurelius', durationSec: 184,
+    audio: media('audios/stoicWisdom/stoicWisdom-Marcus%20Aurelius.mp3') },
+  { id: 'confidence-before-sleep', title: 'Confidence Before Sleep', durationSec: 151,
+    audio: media('audios/confidenceBeforeSleep/confidence-before-sleep.mp3') },
+];
+
 /** A random track, optionally avoiding one already showing. */
 export function randomTrack(excludeId?: string): MeditationTrack {
   if (MEDITATION_MUSIC.length === 1) return MEDITATION_MUSIC[0];
