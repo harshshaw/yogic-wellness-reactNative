@@ -59,19 +59,18 @@ const dayColors: ThemeColors = {
   statRoseSoft: '#ECEFFF',
 };
 
-// Warm-blue night theme — deep navy surfaces, soft blue-white text, a friendly
-// warm-blue accent for buttons, cohesive cool secondaries + one warm amber pop.
+// Black night theme — near-black base with blue accents layered on top.
 const nightColors: ThemeColors = {
-  bg: '#0C1526',
-  card: '#14203A',
-  cardLight: '#1D2C4A',
+  bg: '#000000',
+  card: '#0E1015',
+  cardLight: '#16181F',
   textPrimary: '#EAF1FC',
-  textSecondary: '#93A3C4',
-  border: 'rgba(150,180,240,0.12)',
+  textSecondary: '#8A93A8',
+  border: 'rgba(140,165,220,0.12)',
   borderStrong: 'rgba(110,168,255,0.34)',
   accent: '#6EA8FF',
   accentSoft: 'rgba(110,168,255,0.16)',
-  overlay: 'rgba(8,14,30,0.72)',
+  overlay: 'rgba(0,0,0,0.75)',
   statOrange: '#7FA8E0',
   statOrangeSoft: 'rgba(127,168,224,0.15)',
   statMint: '#6FC3E8',

@@ -268,8 +268,8 @@ export default function SleepScreen() {
   const isNight = mode === 'night';
   const [selectedMood] = useState<string | null>(null);
 
-  const BG          = isNight ? '#0B1024' : '#F8F9FF';
-  const CARD        = isNight ? '#161B33' : '#FFFFFF';
+  const BG          = isNight ? '#000000' : '#F8F9FF';
+  const CARD        = isNight ? '#0E1015' : '#FFFFFF';
   const BORDER      = isNight ? 'rgba(255,255,255,0.08)' : '#F1F5F9';
   const TEXT        = isNight ? '#E8E9F3' : '#0F172A';
   const MUTED       = isNight ? '#8B92B0' : '#6B7280';
