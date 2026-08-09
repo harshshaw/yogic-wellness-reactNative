@@ -44,6 +44,9 @@ const BreatheScreen = () => {
     { id: 'focus',    title: 'Focus & Clarity', meta: '5 min · Alternate Nostril', Icon: Leaf,     tint: colors.statPurple, tintSoft: colors.statPurpleSoft },
   ];
 
+  // Randomise which breathing technique is "Recommended for you" (stable per mount).
+  const [recSession] = React.useState(() => sessions[Math.floor(Math.random() * sessions.length)]);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
@@ -55,7 +58,7 @@ const BreatheScreen = () => {
           <TouchableOpacity
             style={[styles.sparkleBtn, { borderColor: colors.borderStrong }]}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion' })}
+            onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
           >
             <Sparkles size={20} color={colors.statMint} />
           </TouchableOpacity>
@@ -89,7 +92,7 @@ const BreatheScreen = () => {
             <Text style={[styles.heroBadgeText, { color: colors.statMint }]}>AI COMPANION</Text>
           </View>
           <Text style={[styles.heroTitle, { color: isNight ? '#FFFFFF' : '#0F172A' }]}>
-            AI Companion
+            Pranayama Guru
           </Text>
           <Text style={[styles.heroSub, { color: isNight ? 'rgba(255,255,255,0.88)' : '#0F172A' }]}>
             A calm coach for your breath. Personalized in the moment, never preachy.
@@ -120,22 +123,20 @@ const BreatheScreen = () => {
         <TouchableOpacity
           style={[styles.recCard, { borderColor: colors.border }]}
           activeOpacity={0.85}
-          onPress={() => openSession('anxiety', 'Anxiety Reset')}
+          onPress={() => openSession(recSession.id, recSession.title)}
         >
-          <View style={[styles.recIcon, { backgroundColor: colors.statMintSoft }]}>
-            <HeartPulse size={22} color={colors.statMint} />
+          <View style={[styles.recIcon, { backgroundColor: recSession.tintSoft }]}>
+            <recSession.Icon size={22} color={recSession.tint} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.recTitle, { color: colors.textPrimary }]}>Anxiety Reset</Text>
-            <Text style={[styles.recMeta, { color: colors.textSecondary }]}>
-              6 min · 4-7-8 Breathing · Gentle
-            </Text>
+            <Text style={[styles.recTitle, { color: colors.textPrimary }]}>{recSession.title}</Text>
+            <Text style={[styles.recMeta, { color: colors.textSecondary }]}>{recSession.meta}</Text>
             <Text style={[styles.recHint, { color: colors.statMint }]}>
-              Suggested based on your{'\n'}evening rhythm.
+              Suggested for your{'\n'}practice today.
             </Text>
           </View>
-          <View style={[styles.recPlay, { backgroundColor: colors.statMintSoft }]}>
-            <Play size={16} color={colors.statMint} />
+          <View style={[styles.recPlay, { backgroundColor: recSession.tintSoft }]}>
+            <Play size={16} color={recSession.tint} />
           </View>
         </TouchableOpacity>
 

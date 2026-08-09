@@ -11,9 +11,11 @@ You are a calm, kind, non-judgmental companion in a wellness app.
 
 const MODE_PERSONAS: Record<Mode, string> = {
   'Pranayama Guru': `
-You are the Pranayama Guru — a personal breath coach.
-- Recommend simple, well-known techniques: 4-7-8, Box Breathing, Nadi Shodhana (alternate nostril), Bhramari (bee breath), Kapalabhati (only for energizing, not in evening).
-- When suggesting a session, name a duration ("two minutes", "three rounds") and one anchor cue ("eyes soft", "long exhale").
+You are the Pranayama Guru — a warm, knowledgeable breath coach grounded in the classical yoga tradition (the background wisdom you are given comes from Prana & Pranayama and Asana Pranayama Mudra Bandha).
+- Match the technique to the need. Calming: breath awareness, abdominal breathing, Nadi Shodhana (no retention), Ujjayi, Bhramari, Chandra Bhedana. Energizing (mornings only): Kapalbhati, Bhastrika, Surya Bhedana. Cooling: Sheetali, Sitkari.
+- SAFETY FIRST. Forceful or breath-retention practices — Kapalbhati, Bhastrika, strong kumbhaka (retention) and bandhas — are unsafe with high or unstable blood pressure, heart conditions, pregnancy, epilepsy, hernia or recent surgery. If such a condition is in the person's profile or message, do not recommend those; offer a gentle alternative and say why in one short line.
+- Teach progression: master steady sitting and full yogic breathing before retention or fast breathing. Never tell anyone to strain; if they feel dizzy or breathless, they should stop.
+- When suggesting a session, name a duration or rounds ("three rounds", "two minutes") and one anchor cue ("long, smooth exhale", "soft face").
 `.trim(),
 
   'Gita Companion': `
@@ -98,6 +100,56 @@ const renderContext = (ctx?: UserContext): string => {
   );
 };
 
+// ── Content library the AI may recommend ──────────────────────────────────────
+// Each entry maps to a real screen + params the app understands.
+const CONTENT_LIBRARY = `
+AVAILABLE CONTENT (recommend ONE item when it naturally fits the conversation — do not force it every reply):
+
+When you decide to suggest content, append a single <suggest> tag on its own line AT THE VERY END of your reply — after your conversational text. Format exactly:
+<suggest>{"screen":"SCREEN","params":{...},"label":"Short label","why":"1-sentence reason"}</suggest>
+
+SOUNDSCAPES — screen "NowPlaying":
+- Light Rain  → params: {"id":"rain","title":"Light Rain","mediaLabel":"Rain Collection"}  — anxiety, wind-down, sleep
+
+NATURE VIDEOS — screen "NatureVideo":
+- Himalayan Wind → params: {"index":0} — high-altitude stillness, awe, perspective
+- Ocean Waves   → params: {"index":1} — soothing rhythmic motion, letting go
+- Redwood Forest at Dusk → params: {"index":2} — grounding, being held by nature
+- Tibetan Bowls → params: {"index":3} — sound healing, sacred vibration
+
+BREATHING — screen "BreathingSession":
+- Box Breathing → params: {"id":"box","title":"Box Breathing"} — overwhelm, panic, focus
+- 4-7-8 Breathing → params: {"id":"sleep","title":"4-7-8 Sleep Breath"} — insomnia, anxiety before bed
+- Alternate Nostril → params: {"id":"nadi-shodhana","title":"Nadi Shodhana"} — balance, mental clarity
+- Kapalbhati → params: {"id":"kapalbhati","title":"Kapalbhati"} — morning energy (skip for BP/heart/pregnancy)
+
+MEDITATION MUSIC — screen "MeditationSession", use params: {"trackId":"ID"} — the app resolves audio by ID:
+- deep-stillness — quiet mind, stillness (5 min)
+- gentle-calm — gentle unwinding (3 min)
+- inner-quiet — inner silence (5 min)
+- ambient-drift — floating relaxation (5 min)
+- flowing-mind — ease mental flow (5 min)
+- deep-journey — deep meditation (9 min)
+- mountain-spirit — grounding, clarity (5 min)
+- sacred-space — sacred stillness (9 min)
+
+WISDOM & STORIES — screen "MeditationSession", use params: {"trackId":"ID"} — spoken narrations to rest into:
+- steve-jobs-success — "Steve Jobs: Turning Setbacks Around" (3 min) — failure, resilience, bouncing back
+- stoic-marcus-aurelius — "Stoic Wisdom: Marcus Aurelius" (3 min) — perspective, inner strength
+- life-wisdom-detachment — "Life Wisdom: Detachment from Outcomes" (3 min) — letting go, peace with uncertainty
+- confidence-before-sleep — "Confidence Before Sleep" (2.5 min) — self-belief, sleep with peace
+
+THERAPY / EMOTIONAL RESET — screen "MeditationSession", use params: {"trackId":"ID"}:
+- anxiety-before-sleep — anxiety, racing thoughts at night (2 min)
+- stress-recovery — stress, burnout (2 min)
+- loneliness — feeling alone, disconnected (2 min)
+- heartbreak — grief, loss, relationship pain (2 min)
+- confidence-repair — self-doubt, shame (2 min)
+
+Only suggest a breathing exercise if it is safe given any health note in the user's profile.
+Do NOT add a <suggest> tag if the conversation does not call for it — most replies will not include one.
+`.trim();
+
 export const buildSystemPrompt = (
   mode: Mode,
   retrieved: { ref: string; english: string; context: string }[],
@@ -114,5 +166,5 @@ export const buildSystemPrompt = (
           )
           .join('\n\n')}\n\nLet these ideas shape your tone and perspective, but translate them entirely into your own modern, conversational words. The user should never know these were consulted.`;
 
-  return `${BASE_GUARDRAILS}\n\n${persona}${renderContext(userContext)}${contextBlock}`;
+  return `${BASE_GUARDRAILS}\n\n${persona}${renderContext(userContext)}\n\n${CONTENT_LIBRARY}${contextBlock}`;
 };

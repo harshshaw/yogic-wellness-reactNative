@@ -17,7 +17,13 @@ import { useStreakStorage } from '../hooks/useStreakStorage';
 import { useTheme } from '../hooks/useTheme';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
-import { getSessionMedia } from '../utils/sessionMedia';
+import {
+  MEDITATION_MUSIC,
+  MEDITATION_MINDFULNESS,
+  THERAPY_EMOTIONAL_RESET,
+  WISDOM_STORIES,
+  randomFrom,
+} from '../utils/meditationMusic';
 import { Heart } from './Icons';
 import StreakCelebration from './StreakCelebration';
 
@@ -273,20 +279,31 @@ export default function PranayamaScreen() {
 
   const startSession = (id: string, meta: string, type: string, title: string) => {
     activeSession.current = { id, startedAt: Date.now(), durationSecs: parseDuration(meta) };
-    const media = getSessionMedia(id, type as any);
-    // music/video/meditation types → NowPlaying with dynamic video+audio
-    // breathing types → BreathingSession (animated guide)
-    if (type === 'music' || type === 'video' || type === 'meditation') {
-      navigation.navigate('NowPlaying' as any, {
-        id,
-        title,
-        videoSource: media.video,
-        audioSource: media.audio,
-        mediaLabel: media.label,
-      });
-    } else {
+
+    // Breathing → the animated breathing guide (unchanged).
+    if (type === 'breathing') {
       navigation.navigate('BreathingSession' as any, { id, title });
+      return;
     }
+
+    // Everything else pulls a random track from the Rest library and plays it in
+    // the Rest player, over the same background videos as the Rest screen.
+    const pool =
+      type === 'music'
+        ? MEDITATION_MUSIC
+        : type === 'meditation'
+        ? [...MEDITATION_MINDFULNESS, ...MEDITATION_MUSIC]
+        : [...WISDOM_STORIES, ...THERAPY_EMOTIONAL_RESET]; // 'video' / other
+    const track = randomFrom(pool) ?? MEDITATION_MUSIC[0];
+
+    navigation.navigate('MeditationSession' as any, {
+      techniqueId: 'meditation-music',
+      techniqueName: title,
+      title: track.title,
+      durationSec: track.durationSec,
+      audio: track.audio,
+      startImmersive: true,
+    });
   };
 
   return (
@@ -614,7 +631,7 @@ export default function PranayamaScreen() {
                   key={i}
                   style={[s.promptChip, { borderColor: BORDER, backgroundColor: CARD }]}
                   activeOpacity={0.75}
-                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion', prompt: p.replace('\n', ' ') })}
+                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
                 >
                   <Text style={[s.promptText, { color: TEXT }]}>{p}</Text>
                 </TouchableOpacity>
@@ -623,7 +640,7 @@ export default function PranayamaScreen() {
             <TouchableOpacity
               style={[s.micBtn, { backgroundColor: GREEN }]}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion' })}
+              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
             >
               <MicIcon size={22} color="#fff" />
             </TouchableOpacity>

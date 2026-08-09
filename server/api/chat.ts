@@ -27,6 +27,7 @@ const MAX_HISTORY = 30;
 // dedicated corpus; every other mode draws on the Gita corpus.
 const CORPUS_FILES: Record<string, string> = {
   'Relationship Guru': 'data/relationship-embeddings.json',
+  'Pranayama Guru': 'data/pranayama-embeddings.json',
   default: 'data/gita-embeddings.json',
 };
 
@@ -80,7 +81,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Gita Companion and Relationship Guru lean on their corpus, so they get a
     // lower floor to retrieve grounding more generously.
     const SCORE_FLOOR =
-      mode === 'Gita Companion' || mode === 'Relationship Guru' ? 0.15 : 0.18;
+      mode === 'Gita Companion' || mode === 'Relationship Guru' || mode === 'Pranayama Guru'
+        ? 0.15
+        : 0.18;
     const relevant = retrieved.filter(r => r.score >= SCORE_FLOOR).map(r => r.verse);
 
     // 3. Build the prompt, personalised with the user context if provided.

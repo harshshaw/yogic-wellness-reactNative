@@ -16,23 +16,30 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
 import { warm, RADII } from '../styles/warm';
-import { Sparkles, X, Mic, Send, Moon, Target, Heart, Volume2, VolumeX } from './Icons';
+import { Sparkles, X, Mic, Send, Moon, Target, Heart, Wind, Volume2, VolumeX, Play } from './Icons';
 import {
   sendToCompanion,
   distillMemory,
   transcribeAudio,
   type CompanionMode,
   type UserContext,
+  type ContentSuggestion,
 } from '../lib/aiCompanion';
 import { getMemory, saveMemory, saveTurns } from '../lib/companionMemory';
+import { ALL_REST_AUDIO } from '../utils/meditationMusic';
 import { apiRequest } from '../lib/apiClient';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 
 type Mode = CompanionMode;
-type Msg = { from: 'ai' | 'user'; text: string; cite?: string; time: string };
+type Msg = { from: 'ai' | 'user'; text: string; cite?: string; time: string; suggestion?: ContentSuggestion };
 
 const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: string[] }> = {
+  'Pranayama Guru': {
+    open: 'Let’s work with the breath. Tell me how you feel or what you’d like — calm, energy, focus, or sleep.',
+    cite: 'Grounded in classical pranayama',
+    suggestions: ['I feel anxious', 'Energize me', 'Help me sleep', 'Alternate nostril?'],
+  },
   'Gita Companion': {
     open: 'A doubt is a door. Tell me what you are carrying — I’ll offer a quiet reflection.',
     cite: 'Inspired by the Bhagavad Gita',
@@ -54,6 +61,7 @@ const greetingByMode: Record<Mode, { open: string; cite?: string; suggestions: s
 };
 
 const modeIcons: Record<Mode, any> = {
+  'Pranayama Guru': Wind,
   'Gita Companion': Sparkles,
   'Sleep Guide': Moon,
   'Confidence Coach': Target,
@@ -238,7 +246,10 @@ const AICompanionScreen = () => {
         reply.citations.length > 0
           ? reply.citations.map(c => c.ref).join(' · ')
           : undefined;
-      setMessages(m => [...m, { from: 'ai', text: reply.content, cite, time: timeStamp() }]);
+      setMessages(m => [
+        ...m,
+        { from: 'ai', text: reply.content, cite, time: timeStamp(), suggestion: reply.suggestion },
+      ]);
       speak(reply.content);
     } catch (err: any) {
       setMessages(m => [
@@ -290,6 +301,23 @@ const AICompanionScreen = () => {
       })();
     };
   }, [token, mode]);
+
+  // When the user returns from a content session, ask how they feel.
+  const pendingFollowUp = useRef(false);
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      if (!pendingFollowUp.current) return;
+      pendingFollowUp.current = false;
+      const followUp: Msg = {
+        from: 'ai',
+        text: 'How are you feeling now? 🙏',
+        time: timeStamp(),
+      };
+      setMessages(m => [...m, followUp]);
+      speak(followUp.text);
+    });
+    return unsub;
+  }, [navigation]);
 
   // Keep the thread pinned to the newest message.
   const scrollRef = useRef<ScrollView | null>(null);
@@ -347,15 +375,49 @@ const AICompanionScreen = () => {
       >
         {messages.map((m, i) =>
           m.from === 'ai' ? (
-            <View
-              key={i}
-              style={[
-                styles.aiBubble,
-                { backgroundColor: colors.cardLight, borderColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.aiText, { color: colors.textPrimary }]}>{m.text}</Text>
-              <Text style={[styles.time, { color: colors.textSecondary }]}>{m.time}</Text>
+            <View key={i}>
+              <View
+                style={[
+                  styles.aiBubble,
+                  { backgroundColor: colors.cardLight, borderColor: colors.border },
+                ]}
+              >
+                <Text style={[styles.aiText, { color: colors.textPrimary }]}>{m.text}</Text>
+                <Text style={[styles.time, { color: colors.textSecondary }]}>{m.time}</Text>
+              </View>
+              {m.suggestion && (
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  style={[styles.suggestionCard, { backgroundColor: colors.card, borderColor: colors.accent }]}
+                  onPress={() => {
+                    pendingFollowUp.current = true;
+                    const s = m.suggestion!;
+                    let params = s.params;
+                    if (s.screen === 'MeditationSession' && params.trackId) {
+                      const track = ALL_REST_AUDIO.find(t => t.id === params.trackId);
+                      if (track) {
+                        params = {
+                          techniqueId: track.id,
+                          techniqueName: 'Rest',
+                          title: track.title,
+                          durationSec: track.durationSec,
+                          audio: track.audio,
+                          startImmersive: false,
+                        };
+                      }
+                    }
+                    (navigation as any).navigate(s.screen, params);
+                  }}
+                >
+                  <View style={[styles.suggestionIcon, { backgroundColor: colors.accentSoft }]}>
+                    <Play size={14} color={colors.accent} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.suggestionLabel, { color: colors.textPrimary }]}>{m.suggestion.label}</Text>
+                    <Text style={[styles.suggestionWhy, { color: colors.textSecondary }]}>{m.suggestion.why}</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <View key={i} style={[styles.userBubble, { backgroundColor: colors.statPurple }]}>
@@ -565,6 +627,26 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryGold,
     alignItems: 'center', justifyContent: 'center',
   },
+
+  suggestionCard: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    marginLeft: 4,
+    maxWidth: '82%',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 10,
+  },
+  suggestionIcon: {
+    width: 32, height: 32, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  suggestionLabel: { fontSize: 13, fontWeight: '700' },
+  suggestionWhy: { fontSize: 11, marginTop: 2, lineHeight: 15 },
 });
 
 export default AICompanionScreen;

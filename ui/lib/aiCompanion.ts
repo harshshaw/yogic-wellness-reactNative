@@ -9,6 +9,7 @@ export const AI_API_URL =
   'https://karmana.vercel.app';
 
 export type CompanionMode =
+  | 'Pranayama Guru'
   | 'Gita Companion'
   | 'Sleep Guide'
   | 'Confidence Coach'
@@ -36,10 +37,32 @@ export type UserContext = {
 
 export type Citation = { ref: string; english: string };
 
+export type ContentSuggestion = {
+  screen: 'NowPlaying' | 'NatureVideo' | 'BreathingSession' | 'MeditationSession';
+  // For MeditationSession tracks, AI passes trackId; the client resolves audio/duration.
+  params: Record<string, any> & { trackId?: string };
+  label: string;
+  why: string;
+};
+
 export type ChatResponse = {
   content: string;
   citations: Citation[];
+  suggestion?: ContentSuggestion;
 };
+
+// Parses and strips the optional <suggest> tag the AI appends to its reply.
+export function parseSuggestion(raw: string): { text: string; suggestion?: ContentSuggestion } {
+  const match = raw.match(/<suggest>([\s\S]*?)<\/suggest>/);
+  if (!match) return { text: raw.trim() };
+  try {
+    const suggestion = JSON.parse(match[1].trim()) as ContentSuggestion;
+    const text = raw.replace(match[0], '').trim();
+    return { text, suggestion };
+  } catch {
+    return { text: raw.replace(match[0], '').trim() };
+  }
+}
 
 // Sends a recorded voice clip to the Whisper endpoint and returns the transcript.
 // `uri` is the local file URI from expo-av; `format` is the file extension.
@@ -78,8 +101,9 @@ export async function sendToCompanion(
     throw new Error(`AI request failed (${res.status}): ${text}`);
   }
 
-  const json = (await res.json()) as ChatResponse;
-  return json;
+  const json = (await res.json()) as { content: string; citations: Citation[] };
+  const { text, suggestion } = parseSuggestion(json.content ?? '');
+  return { content: text, citations: json.citations ?? [], suggestion };
 }
 
 // Distils an updated memory summary from the prior summary + latest turns.
