@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   heroOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 24,
   },

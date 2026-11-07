@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Audio } from 'expo-av';
+import { AudioModule, RecordingPresets, setAudioModeAsync, useAudioRecorder } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Speech from 'expo-speech';
 import { COLORS } from '../styles/colors';
@@ -133,7 +133,7 @@ const AICompanionScreen = () => {
   // ── Voice output (text-to-speech for AI replies) ──
   const [voiceOn, setVoiceOn] = useState(true);
   const voiceOnRef = useRef(true);
-  voiceOnRef.current = voiceOn;
+  useEffect(() => { voiceOnRef.current = voiceOn; }, [voiceOn]);
 
   const speak = async (text: string) => {
     if (!voiceOnRef.current || !text) return;
@@ -141,11 +141,11 @@ const AICompanionScreen = () => {
     try {
       // Route audio to the main loudspeaker (not the quiet iOS earpiece),
       // play even when the ringer switch is silent, and don't duck.
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        playThroughEarpieceAndroid: false,
-        shouldDuckAndroid: false,
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
+        shouldRouteThroughEarpiece: false,
+        interruptionMode: 'doNotMix',
       });
     } catch {
       // ignore — fall back to default routing
@@ -162,48 +162,52 @@ const AICompanionScreen = () => {
   };
 
   // ── Voice input (record → Whisper transcription) ──
-  const recordingRef = useRef<Audio.Recording | null>(null);
+  const recording = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recordingBusy = useRef(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const startRecording = async () => {
+    if (recordingBusy.current) return;
+    recordingBusy.current = true;
     try {
       Speech.stop();
-      const perm = await Audio.requestPermissionsAsync();
+      const perm = await AudioModule.requestRecordingPermissionsAsync();
       if (!perm.granted) {
         setDraft('Microphone access is needed to speak.');
         return;
       }
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      recordingRef.current = recording;
+      await recording.prepareToRecordAsync();
+      recording.record();
       setIsRecording(true);
     } catch (err) {
       console.warn('startRecording failed', err);
       setIsRecording(false);
+      await setAudioModeAsync({ allowsRecording: false }).catch(error =>
+        console.warn('Could not restore playback mode', error));
+    } finally {
+      recordingBusy.current = false;
     }
   };
 
   const stopAndTranscribe = async () => {
-    const recording = recordingRef.current;
-    recordingRef.current = null;
+    if (recordingBusy.current || !isRecording) return;
+    recordingBusy.current = true;
     setIsRecording(false);
-    if (!recording) return;
 
     setIsTranscribing(true);
     try {
-      await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
-      const uri = recording.getURI();
+      await recording.stop();
+      await setAudioModeAsync({ allowsRecording: false });
+      const uri = recording.uri;
       if (!uri) return;
 
       const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: 'base64' as any,
+        encoding: FileSystem.EncodingType.Base64,
       });
       const ext = uri.split('.').pop()?.toLowerCase() || 'm4a';
       const text = await transcribeAudio(base64, ext);
@@ -214,9 +218,18 @@ const AICompanionScreen = () => {
     } catch (err) {
       console.warn('transcription failed', err);
     } finally {
+      recordingBusy.current = false;
       setIsTranscribing(false);
+      await setAudioModeAsync({ allowsRecording: false }).catch(error =>
+        console.warn('Could not restore playback mode', error));
     }
   };
+
+  useEffect(() => () => {
+    void Speech.stop();
+    void setAudioModeAsync({ allowsRecording: false }).catch(error =>
+      console.warn('Could not restore playback mode', error));
+  }, []);
 
   const toggleMic = () => {
     if (isTranscribing) return;
@@ -271,7 +284,7 @@ const AICompanionScreen = () => {
 
   // Keep the latest messages in a ref so the unmount handler isn't stale.
   const messagesRef = useRef(messages);
-  messagesRef.current = messages;
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   // On leaving the screen: persist the session's turns, then distil an updated
   // memory summary so the AI remembers this conversation next time.

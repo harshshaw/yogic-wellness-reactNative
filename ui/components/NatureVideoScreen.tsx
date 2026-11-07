@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { setAudioModeAsync } from 'expo-audio';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Audio, Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import SessionVideo from './SessionVideo';
 import { NATURE_VIDEOS } from '../utils/sessionMedia';
 import { X, ChevronLeft, ChevronRight, Pause, Play } from './Icons';
 import BreathingLoader from './BreathingLoader';
@@ -26,16 +27,15 @@ export default function NatureVideoScreen() {
   const [index, setIndex] = useState<number>(route.params?.index ?? 0);
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(false);
-  const videoRef = useRef<Video>(null);
 
   const current = NATURE_VIDEOS[index];
 
   // Let the video's own audio play even when the phone is on silent.
   useEffect(() => {
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: false,
-      shouldDuckAndroid: true,
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldPlayInBackground: false,
+      interruptionMode: 'duckOthers',
     }).catch(() => {});
   }, []);
 
@@ -47,37 +47,22 @@ export default function NatureVideoScreen() {
   const prev = () => setIndex(i => (i - 1 + NATURE_VIDEOS.length) % NATURE_VIDEOS.length);
   const next = () => setIndex(i => (i + 1) % NATURE_VIDEOS.length);
 
-  const togglePlay = async () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (paused) {
-      await v.playAsync();
-      setPaused(false);
-    } else {
-      await v.pauseAsync();
-      setPaused(true);
-    }
-  };
+  const togglePlay = () => setPaused(value => !value);
 
   return (
     <View style={styles.root}>
       <StatusBar hidden />
 
-      <Video
-        ref={videoRef}
+      <SessionVideo
         key={current.id}
         source={current.source}
         style={StyleSheet.absoluteFill}
-        resizeMode={ResizeMode.COVER}
-        shouldPlay
-        isLooping
-        isMuted={false}
+        contentFit="cover"
+        playing={!paused}
+        loop
+        muted={false}
         volume={1.0}
-        onLoadStart={() => setLoading(true)}
-        onReadyForDisplay={() => setLoading(false)}
-        onPlaybackStatusUpdate={(s: AVPlaybackStatus) => {
-          if (s.isLoaded && s.isPlaying) setLoading(false);
-        }}
+        onReady={() => setLoading(false)}
       />
 
       {loading && <BreathingLoader />}

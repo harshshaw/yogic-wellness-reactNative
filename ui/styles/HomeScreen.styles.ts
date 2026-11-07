@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
   },
 
   headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(245,231,193,0.05)',
   },
 
@@ -135,7 +135,7 @@ export const styles = StyleSheet.create({
   },
 
   goalOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(28,20,15,0.55)',
   },
 

@@ -813,7 +813,7 @@ const s = StyleSheet.create({
   moodLabel: { fontSize: 13, fontWeight: '600' },
 
   heroCard: { marginHorizontal: 20, height: 280, borderRadius: 20, overflow: 'hidden', marginBottom: 28 },
-  heroOverlay: { ...StyleSheet.absoluteFillObject },
+  heroOverlay: { ...StyleSheet.absoluteFill },
   heroContent: { flex: 1, padding: 22, justifyContent: 'flex-end' },
   recPill: {
     flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start',
@@ -943,7 +943,7 @@ const s = StyleSheet.create({
 
   // feedback sheet
   modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.5)',
     zIndex: 100,

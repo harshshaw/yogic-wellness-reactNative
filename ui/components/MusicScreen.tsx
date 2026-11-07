@@ -102,7 +102,7 @@ const CoverArt = ({
       colors={gradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={StyleSheet.absoluteFillObject}
+      style={StyleSheet.absoluteFill}
     />
     {symbol && (
       <View style={styles.coverGlyph}>
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   trackPlayBtn: { padding: 8 },
 
   coverGlyph: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

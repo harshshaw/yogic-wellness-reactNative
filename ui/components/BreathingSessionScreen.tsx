@@ -10,7 +10,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../hooks/useAuth';
 import { recordSession } from '../lib/wellnessApi';
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import SessionVideo from './SessionVideo';
 import { useTheme } from '../hooks/useTheme';
 import { X, Pause, Play, Check } from './Icons';
 import { media } from '../lib/media';
@@ -134,9 +134,6 @@ const BreathingSessionScreen = () => {
     }).start(() => setStage('session'));
   };
 
-  const onTutorialStatus = (status: AVPlaybackStatus) => {
-    if (status.isLoaded && status.didJustFinish) endTutorial();
-  };
 
   useEffect(() => {
     if (stage !== 'session' || !running || done) return;
@@ -219,13 +216,13 @@ const BreathingSessionScreen = () => {
   if (stage === 'tutorial') {
     return (
       <View style={[styles.screen, { backgroundColor: '#000' }]}>
-        <Animated.View style={[StyleSheet.absoluteFillObject, { opacity: tutorialOpacity }]}>
-          <Video
+        <Animated.View style={[StyleSheet.absoluteFill, { opacity: tutorialOpacity }]}>
+          <SessionVideo
             source={TUTORIAL_VIDEO}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode={ResizeMode.COVER}
-            shouldPlay
-            onPlaybackStatusUpdate={onTutorialStatus}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            playing
+            onEnd={endTutorial}
           />
           <View style={styles.tutorialOverlay}>
             <Text style={[styles.overline, { color: '#FFFFFF' }]}>HOW IT WORKS</Text>
@@ -554,7 +551,7 @@ const styles = StyleSheet.create({
 
   // TUTORIAL
   tutorialOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingHorizontal: 32,

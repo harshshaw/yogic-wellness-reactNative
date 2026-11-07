@@ -168,7 +168,7 @@ const AICompanionHomeScreen = () => {
 
 // ─── Soft mountain silhouettes for the hero ─────────────────────────────
 const MountainSilhouette = () => (
-  <View style={StyleSheet.absoluteFillObject}>
+  <View style={StyleSheet.absoluteFill}>
     <Svg
       width="100%"
       height="100%"

@@ -585,7 +585,7 @@ const localStyles = StyleSheet.create({
 
   // — light-mode Today's Goal overlay —
   goalOverlayLight: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(254,243,199,0.7)',
   },
 

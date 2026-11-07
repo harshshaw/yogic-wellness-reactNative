@@ -1,7 +1,9 @@
+import { useEventListener } from 'expo';
+import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, Modal, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Audio, AVPlaybackStatus, Video, ResizeMode } from 'expo-av';
+import SessionVideo from './SessionVideo';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
@@ -113,65 +115,37 @@ const MeditationSessionScreen = () => {
   }, [hasAudio, secondsLeft, running, done]);
 
   // ── Guided-audio playback ──
-  const soundRef = useRef<Audio.Sound | null>(null);
+  const narration = useAudioPlayer(audioSource ?? null);
+  const [audioReady, setAudioReady] = useState(false);
   useEffect(() => {
     if (!hasAudio) return;
     let cancelled = false;
-
-    const onStatus = (status: AVPlaybackStatus) => {
-      if (!status.isLoaded) return;
-      const durMs = status.durationMillis ?? totalSeconds * 1000;
-      const remaining = Math.max(0, Math.ceil((durMs - status.positionMillis) / 1000));
-      setSecondsLeft(remaining);
-      if (status.didJustFinish) {
-        setDone(true);
-        // Mark the course module complete as soon as narration finishes, so it
-        // unlocks the next module even if the user dismisses without tapping Done.
-        if (moduleId) markCompleted(moduleId);
-      }
-    };
-
-    (async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
-          playThroughEarpieceAndroid: false,
-          shouldDuckAndroid: false,
-        });
-        const { sound } = await Audio.Sound.createAsync(
-          audioSource!,
-          { shouldPlay: true },
-          onStatus
-        );
-        if (cancelled) {
-          await sound.unloadAsync();
-          return;
-        }
-        soundRef.current = sound;
-      } catch {
-        // if audio fails to load, fall back to letting the user End manually
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      soundRef.current?.unloadAsync().catch(() => {});
-      soundRef.current = null;
-    };
+    setAudioModeAsync({
+      allowsRecording: false,
+      playsInSilentMode: true,
+      shouldRouteThroughEarpiece: false,
+      interruptionMode: 'doNotMix',
+    }).then(() => {
+      if (!cancelled) setAudioReady(true);
+    }).catch(error => console.warn('Narration setup failed', error));
+    return () => { cancelled = true; };
   }, [hasAudio]);
 
-  // Pause / resume the narration when the user toggles running.
-  useEffect(() => {
-    if (!hasAudio || !soundRef.current || done) return;
-    if (running) soundRef.current.playAsync().catch(() => {});
-    else soundRef.current.pauseAsync().catch(() => {});
-  }, [running, hasAudio, done]);
+  useEventListener(narration, 'playbackStatusUpdate', narrationStatus => {
+    if (!hasAudio || !narrationStatus.isLoaded) return;
+    // expo-audio reports time in seconds, not milliseconds.
+    const duration = narrationStatus.duration || totalSeconds;
+    setSecondsLeft(Math.max(0, Math.ceil(duration - narrationStatus.currentTime)));
+    if (narrationStatus.didJustFinish) {
+      setDone(true);
+      if (moduleId) void markCompleted(moduleId);
+    }
+  });
 
-  // Stop narration once the session is done.
   useEffect(() => {
-    if (done && soundRef.current) soundRef.current.stopAsync().catch(() => {});
-  }, [done]);
+    if (hasAudio && audioReady && running && !done) narration.play();
+    else narration.pause();
+  }, [narration, hasAudio, audioReady, running, done]);
 
   const finish = () => {
     if (!recordedRef.current) {
@@ -203,16 +177,16 @@ const MeditationSessionScreen = () => {
         {videoPool.map((src, i) => (
           <Animated.View
             key={i}
-            style={[StyleSheet.absoluteFillObject, { opacity: videoOpacities[i] }]}
+            style={[StyleSheet.absoluteFill, { opacity: videoOpacities[i] }]}
             pointerEvents="none"
           >
-            <Video
+            <SessionVideo
               source={src}
-              style={StyleSheet.absoluteFillObject}
-              resizeMode={ResizeMode.COVER}
-              isLooping
-              isMuted
-              shouldPlay
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              loop
+              muted
+              playing
             />
           </Animated.View>
         ))}
@@ -418,7 +392,7 @@ const styles = StyleSheet.create({
 
   // Immersive full-screen video mode
   immersive: { flex: 1, backgroundColor: '#000' },
-  immScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' },
+  immScrim: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.3)' },
   immTop: {
     position: 'absolute', top: 56, left: 20, right: 20, zIndex: 3,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -429,14 +403,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
   immNav: {
-    ...StyleSheet.absoluteFillObject, zIndex: 2,
+    ...StyleSheet.absoluteFill, zIndex: 2,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12,
   },
   immNavBtn: {
     width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
-  immCenter: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
+  immCenter: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
   immCountdown: { color: '#FFFFFF', fontSize: 56, fontWeight: '200', textShadowColor: 'rgba(0,0,0,0.4)', textShadowRadius: 12 },
   immInstruction: { color: 'rgba(255,255,255,0.9)', fontSize: 15, lineHeight: 22, textAlign: 'center', marginTop: 18, textShadowColor: 'rgba(0,0,0,0.5)', textShadowRadius: 8 },
   immControls: {

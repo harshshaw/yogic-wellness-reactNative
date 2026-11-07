@@ -65,7 +65,7 @@ export function parseSuggestion(raw: string): { text: string; suggestion?: Conte
 }
 
 // Sends a recorded voice clip to the Whisper endpoint and returns the transcript.
-// `uri` is the local file URI from expo-av; `format` is the file extension.
+// `uri` is the local file URI from expo-audio; `format` is the file extension.
 export async function transcribeAudio(
   base64: string,
   format = 'm4a'
