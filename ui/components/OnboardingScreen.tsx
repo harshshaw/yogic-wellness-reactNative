@@ -15,7 +15,7 @@ import { saveOnboarding, OnboardingData } from '../utils/onboardingStorage';
 import { useAuth } from '../hooks/useAuth';
 import { apiRequest } from '../lib/apiClient';
 
-const GREEN = '#10B981';
+const GREEN = '#5B8DEF';
 const INK = '#0F172A';
 const MUTED = '#6B7280';
 const BORDER = '#E5E7EB';
@@ -308,7 +308,7 @@ const Chips = ({ options, value, onSelect, multi, values, onToggle }: ChipsProps
           onPress={() => (multi ? onToggle?.(opt) : onSelect?.(opt))}
           style={[
             styles.chip,
-            selected && { backgroundColor: '#ECFDF5', borderColor: GREEN },
+            selected && { backgroundColor: '#E7F0FF', borderColor: GREEN },
           ]}
         >
           <Text style={[styles.chipText, selected && { color: GREEN, fontWeight: '700' }]}>

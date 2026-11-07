@@ -1,3 +1,4 @@
+import type { VideoContentFit } from 'expo-video';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Video, ResizeMode } from 'expo-av';
+import SessionVideo from './SessionVideo';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { RAIN_VIDEOS } from '../utils/sessionMedia';
@@ -27,11 +28,11 @@ const CROSSFADE_MS = 500;
 const CrossfadeVideo = ({
   source,
   style,
-  resizeMode,
+  contentFit,
 }: {
   source: MediaSource;
   style: StyleProp<ViewStyle>;
-  resizeMode: ResizeMode;
+  contentFit: VideoContentFit;
 }) => {
   // Compare by uri, not object identity: media() builds a fresh object on every
   // call, so `===` would never match and each render would stack a new layer.
@@ -57,14 +58,14 @@ const CrossfadeVideo = ({
   return (
     <View style={style}>
       {layers.map(l => (
-        <Animated.View key={l.id} style={[StyleSheet.absoluteFillObject, { opacity: l.opacity }]}>
-          <Video
+        <Animated.View key={l.id} style={[StyleSheet.absoluteFill, { opacity: l.opacity }]}>
+          <SessionVideo
             source={l.source}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode={resizeMode}
-            isLooping
-            isMuted
-            shouldPlay
+            style={StyleSheet.absoluteFill}
+            contentFit={contentFit}
+            loop
+            muted
+            playing
           />
         </Animated.View>
       ))}
@@ -218,7 +219,7 @@ const NowPlayingScreen = () => {
   if (immersive) {
     return (
       <View style={styles.immersiveContainer}>
-        <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
+        <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFill} contentFit="cover" />
         <TouchableWithoutFeedback onPress={() => setImmersive(false)}>
           <View style={StyleSheet.absoluteFill}>
             <View style={styles.exitHint}>
@@ -240,7 +241,7 @@ const NowPlayingScreen = () => {
   return (
     <View style={styles.container}>
       {/* Background video — always visible, changes per session */}
-      <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFillObject} resizeMode={ResizeMode.COVER} />
+      <CrossfadeVideo source={bgVideo} style={StyleSheet.absoluteFill} contentFit="cover" />
       {/* Dark overlay so white text stays readable */}
       <View style={styles.veil} />
 
@@ -274,7 +275,7 @@ const NowPlayingScreen = () => {
               colors={gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
             />
             <Text style={styles.artGlyph}>ॐ</Text>
           </View>
@@ -378,7 +379,7 @@ const UpNextRow = ({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   veil: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
 
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
   },
 
   rainNavLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

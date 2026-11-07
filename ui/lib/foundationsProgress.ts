@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 // unlock sequentially and resume where they left off. Stored locally (like the
 // auth-user cache); the completion also records a session on the backend.
 
-const PATH = `${(FileSystem as any).documentDirectory}foundations-progress.json`;
+const PATH = `${FileSystem.documentDirectory}foundations-progress.json`;
 
 export async function loadCompleted(): Promise<string[]> {
   try {

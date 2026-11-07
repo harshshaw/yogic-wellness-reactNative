@@ -12,6 +12,7 @@ import MorningReflectionScreen from './MorningReflectionScreen';
 import JournalScreen from './JournalScreen';
 import MeditationScreen from './MeditationScreen';
 import MeditationSessionScreen from './MeditationSessionScreen';
+import NatureVideoScreen from './NatureVideoScreen';
 import ProfileScreen from './ProfileScreen';
 import ReelsScreen from './ReelsScreen';
 
@@ -67,6 +68,11 @@ export default function AppNavigator() {
         name="MeditationSession"
         component={MeditationSessionScreen}
         options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="NatureVideo"
+        component={NatureVideoScreen}
+        options={{ presentation: 'fullScreenModal', animation: 'fade' }}
       />
       <Stack.Screen
         name="Profile"

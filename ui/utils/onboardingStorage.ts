@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export type OnboardingData = {
   age: string;
@@ -13,7 +13,7 @@ export type OnboardingData = {
   completedAt: string;
 };
 
-const FILE_PATH = `${(FileSystem as any).documentDirectory}onboarding-data.json`;
+const FILE_PATH = `${FileSystem.documentDirectory}onboarding-data.json`;
 
 export async function saveOnboarding(data: OnboardingData): Promise<void> {
   try {

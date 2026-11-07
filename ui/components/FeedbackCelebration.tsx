@@ -143,7 +143,7 @@ export default function FeedbackCelebration({ visible, emoji, label, onClose }: 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <Animated.View style={[st.backdrop, backdropStyle]}>
-        {confetti.map((c) => <ConfettiPiece key={c.key} {...c} />)}
+        {confetti.map(({ key, ...piece }) => <ConfettiPiece key={key} {...piece} />)}
 
         <View style={st.center}>
           {/* 3D badge */}

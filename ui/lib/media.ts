@@ -10,7 +10,7 @@
 // Origin fallback (direct bucket): https://storage.googleapis.com/karmana-media-prod/assets
 const MEDIA_BASE = 'https://media.karmana.ie/assets';
 
-/** What expo-av / expo-video accept in a `source` prop for remote files. */
+/** What expo-audio / expo-video accept in a `source` prop for remote files. */
 export type MediaSource = { uri: string };
 
 /**
@@ -24,7 +24,7 @@ export const media = (path: string): MediaSource => ({
   uri: `${MEDIA_BASE}/${path.replace(/^\/+/, '')}`,
 });
 
-// CACHING: expo-av streams these and does not persist them between launches, so
+// CACHING: expo-audio streams these and does not persist them between launches, so
 // a user on a plane or a mat with no signal gets silence. If offline playback
 // matters, download-on-first-play into FileSystem.documentDirectory and prefer
 // the local copy — the bucket layout above is designed to mirror local paths so

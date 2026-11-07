@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { setAudioModeAsync, useAudioPlayer, type AudioPlayer } from 'expo-audio';
 import React, {
   createContext,
   useContext,
@@ -30,146 +30,79 @@ const AudioContext = createContext<AudioContextValue>({
 const BACKGROUND_SOURCE = media('karmana-app-music.mp3');
 const TRACK_SOURCE = media('music-playlist/screen-recording.mp3');
 
+function configureLoop(player: AudioPlayer, volume: number) {
+  player.loop = true;
+  player.volume = volume;
+}
+
 export const AppMusicProvider = ({ children }: { children: React.ReactNode }) => {
   const [muted, setMuted] = useState(true);
   const [isTrackPlaying, setIsTrackPlaying] = useState(false);
 
-  const bgRef = useRef<Audio.Sound | null>(null);
-  const trackRef = useRef<Audio.Sound | null>(null);
-
+  const bg = useAudioPlayer(BACKGROUND_SOURCE);
+  const track = useAudioPlayer(TRACK_SOURCE);
   const mutedRef = useRef(true);
   const trackPlayingRef = useRef(false);
+  const [audioReady, setAudioReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-
-    const load = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          staysActiveInBackground: false,
-        });
-
-        const [{ sound: bg }, { sound: track }] = await Promise.all([
-          Audio.Sound.createAsync(BACKGROUND_SOURCE, {
-            shouldPlay: !mutedRef.current,
-            isLooping: true,
-            volume: 0.1,
-          }),
-          Audio.Sound.createAsync(TRACK_SOURCE, {
-            shouldPlay: false,
-            isLooping: true,
-            volume: 0.7,
-          }),
-        ]);
-
-        if (cancelled) {
-          await bg.unloadAsync().catch(() => {});
-          await track.unloadAsync().catch(() => {});
-          return;
-        }
-
-        bgRef.current = bg;
-        trackRef.current = track;
-      } catch (err) {
-        console.warn('Audio load failed', err);
-      }
-    };
-
-    load();
-
-    const onAppStateChange = async (state: AppStateStatus) => {
-      try {
-        if (state === 'active') {
-          if (trackPlayingRef.current && trackRef.current) {
-            await trackRef.current.playAsync();
-          } else if (!mutedRef.current && bgRef.current) {
-            await bgRef.current.playAsync();
-          }
-        } else {
-          if (bgRef.current) await bgRef.current.pauseAsync();
-          if (trackRef.current) await trackRef.current.pauseAsync();
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    const sub = AppState.addEventListener('change', onAppStateChange);
-
-    return () => {
-      cancelled = true;
-      sub.remove();
-      const bg = bgRef.current;
-      const track = trackRef.current;
-      bgRef.current = null;
-      trackRef.current = null;
-      if (bg) bg.unloadAsync().catch(() => {});
-      if (track) track.unloadAsync().catch(() => {});
-    };
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: 'duckOthers',
+      shouldPlayInBackground: false,
+    }).then(() => {
+      if (!cancelled) setAudioReady(true);
+    }).catch(error => console.warn('Audio setup failed', error));
+    return () => { cancelled = true; };
   }, []);
 
-  // Background mute/unmute — only acts on bg, never overrides an active track
+  useEffect(() => {
+    configureLoop(bg, 0.1);
+    configureLoop(track, 0.7);
+  }, [bg, track]);
+
+  useEffect(() => {
+    const onAppStateChange = (state: AppStateStatus) => {
+      if (state === 'active') {
+        if (trackPlayingRef.current) track.play();
+        else if (!mutedRef.current) bg.play();
+      } else {
+        bg.pause();
+        track.pause();
+      }
+    };
+    const subscription = AppState.addEventListener('change', onAppStateChange);
+    return () => subscription.remove();
+  }, [bg, track]);
+
+  // Background mute never overrides an active track.
   useEffect(() => {
     mutedRef.current = muted;
-    const bg = bgRef.current;
-    if (!bg) return;
-    (async () => {
-      try {
-        if (muted || trackPlayingRef.current) await bg.pauseAsync();
-        else await bg.playAsync();
-      } catch {
-        // ignore
-      }
-    })();
-  }, [muted]);
+    if (muted || isTrackPlaying || !audioReady || AppState.currentState === 'background') bg.pause();
+    else bg.play();
+  }, [bg, muted, isTrackPlaying, audioReady]);
 
-  const playTrack = async (source?: MediaSource) => {
-    const bg = bgRef.current;
-    if (bg) await bg.pauseAsync().catch(() => {});
-
-    // If a new source is provided, swap out the current track sound
-    if (source !== undefined) {
-      const old = trackRef.current;
-      trackRef.current = null;
-      if (old) await old.unloadAsync().catch(() => {});
-      try {
-        const { sound } = await Audio.Sound.createAsync(source, {
-          shouldPlay: false,
-          isLooping: true,
-          volume: 0.7,
-        });
-        trackRef.current = sound;
-      } catch (err) {
-        console.warn('Track swap failed', err);
-        return;
-      }
-    }
-
-    const track = trackRef.current;
-    if (!track) return;
+  const playTrack = (source?: MediaSource) => {
     try {
-      await track.playAsync();
+      bg.pause();
+      if (source !== undefined) {
+        track.replace(source);
+        // The web implementation creates a fresh media element on replace.
+        configureLoop(track, 0.7);
+      }
+      track.play();
       trackPlayingRef.current = true;
       setIsTrackPlaying(true);
-    } catch {
-      // ignore
+    } catch (error) {
+      console.warn('Track playback failed', error);
     }
   };
 
-  const pauseTrack = async () => {
-    const bg = bgRef.current;
-    const track = trackRef.current;
-    if (!track) return;
-    try {
-      await track.pauseAsync();
-      trackPlayingRef.current = false;
-      setIsTrackPlaying(false);
-      if (bg && !mutedRef.current) await bg.playAsync();
-    } catch {
-      // ignore
-    }
+  const pauseTrack = () => {
+    track.pause();
+    trackPlayingRef.current = false;
+    setIsTrackPlaying(false);
   };
 
   const toggleTrack = () => {

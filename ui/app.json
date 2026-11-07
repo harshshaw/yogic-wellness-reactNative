@@ -4,11 +4,6 @@
     "slug": "yogicwellness",
     "version": "1.0.0",
     "icon": "./assets/images/icon.png",
-    "splash": {
-      "image": "./assets/images/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
-    },
     "android": {
       "package": "ie.karmana.app",
       "adaptiveIcon": {
@@ -35,14 +30,19 @@
       }
     },
     "owner": "harsshaw",
-    "runtimeVersion": "exposdk:54.0.0",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
     "updates": {
       "url": "https://u.expo.dev/1c36a2b4-712b-468b-b4b3-4cb35dc98a2e"
     },
     "ios": {
       "bundleIdentifier": "ie.karmana.app",
       "infoPlist": {
-        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ],
         "NSMicrophoneUsageDescription": "Allow microphone access so you can speak to your AI companion and have it transcribed."
       }
     },
@@ -55,11 +55,29 @@
         }
       ],
       [
-        "expo-av",
+        "expo-audio",
         {
-          "microphonePermission": "Allow microphone access so you can speak to your AI companion and have it transcribed."
+          "microphonePermission": "Allow microphone access so you can speak to your AI companion and have it transcribed.",
+          "enableBackgroundPlayback": false
         }
-      ]
-    ]
+      ],
+      "expo-font",
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ],
+      "expo-status-bar",
+      "expo-web-browser",
+      "expo-video",
+      "expo-asset"
+    ],
+    "experiments": {
+      "autolinkingModuleResolution": true
+    }
   }
 }

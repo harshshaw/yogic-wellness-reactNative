@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
 import BrandLogo from './BrandLogo';
 
-const GREEN = '#10B981';
+const GREEN = '#5B8DEF';
 const INK = '#0F172A';
 const MUTED = '#6B7280';
 const BORDER = '#E5E7EB';

@@ -11,7 +11,7 @@ export const API_BASE = 'https://karmana-backend-894590249756.europe-west1.run.a
 // Flip to true when testing UI without a running backend
 export const MOCK_AUTH = false;
 
-const TOKEN_PATH = `${(FileSystem as any).documentDirectory}auth-token.json`;
+const TOKEN_PATH = `${FileSystem.documentDirectory}auth-token.json`;
 
 // ── token persistence ────────────────────────────────────────────────────────
 

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Video, ResizeMode } from 'expo-av';
+import SessionVideo from './SessionVideo';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import reelsContent from '../utils/reels-content.json';
@@ -169,7 +169,7 @@ const QuoteCard = ({
       colors={palette}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={StyleSheet.absoluteFillObject}
+      style={StyleSheet.absoluteFill}
     />
     <SafeAreaView style={styles.cardContent}>
       <Text style={styles.category}>{item.category.toUpperCase()}</Text>
@@ -190,13 +190,13 @@ const VideoCard = ({
   engagement: ReelEngagement;
 }) => (
   <View style={{ height: SCREEN_H, width: '100%', backgroundColor: '#000' }}>
-    <Video
+    <SessionVideo
       source={item.source}
-      style={StyleSheet.absoluteFillObject}
-      resizeMode={ResizeMode.COVER}
-      isLooping
-      isMuted={false}
-      shouldPlay={active}
+      style={StyleSheet.absoluteFill}
+      contentFit="cover"
+      loop
+      muted={false}
+      playing={active}
     />
     <ActionRail {...engagement} />
   </View>

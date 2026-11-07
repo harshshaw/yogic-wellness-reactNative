@@ -12,37 +12,9 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { useAppMusic } from '../hooks/useAppMusic';
 import { useAuth } from '../hooks/useAuth';
 import { useReflection } from '../hooks/useReflection';
-import { pickForReflection, formatMin } from '../utils/meditationMusic';
+import { pickForReflection, formatMin, ALL_REST_AUDIO } from '../utils/meditationMusic';
 import { useTheme } from '../hooks/useTheme';
 import { COLORS, styles } from '../styles/HomeScreen.styles';
-import restData from '../utils/rest-screen-plan.json';
-
-// Nature-related soundscapes pulled from the Rest screen's data so the two
-// stay in sync. We surface the "Nature" and "Rain Collection" categories.
-const NATURE_EMOJI: Record<string, string> = {
-  Forest: '🌲',
-  Waterfall: '💦',
-  'Himalayan Winds': '🏔️',
-  'Ocean Waves': '🌊',
-  'River Flow': '🏞️',
-  'Light Rain': '🌦️',
-  'Thunder Storm': '⛈️',
-  'Rain on Window': '🌧️',
-  'Rain in Forest': '🌳',
-};
-
-const NATURE_SOUNDS = (() => {
-  const soundscapes = restData.sections.find((s) => s.id === 1);
-  const cats = soundscapes?.categories ?? [];
-  const wanted = cats.filter((c) => c.name === 'Nature' || c.name === 'Rain Collection');
-  return wanted.flatMap((c) =>
-    c.items.map((title) => ({
-      title,
-      sub: c.name,
-      emoji: NATURE_EMOJI[title] ?? '🌿',
-    }))
-  );
-})();
 
 const SoundOnIcon = ({ color }: { color: string }) => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
@@ -256,18 +228,36 @@ const HomeScreen = () => {
   const affirmation = DAILY_AFFIRMATIONS[dayIndex % DAILY_AFFIRMATIONS.length];
   const headerIconColor = isNight ? colors.textPrimary : COLORS.deepBrown;
 
-  // derive a meditation recommendation from reflection data (from the
-  // meditation-foundation-audios library)
-  const recommendation = (() => {
+  // Mood-aware "Today's Recommendation" — a random, mood-appropriate track from
+  // the whole Rest library (music, mindfulness, focus, therapy, wisdom).
+  // Memoised on the reflection so it stays stable until the mood data changes.
+  const recommendation = React.useMemo(() => {
     if (!data) return null;
-    const { track, hint } = pickForReflection(data.mood, data.energy, data.sleep);
+    const { track, hint, label } = pickForReflection(data.mood, data.energy, data.sleep);
     return {
       name: track.title,
-      meta: `${formatMin(track.durationSec)} · Meditation`,
+      meta: `${formatMin(track.durationSec)} · ${label}`,
       hint,
       track,
     };
-  })();
+  }, [data?.mood, data?.energy, data?.sleep]);
+
+  // A random handful of Rest tracks for the "Calm Picks" row (stable per mount).
+  const restPicks = React.useMemo(
+    () => [...ALL_REST_AUDIO].sort(() => Math.random() - 0.5).slice(0, 8),
+    [],
+  );
+
+  // Open a Rest track in the Rest player, with the same background videos.
+  const playRestTrack = (t: (typeof ALL_REST_AUDIO)[number]) =>
+    navigation.navigate('MeditationSession', {
+      techniqueId: 'meditation-music',
+      techniqueName: 'From your library',
+      title: t.title,
+      durationSec: t.durationSec,
+      audio: t.audio,
+      startImmersive: true,
+    });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -347,7 +337,7 @@ const HomeScreen = () => {
           >
             <View style={localStyles.reflectionIconWrap}>
               <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
-                <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <Path d="M12 2v4M4.93 7.93l2.83 2.83M2 14h4M18.07 7.93l-2.83 2.83M22 14h-4M5 19h14M8 19a4 4 0 0 1 8 0" stroke="#3D74D6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
@@ -368,7 +358,7 @@ const HomeScreen = () => {
             <View style={localStyles.recTop}>
               <View style={localStyles.recIconWrap}>
                 <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-                  <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke="#3D74D6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </Svg>
               </View>
               <View style={{ flex: 1 }}>
@@ -476,14 +466,14 @@ const HomeScreen = () => {
         </ImageBackground>
 
         
- {/* NATURE THERAPY */}
+ {/* CALM PICKS — random tracks from the Rest library */}
  <View style={localStyles.sectionRow}>
           <View>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary, paddingHorizontal: 0, marginTop: 0, marginBottom: 0 }]}>
-              Nature Therapy
+              Calm Picks
             </Text>
             <Text style={[localStyles.natureSub, { color: colors.textSecondary }]}>
-              Calming nature soundscapes
+              Music, mindfulness & more from your library
             </Text>
           </View>
         </View>
@@ -492,24 +482,24 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={localStyles.natureRow}
         >
-          {NATURE_SOUNDS.map((item) => (
+          {restPicks.map((t) => (
             <TouchableOpacity
-              key={item.title}
+              key={t.id}
               activeOpacity={0.85}
               style={[localStyles.natureTile, { backgroundColor: isNight ? colors.cardLight : '#FFFFFF', borderColor: colors.border }]}
-              onPress={() => navigation.navigate('Sleep', { autoPlay: { title: item.title, sub: item.sub } })}
+              onPress={() => playRestTrack(t)}
             >
-              <View style={[localStyles.natureIcon, { backgroundColor: 'rgba(16,185,129,0.12)' }]}>
-                <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
+              <View style={[localStyles.natureIcon, { backgroundColor: 'rgba(91,141,239,0.12)' }]}>
+                <Text style={{ fontSize: 26 }}>🎧</Text>
               </View>
               <Text style={[localStyles.natureTitle, { color: colors.textPrimary }]} numberOfLines={1}>
-                {item.title}
+                {t.title}
               </Text>
               <Text style={[localStyles.natureMeta, { color: colors.textSecondary }]} numberOfLines={1}>
-                {item.sub}
+                {formatMin(t.durationSec)}
               </Text>
               <View style={localStyles.naturePlay}>
-                <Text style={{ fontSize: 11, color: '#10B981', fontWeight: '700' }}>▶ Play</Text>
+                <Text style={{ fontSize: 11, color: '#5B8DEF', fontWeight: '700' }}>▶ Play</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -595,7 +585,7 @@ const localStyles = StyleSheet.create({
 
   // — light-mode Today's Goal overlay —
   goalOverlayLight: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(254,243,199,0.7)',
   },
 
@@ -656,7 +646,7 @@ const localStyles = StyleSheet.create({
   reflectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#7C3AED',
+    color: '#3D74D6',
   },
   reflectionSub: {
     fontSize: 13,
@@ -668,13 +658,13 @@ const localStyles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#3D74D6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   reflectionPlayLabel: {
     fontSize: 11,
-    color: '#7C3AED',
+    color: '#3D74D6',
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 15,
@@ -693,12 +683,12 @@ const localStyles = StyleSheet.create({
     backgroundColor: 'rgba(124,58,237,0.15)',
     alignItems: 'center', justifyContent: 'center',
   },
-  recLabel: { fontSize: 11, fontWeight: '700', color: '#7C3AED', letterSpacing: 1, textTransform: 'uppercase' },
+  recLabel: { fontSize: 11, fontWeight: '700', color: '#3D74D6', letterSpacing: 1, textTransform: 'uppercase' },
   recName: { fontSize: 17, fontWeight: '800', color: '#0F172A', marginTop: 2 },
   recMeta: { fontSize: 13, color: '#6B7280', marginTop: 2 },
   recPlay: {
     width: 44, height: 44, borderRadius: 22,
-    backgroundColor: '#7C3AED', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#3D74D6', alignItems: 'center', justifyContent: 'center',
   },
   recHint: { fontSize: 13, color: '#4C1D95', marginTop: 12, lineHeight: 18 },
 
@@ -746,7 +736,7 @@ const localStyles = StyleSheet.create({
     marginHorizontal: 18, marginTop: 22, marginBottom: 8,
     borderRadius: 20, borderWidth: 1, padding: 20, alignItems: 'center',
   },
-  affirmTop: { fontSize: 12, fontWeight: '700', color: '#8B5CF6', letterSpacing: 0.5, marginBottom: 10 },
+  affirmTop: { fontSize: 12, fontWeight: '700', color: '#5B8DEF', letterSpacing: 0.5, marginBottom: 10 },
   affirmText: { fontSize: 16, fontWeight: '700', textAlign: 'center', lineHeight: 24, fontStyle: 'italic' },
 });
 

@@ -17,7 +17,13 @@ import { useStreakStorage } from '../hooks/useStreakStorage';
 import { useTheme } from '../hooks/useTheme';
 import { getMoodState, getRecommendations } from '../utils/moodRecommendations';
 import { computeReflectionProgress, moodLabel } from '../utils/reflectionProgress';
-import { getSessionMedia } from '../utils/sessionMedia';
+import {
+  MEDITATION_MUSIC,
+  MEDITATION_MINDFULNESS,
+  THERAPY_EMOTIONAL_RESET,
+  WISDOM_STORIES,
+  randomFrom,
+} from '../utils/meditationMusic';
 import { Heart } from './Icons';
 import StreakCelebration from './StreakCelebration';
 
@@ -38,7 +44,7 @@ const BoltIcon = ({ size = 22, color = '#F59E0B' }) => (
   </Svg>
 );
 
-const LungsIcon = ({ size = 22, color = '#10B981' }) => (
+const LungsIcon = ({ size = 22, color = '#5B8DEF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <Path d="M12 3v3M9 6C6 6 3 9 3 12c0 4 2 7 5 7h1v-4H7l2-3 3 3V9M15 6c3 0 6 3 6 6 0 4-2 7-5 7h-1v-4h2l-2-3-3 3V9" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
@@ -50,7 +56,7 @@ const PlayIcon = ({ size = 20, color = '#fff' }) => (
   </Svg>
 );
 
-const SparklesIcon = ({ size = 18, color = '#10B981' }) => (
+const SparklesIcon = ({ size = 18, color = '#5B8DEF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
     <Path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" fill={color} />
   </Svg>
@@ -75,13 +81,13 @@ const CheckIcon = ({ size = 14, color = '#fff' }) => (
   </Svg>
 );
 
-const SquareIcon = ({ size = 22, color = '#10B981' }) => (
+const SquareIcon = ({ size = 22, color = '#5B8DEF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <Path d="M4 4h16v16H4z" stroke={color} strokeWidth="2" strokeLinejoin="round" />
   </Svg>
 );
 
-const PersonMeditateIcon = ({ size = 22, color = '#8B5CF6' }) => (
+const PersonMeditateIcon = ({ size = 22, color = '#5B8DEF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <Circle cx="12" cy="5" r="2.2" fill={color} />
     <Path d="M6 18c2-3 4-4 6-4s4 1 6 4M4 18h16" stroke={color} strokeWidth="2" strokeLinecap="round" />
@@ -103,7 +109,7 @@ const VideoPlayIcon = ({ size = 22, color = '#EF4444' }) => (
   </Svg>
 );
 
-const SoundWaveIcon = ({ size = 22, color = '#10B981' }) => (
+const SoundWaveIcon = ({ size = 22, color = '#5B8DEF' }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <Path d="M4 12v0M8 8v8M12 5v14M16 8v8M20 12v0" stroke={color} strokeWidth="2" strokeLinecap="round" />
   </Svg>
@@ -131,7 +137,7 @@ const Sparkline = ({ color }: { color: string }) => (
 
 
 // ── circular progress ring ─────────────────────────────────────────────────────
-const CircleRing = ({ percent = 0.83, size = 64, color = '#1B5E20' }) => {
+const CircleRing = ({ percent = 0.83, size = 64, color = '#234B9E' }) => {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   const dash = circ * percent;
@@ -178,7 +184,7 @@ export default function PranayamaScreen() {
   const { colors, mode } = useTheme();
   const { data: reflectionData } = useReflection();
 
-  const GREEN = '#1B5E20';
+  const GREEN = '#234B9E';
   const GREEN_SOFT = '#E8F5E9';
   const GREEN_MED = '#2E7D32';
   const isNight = mode === 'night';
@@ -273,20 +279,31 @@ export default function PranayamaScreen() {
 
   const startSession = (id: string, meta: string, type: string, title: string) => {
     activeSession.current = { id, startedAt: Date.now(), durationSecs: parseDuration(meta) };
-    const media = getSessionMedia(id, type as any);
-    // music/video/meditation types → NowPlaying with dynamic video+audio
-    // breathing types → BreathingSession (animated guide)
-    if (type === 'music' || type === 'video' || type === 'meditation') {
-      navigation.navigate('NowPlaying' as any, {
-        id,
-        title,
-        videoSource: media.video,
-        audioSource: media.audio,
-        mediaLabel: media.label,
-      });
-    } else {
+
+    // Breathing → the animated breathing guide (unchanged).
+    if (type === 'breathing') {
       navigation.navigate('BreathingSession' as any, { id, title });
+      return;
     }
+
+    // Everything else pulls a random track from the Rest library and plays it in
+    // the Rest player, over the same background videos as the Rest screen.
+    const pool =
+      type === 'music'
+        ? MEDITATION_MUSIC
+        : type === 'meditation'
+        ? [...MEDITATION_MINDFULNESS, ...MEDITATION_MUSIC]
+        : [...WISDOM_STORIES, ...THERAPY_EMOTIONAL_RESET]; // 'video' / other
+    const track = randomFrom(pool) ?? MEDITATION_MUSIC[0];
+
+    navigation.navigate('MeditationSession' as any, {
+      techniqueId: 'meditation-music',
+      techniqueName: title,
+      title: track.title,
+      durationSec: track.durationSec,
+      audio: track.audio,
+      startImmersive: true,
+    });
   };
 
   return (
@@ -413,7 +430,7 @@ export default function PranayamaScreen() {
               };
               const typeTint = (type: string) => {
                 if (type === 'breathing') return { tint: GREEN_MED, tintSoft: GREEN_SOFT };
-                if (type === 'meditation') return { tint: '#8B5CF6', tintSoft: '#EDE9FE' };
+                if (type === 'meditation') return { tint: '#5B8DEF', tintSoft: '#E7F0FF' };
                 if (type === 'music') return { tint: '#F59E0B', tintSoft: '#FEF3C7' };
                 return { tint: '#EF4444', tintSoft: '#FEE2E2' };
               };
@@ -614,7 +631,7 @@ export default function PranayamaScreen() {
                   key={i}
                   style={[s.promptChip, { borderColor: BORDER, backgroundColor: CARD }]}
                   activeOpacity={0.75}
-                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion', prompt: p.replace('\n', ' ') })}
+                  onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru', prompt: p.replace('\n', ' ') })}
                 >
                   <Text style={[s.promptText, { color: TEXT }]}>{p}</Text>
                 </TouchableOpacity>
@@ -623,7 +640,7 @@ export default function PranayamaScreen() {
             <TouchableOpacity
               style={[s.micBtn, { backgroundColor: GREEN }]}
               activeOpacity={0.85}
-              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Gita Companion' })}
+              onPress={() => navigation.navigate('AICompanionChat', { mode: 'Pranayama Guru' })}
             >
               <MicIcon size={22} color="#fff" />
             </TouchableOpacity>
@@ -817,7 +834,7 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     zIndex: 2,
   },
-  recCheckOn: { backgroundColor: '#10B981' },
+  recCheckOn: { backgroundColor: '#5B8DEF' },
   recCheckOff: { borderWidth: 1.5, borderColor: '#D1D5DB', backgroundColor: 'transparent' },
   recRingWrap: {
     position: 'absolute',
@@ -881,7 +898,7 @@ const s = StyleSheet.create({
     elevation: 2,
   },
   ringCenter: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

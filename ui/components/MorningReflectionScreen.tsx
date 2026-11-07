@@ -162,7 +162,7 @@ const SaveSuccessOverlay = () => {
 
 const ov = StyleSheet.create({
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(15,12,30,0.82)',
     alignItems: 'center',
     justifyContent: 'center',

@@ -8,7 +8,7 @@ import type { ChatMessage } from './aiCompanion';
 
 type MemoryResponse = { summary?: string; updatedAt?: string };
 
-const MEMORY_PATH = `${(FileSystem as any).documentDirectory}companion-memory.json`;
+const MEMORY_PATH = `${FileSystem.documentDirectory}companion-memory.json`;
 
 // ── local cache ───────────────────────────────────────────────────────────────
 
